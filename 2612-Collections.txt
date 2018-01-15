@@ -1,0 +1,322 @@
+The Collection APIs (Collection Framework)
+========================================================
+
+When we need a group of objects or collection objects, we think about arrays (fixed length collections), and some data structure implementations (Linked list, hashing, tree and sets etc).
+
+In .NET Framework, we have a separate framework that describes the behaviors of the collection and also provide some concrete classes (ready to used) that uses Generics.
+
+
+There are two types of collection Types and these are located at: 
+  1. System.Collections and     
+  2. System.Collections.Generic
+
+Types at System.Collections are non-generics and they were introduced before the .net framework version 2.0 (Version 1.0 to 1.1, there was not a Generic concept in APIs). In 2.0 version of .net framework, generics introduced and also the new library that uses Generics and it is "System.Collections.Generic" namespace.
+
+What makes a type is a collection type?
+----------------------
+A type that implements IEnumerable or IEnumerable<T> is a collection type. (Note: We will not use old non-generic APis).
+
+[In Java, Iterable<T> interface defines collection behavior]
+
+The IEnumerable<T> interface has a method called  "IEnumerator<T> GetEnumerator()" which returns an object that contains the collection traversal methods.
+
+Here is an example of array and string collection. (You can use for, while or do while or a collection foreach loop)
+
+
+            int[] ar = { 10,20,30};
+            string str = "Hello";
+
+            for(IEnumerator/CharEnumerator e=str.GetEnumerator(); e.MoveNext();)
+            {
+                Console.WriteLine(e.Current);
+            }
+            for(IEnumerator e=ar.GetEnumerator();e.MoveNext();)
+            {
+                Console.WriteLine(e.Current);
+            }
+
+            foreach (var e in str)
+                Console.WriteLine(e);
+            foreach (var e in ar)
+                Console.WriteLine(e);
+
+How to create a collection?
+There are two ways:
+  1. Implement the IEnumerable or
+  2. Use the special keywords "yield return" and "yield break"; these keyword creates an object of IEnumerable 	automatically without implementing the IEnumerable and IEnumerator interfaces.
+
+The yield return statement pushes one after one element into the object of IEnumerable<T>. And the yield break; will terminate or stop to push the object into IEnumerable<T>.
+
+Example: 
+
+class Test
+{
+  public static IEnumerable<T> SomeInts()
+  {
+     yield return 10;
+     yield return 20;
+     yield return 30; 
+   }
+  static void Main()
+   {
+     var nos = SomeInts();
+     foreach(var n in nos) 
+         Console.WriteLine(n);
+    }
+}
+Note the object returned by the "SomeInts()" method is a readonly collection of ints -- you just iterate them and nothing else.
+
+Example:
+
+class Test
+    {
+        public static IEnumerable<int> GetOdds(int []nos)
+        {
+            foreach(var n in nos)
+            {
+                if (n % 2 != 0)
+                    yield return n;
+            }
+        }
+        public static IEnumerable<int> GetEvens(int[] nos)
+        {
+            foreach (var n in nos)
+            {
+                if (n % 2 == 0)
+                    yield return n;
+            }
+        }
+        static void Main(string[] args)
+        {
+            int[] nos = { 11, 22, 3,  5,4, 5, 6, 77, 8, 9, 4, 533 };
+            var evens = GetEvens(nos);
+            foreach (var n in GetOdds(nos))
+                Console.WriteLine(n);
+            foreach (var n in evens)
+                Console.WriteLine(n);
+        }
+    }
+
+Example: Add some filter methods into ProductBao.
+
+
+  public class ProductBao
+   {
+      public  ProductViewModel []Products { get;set;}
+
+      public ProductBao()
+       {
+         .....
+        }
+       //List the Products whose name begins with given name
+      public IEnumerable<ProductViewModel> ProductsByName(string name)
+       {
+          foreach(var p in products)
+            if(p.Name.StartsWith(name))
+                 yield return p;
+        }
+      public IEnumerable<ProductViewModel> ProductsByCategoryName(string name)
+       {
+          foreach(var p in products)
+            if(p.Category.Name.Equals(name))
+                 yield return p;
+        }
+      public IEnumerable<ProductViewModel> ProductsByRate(decimal start, decimal end)
+       {
+          foreach(var p in products)
+            if(p.Rate>=start && p.Rate<=end)
+                 yield return p;
+        }
+    ....
+   }
+Example: Add "Subject" property into "Question" collection and filter them by subject name.
+Example: Add filter methods in Invoice class -- GetAllInvoices(Date start, Date end),
+                                                GetAllInvoices(string customerName)
+
+   }
+
+The concrete classes of collection framework
+------------------------------------------
+1. List<T> - A dynamic array like object whose size can be grows or shrinks whenever items are added or removed 		respsectively.
+2. Dictionary<K,V> - A map or dictionary object of Key-value pair collection. The key must be unique and it has
+			Equals() and GetHashCode() method (overriden methods)
+3. LinkedList<T> -- A linked list representation
+4. Stack<T>  -- Stack implementation
+5. Queue<T> -- Queue implementation
+
+Example-1
+
+           List<int> nos = new List<int>();
+            nos.Add(100);
+            nos.Add(200);
+            nos.Insert(0, 50);
+            foreach(var n in nos)
+            {
+                Console.WriteLine(n);
+            }
+            nos.Remove(200);
+            nos.RemoveAt(0);
+            if (!nos.Contains(90))
+                nos.Add(90);
+
+            Console.WriteLine(nos.IndexOf(1000)); // -1 if not exists
+            nos.Sort();
+            foreach (var n in nos)
+                Console.WriteLine(n); 
+
+Example-2   Initialize the list
+
+            var nos = new List<int>()
+             {
+                10,20,22,3,44
+              };
+             var countries = new List<string>() { "India","Nepal","UK" };
+
+Example-3   List of Category(Id, Name) objects
+            var categories = new List<Category>()
+              {
+                 new Category { Id = 12, Name = "Pen" },
+                 new Category { Id = 1, Name="Fullscape book" }
+               };
+Example-4  Extends the List<T> to customize the collection.
+
+public class Category { ... }
+public class Categories : List<Category> 
+{
+   //Add extra methods if needed
+  public bool AddUnique(Category cat)
+   {
+       if(Contains(cat))
+            return false; 
+       Add(cat); return true;
+     }
+  public void Add(int id, string name) 
+    {
+        Add(new Category { Id = id, Name = name } );
+     } 
+}
+
+[Note assume that we've overriden Equals and GetHashCode methods in Category class]
+
+Categories cats = new Categories();
+cats.Add(10,"Pencil");
+cats.AddUnique(new Category { Id = 10, Name="Pencil" });
+cats.Add(new Category {Id=2,Name="Book" });
+foreach(var c in cats)
+  Console.WriteLine(c.Id + " " + c.Name);
+
+Example: Sort the List<T> -- We will uses Comparison<T> delegate that has two parameters of the type T and returns >0 if first object value is greater than second object value, returns <0 if second is greter than first one, returns 0 otherwise (both are equals).
+
+          var list = new List<Category>
+            {
+                 new Category {Id=10,Name="G" },
+                 new Category {Id=110,Name="Z" },
+                 new Category {Id=120,Name="B" },
+                 new Category {Id=410,Name="G" },
+                 new Category {Id=11,Name="A" },
+            };
+
+            //anonymous method
+            Comparison<Category> byId = (o1, o2) => o1.Id - o2.Id;
+            list.Sort(byId);
+            foreach (var c in list)
+                Console.WriteLine(c.Id + " " + c.Name);
+
+            list.Sort((x,y)=>x.Name.CompareTo(y.Name));
+            foreach (var c in list)
+                Console.WriteLine(c.Id + " " + c.Name);
+           
+You can use,
+   Comparison<Category> byId = delegate(Category x, Category y)
+     {
+        return x.Id - y.Id;
+      };
+ syntax to create an anonymous method.
+
+
+Example: Create "UserInfo" CLR Plain component
+
+public class UserInfo
+{
+   public string UserName {get;set;}, Password, FirstName, LastName;
+   public DateTime Created, LastVisited;
+   public bool Active;
+}
+
+Create a collection of unique users using List<T> (either you use a composition or inheritance) with following methods:
+
+  1. ListActiveUsers()
+  2. ListInactiveUsers()
+  3. ListUsersCreatedOn(GivenDateTimeRange - start and end date)
+  4. SortByUserName(), FirstName, Created, LastVisited
+  
+public class Users : List<UserInfo> { ... }
+Or
+
+public class USers
+{
+   public List<UserInfo> Users { get;set; }
+   ....
+}
+
+Example: List the Categories and Products in following format:
+
+Category: xxxxxxxxxxxxxxxxxxxxxxxxx
+-----------------------------------------------------
+| Id     |  Name        | ..........................|
+|---------------------------------------------------|
+|  1     | Product1 .................
+| ........
+Category: yyyyyyyyyyyyyyyyyyyyyyyyyy
+|----------------------------------------------------|
+| Id     | .....
+
+The Dictionary<K,V> component
+================================================================
+The Key of the Dictionary type must have overriden the Equals and GetHashCode method; It means it must be unique value.
+
+Example-1
+
+ Dictionary<string,int>  pins = new Dictionary<string,int>();
+ pins.Add("Mehsana",100000);
+ pins.Add("Patan",200000);
+
+ Console.WriteLine(pins.ContainsKey("mehsana")); //false
+ Console.WriteLine(pins.ContainsKey("Patan")); //true
+
+ foreach(KeyValuePair<string,int> pair in pins)
+   {
+     Console.WriteLine( pair.Key + " " + pair.Value);
+   }
+//OR
+  foreach(var pair in pins)
+     Console.WriteLine( pair.Key +  "  " + pair.Value);
+ 
+//To remove the entry
+  pins.Remove("Mehsana");
+
+//To read a value
+  Console.WriteLine(  pins["Patan"] );
+// Change a value
+  
+  pins["Patan"] = 345672;
+  
+Example-2
+
+ var countries = new Dictionary<string,List<string>>();
+ countries.Add("Ind", new List<string>{"Guj","Raj"});
+ countries.Add("Usa", new List<string>());
+ countries["Ind"].Add("Maha");
+ countries["Usa"].Add("Ocl");
+ countries["Usa"].Add("Ny");
+
+ foreach(var c in countries)
+   {
+    Console.WriteLine(c.Key);
+    foreach(var s in c.Value)
+     {
+       Console.WriteLine("\t" + s);
+      }
+    }
+
+   

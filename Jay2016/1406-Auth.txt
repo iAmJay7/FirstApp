@@ -1,0 +1,38 @@
+The System.Web.Mvc.AuthorizeAttribute - a best way to authorize the users or role based authorization
+===============================================================================
+In previous example, we've used method calling approach in each controller's constructor or to a specific action method in order to protect the user's content; i.e to set authorization and examine the authorization flag.
+
+Now, we need to change the above mention situation by creating a public sub class of
+System.Web.Mvc.AuthorizeAttribute class.
+
+Steps 
+=====
+1. Create a public sub class of AuthorizeAttribute and also add "Attribute" suffix to your class.
+
+ public class MyAuthorizeAttribute : System.Web.Mvc.AuthorizeAttribute
+    {
+        protected override bool AuthorizeCore(HttpContextBase httpContext)
+        {
+            string[] arrays = Roles.Split(new string[] { "," }, StringSplitOptions.RemoveEmptyEntries);
+            return arrays.Contains(SessionWrapper.Role);
+        }
+        protected override void HandleUnauthorizedRequest(AuthorizationContext filterContext)
+        {
+            HttpContext.Current.Response.Redirect("~/Home/Login");
+        }
+    }
+
+2. OVerride two methods:
+
+      1. bool AuthorizeCore(..) --- This method is called each time when you request the action of a controller where
+         [MyAttribute] is specified or very same attribute glued to the controller class.
+
+         This method has three "String Fields" namely - Roles, Users, and Order and you can use any of the one or all
+         field to pass action or controller specific data to this method.
+
+         This method returns "true" or "false" depends upon your authorization logic; well it may belong to database, 	 cookie, file or session.
+
+     2. HandleUnauthorizedRequest(..) method will be called if "AuthorizeCore()" returns false -- it means authorization 	failed.    
+
+3. Create Session or Cookie wrapper to persits the authorization flag and other user specific data.
+

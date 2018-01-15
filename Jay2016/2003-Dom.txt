@@ -1,0 +1,413 @@
+The DOM API and HTML objects
+============================
+
+As we know that each html tag is transformed into an object-- HTML object; by the HTML parser. The JavaScript language APIs called Document Object Model provide a programming inteface to these HTML objects. That means we can manipulate the HTML objects (create new HTML objects, Update proparties of existing objects and remove thems) via DOM interface.
+
+The "document" is a entry point object to use the DOM APIs.
+
+DOM objects uses . or [] operator to access the object's properties.
+
+Methods & Properties
+--------------------
+
+1. document.getElementsByTagName("element-name") - It returns a list; NodeList object of given "element-name".
+2. nodeList object - This object is a collection and has two methods:
+		1. length - count of object
+		2. item(index) -- Returns an object at given index.
+3. document.getElementsByName("name-attribute-value') - It returns a nodelist based upon the given name attribute value.
+4. document.getElementsByClassName("css class attribute-value") - Returns a nodelist of those object whose "class"
+								 name matches.
+5. document.getElementById("id-value") - Returns a single "dom object" or nulll
+6. obj.innerHTML - To set/get the HTML content in between open and close tag.
+7. obj.innerText - To set/get the text content in between open and close tag.
+8. obj.value - To set/get value of all <input> elements, <select>, textarea.
+9. obj.remove() - Remove a dom from the tree
+10. obj.removeChild(childDom) - Removes a childDom object from the tree
+11. obj.appendChild(childDom) - Append (at the end of item) an object into the tree.
+
+	By default, html is the root and it has two direct children - head and body
+		and these objects are easily access via;
+		document.body and document.head
+12. obj.setAttribute("name","value") - To set the HTML attribute
+13. obj.setClassName("css-className") - To set CSS class selector
+14. obj.getAttribute("name") - Returns attribute value
+15. document.createElement("element-name") - To create a new HTML object.
+
+
+Example: Select the <h1> objects
+
+<!doctype html>
+<h1>Heading1</h1>
+<h2>Heading2</h2>
+<h1>Heading1</h1>
+<h2>Heading2</h2>
+<script>
+    var list = document.getElementsByTagName("h1");
+    console.dir(list);
+    for (i = 0; i < list.length; i++) {
+        var o = list.item(i);
+        o.style.color = "#f00";
+        o["style"]["backgroundColor"] = "yellow";
+        console.log(o.innerHTML);
+        o.innerHTML = "<em>The</em> <span>Red</span> <code>sun</code>" + i;
+        console.log(o.innerHTML);
+        console.log(o.innerText);
+    }
+</script>
+
+Example: select the object whose name attribute value is "help"
+
+<p name="help">Para1</p>
+<p>Para2</p>
+<h1 name="help">Head1</h1>
+
+<script>
+  var list = document.getElementsByName("help");
+  ... as per previous code...
+</script>
+
+Example: Select objects whose "class" attribute is "help"
+
+<p class="help">Para1</p>
+<p>Para2</p>
+<h1 class="test help">Head1</h1>
+
+<script>
+  var list = document.getElementsByClassName("help");
+  ... as per previous code...
+</script>
+
+Example: Attach "onclick" handler for all element whose name is "temp"
+<h1>First<h1>
+<h2 name="temp">Second</h2>
+<h1 name="temp">Third</h1>
+<button name="text">Fourth</button>
+<script>
+  var list = document.getElementsByName("temp");
+  for(i=0;i<list.length;i++) {
+     var obj = list.item(i);
+     obj.onclick = function() {
+          console.log('Clicked and I'm the ' + i + 'th item in the list');
+     }
+  }
+</script>
+
+Above code will display common message for all "temp" DOM because it aint saves the value of "i" and we known that we need to create a closure.
+
+  change your code : (create anonymous method and call it immediately)
+
+               obj.onclick = (function (i,obj) {
+                    return function() {
+                        console.log('Clicked and Im the ' + i + 'th item in the list');
+                        obj.remove();
+                    }
+                })(i,obj);
+
+Or just create another function that returns a function
+    
+obj.onclick = myClosure(i,obj);
+....
+}
+function myClosure(i,obj) {
+  return function() {
+     console.log('Clicked and Im the ' + i + 'th item in the list');
+     obj.remove();
+  }   
+}
+</script>
+
+Example: Create four buttons and add them to the <body> 
+
+<script>
+  for(i=1;i<=4;i++) {
+     var btn = document.createElement("button");
+     btn.innerHTML = "Button " + i;
+     btn.onclick = myClosure(i);
+     document.body.appendChild( btn );
+  }
+ function myClosure(i) {
+   return function() {
+      console.log(i + ' button is pressed');
+   }
+}
+</script>
+
+Example: 
+No: ___  
+No: ____
+[btnAdd]
+
+<input type="number" id="no1"/>
+<input type="number" id="no2"/>
+<button onclick="doAdd()">Add</button>
+<div id="result"></div>
+
+<script>
+ function doAdd() {
+    var no1 = document.getElementById("no1");
+    var no2 = document.getElementById("no2");
+    var result = document.getElementById("result");
+    result.innerHTML = parseFloat( no1.value ) + parseFloat( no2.value );
+ }
+</script>
+
+Example: Display "text or message"from the array on each succesive 2 seconds.
+
+<div id="out"></div>
+
+<script>
+ var messages = ["First","Second","Thid"];
+ var out = document.getElementById("out");
+ var index = 0;
+ function showMessage() {
+    if(index>=messages.length)
+           index=0;
+    out.innerHTML = messages[index];
+    index++;
+    setTimeout( showMessage, 2000);
+ }
+
+ //start 
+ showMessage();
+</script>
+
+Example: Assume that we've a table with some rows & columns. Write a code to select all <td> and paint background of each td with diff color - sequentially as well as randomny.
+
+Example: Click on each "td" will set background and another click will reset the background
+
+Example: Populate the "<select>" with city names from the array.
+
+<select id="city" onchange="doChange()">
+    <option value="">Select City</option>
+</select>
+<div id="out"></div>
+<script>
+    var cities = ["Mehsana", "Rajkot", "Surat"];
+    var city = document.getElementById("city");
+
+    for (i in cities) {
+        var op = document.createElement("option");
+        op.text = cities[i];
+        op.value = i;
+        city.appendChild(op);
+    }
+    
+    function doChange() {
+        document.getElementById("out").innerHTML = city.value + " " + cities[ city.value];
+    }
+</script>
+
+
+Example: Populate the <ul> and <ul> with cities array.
+
+<list id="city">
+     
+</list>
+<div id="out"></div>
+<script>
+    var cities = ["Mehsana", "Rajkot", "Surat","Jamnagar"];
+    var city = document.getElementById("city");
+
+    for (i in cities) {
+        var op = document.createElement("li");
+        op.innerHTML = cities[i];
+        city.appendChild(op);
+    }
+    
+</script>
+
+
+Example: Display one after one image (assume we'have five images) and uses background-* css properties instead of <img>          tag.
+
+Example: A simple calculator
+
+------------------------
+                   122
+--------------------------
+[ 1 ] [ 2 ] [3]   [ + ]
+[ 4 ] [ 5 ] [6]   [ - ]
+[ 7 ] [ 8 ] [9]   [ * ] 
+[ 0 ] [ = ]       [ / ]
+
+<div id="text"></div>
+<div id="out" ></div>
+<button onclick="doCalc('+')">+</button>
+<button onclick="doCalc('*')">*</button>
+<button onclick="doCalc('/')">/</button>
+<button onclick="doCalc('-')">-</button>
+<button onclick="doCalc('=')">=</button>
+<script>
+    var text = document.getElementById("text");
+    var out = document.getElementById("out");
+    var prev = 0;
+    var operator = "+";
+    var isOperatorPressed = false;
+    for (i = 0; i <= 9; i++) {
+        var b = document.createElement("button");
+        b.innerHTML = i;
+        out.appendChild(b);
+        b.onclick = (function (i) {
+            return function () {
+                if (isOperatorPressed) {
+                    text.innerHTML = i;
+                    isOperatorPressed = false;
+                } else {
+                    text.innerHTML = text.innerHTML + i;
+                }
+            }
+        })(i);
+    }
+    function doCalc(op) {
+        switch (operator) {
+            case "+":
+                text.innerHTML = parseFloat(prev) + parseFloat(text.innerHTML);
+                break;
+            case "-":
+                text.innerHTML = parseFloat(prev) - parseFloat(text.innerHTML);
+                break;
+            case "*":
+                text.innerHTML = parseFloat(prev) * parseFloat(text.innerHTML);
+                break;
+            case "/":
+                text.innerHTML = parseFloat(prev) / parseFloat(text.innerHTML);
+                break;
+        }
+        prev = text.innerHTML;
+        operator = op;
+        isOperatorPressed = true;
+    }
+</script>
+
+Example:
+
+<style>
+    table {
+        border-collapse: collapse;
+        border: 1px solid #aaa;
+    }
+    td {
+        border: 1px solid #aaa;
+        padding: 10px;
+    }
+    #text {
+        text-align: right;
+        padding: 10px;
+    }
+    button {
+        height: 100%;
+        width: 100%;
+    }
+</style>
+<table>
+    <tr>
+        <td colspan="4">
+            <div id="text"></div>
+        </td>
+    </tr>
+    <tr>
+        <td><button onclick="doAppend(1)">1</button></td>
+        <td><button onclick="doAppend(2)">2</button></td>
+        <td><button onclick="doAppend(3)">3</button></td>
+        <td><button onclick="doCalc('+')">+</button></td>
+    </tr>
+    <tr>
+        <td><button onclick="doAppend(4)">4</button></td>
+        <td><button onclick="doAppend(5)">5</button></td>
+        <td><button onclick="doAppend(6)">6</button></td>
+        <td><button onclick="doCalc('*')">*</button></td>
+    </tr>
+    <tr>
+        <td><button onclick="doAppend(7)">7</button></td>
+        <td><button onclick="doAppend(8)">8</button></td>
+        <td><button onclick="doAppend(9)">9</button></td>
+        <td><button onclick="doCalc('/')">/</button></td>
+    </tr>
+    <tr>
+        <td colspan="2"><button onclick="doAppend(0)">0</button></td>
+        <td><button onclick="doCalc('=')">=</button></td>
+        <td><button onclick="doCalc('-')">-</button></td>
+    </tr>
+</table>
+<script>
+    var text = document.getElementById("text");
+
+    var prev = 0;
+    var operator = "+";
+    var isOperatorPressed = false;
+    function doAppend(i) {
+        if (isOperatorPressed) {
+            text.innerHTML = i;
+            isOperatorPressed = false;
+        } else {
+            text.innerHTML = text.innerHTML + i;
+        }
+    }
+    function doCalc(op) {
+        switch (operator) {
+            case "+":
+                text.innerHTML = parseFloat(prev) + parseFloat(text.innerHTML);
+                break;
+            case "-":
+                text.innerHTML = parseFloat(prev) - parseFloat(text.innerHTML);
+                break;
+            case "*":
+                text.innerHTML = parseFloat(prev) * parseFloat(text.innerHTML);
+                break;
+            case "/":
+                text.innerHTML = parseFloat(prev) / parseFloat(text.innerHTML);
+                break;
+        }
+        prev = text.innerHTML;
+        operator = op;
+        isOperatorPressed = true;
+    }
+
+</script>
+
+Example: Color selector
+
+<table>
+    <tr>
+        <td>Red</td>
+        <td>Green</td>
+        <td>Blue</td>
+        <td>Alpha</td>
+    </tr>
+    <tr>
+        <td><input type="range" 
+                   step="1"
+                   onchange="doChange()" id="red" min="0" max="255" value="255" /></td>
+        <td><input type="range" onchange="doChange()" id="green" min="0" max="255" value="0" /></td>
+        <td><input type="range" onchange="doChange()" id="blue" min="0" max="255" value="0"/></td>
+        <td><input type="range" onchange="doChange()" id="alpha" min="0" max="100" value="100" /></td>
+    </tr>
+    <tr>
+        <td id="out" colspan="4"></td>
+    </tr>
+</table>
+
+<script>
+    var red = document.getElementById("red");
+    var green = document.getElementById("green");
+    var blue = document.getElementById("blue");
+    var alpha = document.getElementById("alpha");
+    var out = document.getElementById("out");
+
+    function doChange() {
+        var a = alpha.value / 100;
+        var r = red.value;
+        var b = blue.value;
+        var g = green.value;
+        var hex = "#" + r.toString(16) + g.toString(16) + b.toString(16);
+        out.innerHTML = hex + "<br/>" + "rgba(" + r + "," + g + "," + b + "," + a + ")";
+        document.body.style.backgroundColor = "rgba("+r + ","+ g + "," + b + "," + a + ")";
+    }
+
+    doChange();
+</script>
+
+
+Example: We've country names and each country has a list of state. Program to pupulate state <select> based upon the
+		selected country.
+
+

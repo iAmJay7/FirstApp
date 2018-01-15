@@ -1,0 +1,379 @@
+The Input Output API - System.IO namespace and classes
+=======================================================
+
+In computer system, everthing is input & output and nothing else. You are working on console app then this is a kind of input and output. If you're working with window app or web or even mobile app etc are example of input & output. Further if we're engaged into data save/retrival via DATABASES (RDBMS) or disk files or network files are example IO. Playing video/audio, capturing images, update video/audio/image etc are example of IO. Sending request to web server or mail server or database server or even from a program to another program are example of IO. Cipher ( Encryption or Decryption), zip/unzip etc are example IO.
+
+In short whatever we think and understand about any part or section of computing is an IO and hence it is also known as "Device IO". That means there are different categories of IO devices and perform varities of I/O tasks.
+
+The fundamental unit of "I/O" is a byte -- Write a byte to a device or more devices and read a byte from a device.
+
+       Device A ------>write a byte------------> Device B
+                <------Read a byte ------------
+
+ The way to send a byte or collection of bytes from one device to another device is known as "Stream". The word "Stream" means flow of bytes - either from or to the device; between devices.
+
+
+The System.IO Namespace and classes
+===================================
+In this namespace, we've some file system classes and some fundamenal classes for Device IO.
+
+File System Classes -- These classes represent the Disk, Disk metadata, Abstract data about path, file or folder and implementation of file or folder related actions.
+
+[Note: To test IO APIs we can use any kind of app category but we'll use console and later we'll use web]
+
+1. DriveInfo class : Lists the available drives or volumes
+
+Example:
+
+    DriveInfo[] drives = DriveInfo.GetDrives();
+
+    foreach(var drive in drives)
+    {
+        Console.WriteLine(drive.Name + " " + drive.VolumeLabel);
+    }
+
+2. Path class : Methods to define an abstract path and the actions.
+
+   There are two types of path we will have to use:
+     1. Absolute path - which begins with drive letter or volume or protocol
+	 c:\sample\test.txt
+         c:/sample/test.txt
+         file://c:/sample/text.txt
+         http://www.example.com/text.txt
+
+     2. Relative path - In some cases, we already have base path or we assume that we're refering a folder or location
+	as a base.
+
+	e.g    /myapp <--- This folder is suppose to exists at your web's root e.g http://www.example.com/myapp
+
+              /Styles/style.css <--- Styles at root of web app
+
+   A path is a string and it has different syntax for folder and filenames - i.e folder name rules are quite different
+	from the file name rules.
+
+
+The AppDomain Property
+======================
+What is AppDomain? It is a process of the currently running program/apps and processes stated by this domain.
+
+Code in webpage:
+
+
+<p>@AppDomain.CurrentDomain</p>
+<p>@AppDomain.CurrentDomain.BaseDirectory</p>
+<p>Total assemblies used in web app</p>
+@foreach(var assembly in AppDomain.CurrentDomain.GetAssemblies())
+{
+     try
+    {
+        <p>@assembly.FullName @assembly.Location</p>
+    }
+    catch (Exception ex)
+    {
+        <p>@ex</p>
+    }
+}
+<h1>App Setup details</h1>
+<h2>@AppDomain.CurrentDomain.SetupInformation.ApplicationBase</h2>
+<h2>@AppDomain.CurrentDomain.SetupInformation.ConfigurationFile</h2>
+<h2>@AppDomain.CurrentDomain.SetupInformation.PrivateBinPath</h2>
+<h2>@AppDomain.CurrentDomain.SetupInformation.TargetFrameworkName</h2>                         
+      
+Methods of Path class
+----------------------
+
+Note that "Path" class method do not engage in creating file or folder but they allow us to change , replace, or get a part of the path string.
+
+Example: In web App, Server.MapPath("~") or Request.MapPath("~") returns absolute path of the currenly running app.
+
+@using System.IO
+
+@{ 
+    var path = @"x:\sample\text\app.test";
+    var appPath = Server.MapPath("~");
+
+    <p>App Path : @appPath</p>
+    <p>@path</p>
+    <p>@Path.GetDirectoryName(path)</p>
+    <p>@Path.GetExtension(path)</p>
+    <p>@Path.GetFileName(path)</p>
+    <p>@Path.GetFileNameWithoutExtension(path)</p>
+    <p>@Path.GetFullPath(path)</p>
+    <p>@Path.GetPathRoot(path)</p>
+    <p>@Path.ChangeExtension(path,"best")</p>
+    <p>@Path.Combine(path,@"help\center")</p>
+    <p>@Path.Combine(appPath,@"Index.cshtml")</p>
+    <p>@Server.MapPath("~/Index.cshtml")</p>
+    <p>@Server.MapPath("~/Styles/Style.css")</p>
+    <p>@Request.MapPath("~/Styles/Style.css")</p>
+}
+
+Example: (Use console app to view invalid chars for folders and file names) or use Debug methods
+
+Console.WriteLine(Path.GetInvalidPathChars());     // Returns char[] containing invalid chars
+Console.WriteLine(Path.GetInvalidFileNameChars()); // for file names
+
+var invalidFilenameChars = new String( Path.GetInvalidFileNameChars() );
+Console.WriteLine( invalidFilenameChars );
+
+
+Example: Validate file name and path strings
+
+        var file = @"h?lp.txt";
+        Console.WriteLine(Path.GetInvalidFileNameChars());
+        if(file.IndexOfAny(Path.GetInvalidFileNameChars())==-1)
+        {
+            Console.WriteLine("Valid file name");
+        }
+        else
+        {
+            Console.WriteLine("Invalid file name");
+        }
+
+        var path = @"x:\csn?et\j*ay\sample";
+
+        Console.WriteLine(Path.GetInvalidPathChars());
+        if (path.IndexOfAny(Path.GetInvalidPathChars()) == -1)
+        {
+            Console.WriteLine("Valid path");
+        }
+        else
+        {
+            Console.WriteLine("Invalid path");
+        }
+
+Example: Path and meta data. Path and temporary file location of operating system
+
+
+        Console.WriteLine(Path.AltDirectorySeparatorChar);
+        Console.WriteLine(Path.DirectorySeparatorChar);
+        Console.WriteLine(Path.PathSeparator);
+
+        Console.WriteLine(Path.GetTempPath());
+        var myTemp = Path.Combine(Path.GetTempPath(), "test.tmp");
+        Console.WriteLine(myTemp);
+        myTemp = Path.Combine(Path.GetTempPath(), Path.GetRandomFileName());
+        Console.WriteLine(myTemp);
+        Console.WriteLine(Path.GetTempFileName());
+
+[Temp folder is the very special purpose folder of OS which allows everybody to create files (any user can create files) to represent ad hoc data and the special tools of OS automatically erase or delete the files/folders]
+
+
+The Directory and DirectoryInfo classes 
+----------------------------------------
+We've two version of classes - Directory has static methods whereas DirectoryInfo provides instance methods.
+
+The File and FileInfo classes
+--------------------------------
+File has static methods and FileInfo serve instance methods.
+
+Example:
+
+            var dir = @"c:\csnet\sample";
+
+            if (Directory.Exists(dir))
+                Console.WriteLine("Exists"); //Directory.Delete(dir);
+            else
+                Console.WriteLine("Not Exists"); // Directory.CreateDirectory(dir);
+
+            DirectoryInfo dInfo = new DirectoryInfo(dir);
+
+            if (dInfo.Exists)
+                dInfo.Delete();
+            else
+                dInfo.Create();
+
+Example: Remove directory and all its files and directories - Beware of the use of this method.
+
+     Directory.Delete("path",true); Or obj.Delete(true)
+
+Example: Get or set working directory
+
+            Console.WriteLine(Directory.GetCurrentDirectory());
+            Directory.SetCurrentDirectory(@"c:\\csnet\info");
+            Console.WriteLine(Directory.GetCurrentDirectory());
+
+Example: Enumerate/list the folders or files
+
+            var folder = @"c:\csnet\info\jay2016";
+
+            Console.WriteLine("--- Folders ---");
+            //EnumerateDirectories(folder)
+            //EnumerateDirectories(folder,search,option)
+            foreach (var dir in Directory.EnumerateDirectories(folder,"*.*",SearchOption.AllDirectories))
+                Console.WriteLine(dir);
+
+            Console.WriteLine("--- Files ---");
+            foreach (var dir in Directory.EnumerateFiles(folder,"*.*",SearchOption.AllDirectories))
+                Console.WriteLine(dir);
+
+            Console.WriteLine("--- Both ---");
+            foreach (var dir in Directory.EnumerateFileSystemEntries(folder, "*.*", SearchOption.AllDirectories))
+                Console.WriteLine(dir);
+Example: Directory meta data
+
+            var folder = @"c:\csnet\info\jay2016";
+            DirectoryInfo info = new DirectoryInfo(folder);
+
+            Console.WriteLine(info.GetAccessControl(System.Security.AccessControl.AccessControlSections.Group));
+            Console.WriteLine(info.CreationTime);
+            Console.WriteLine(info.LastAccessTime);
+            Console.WriteLine(info.LastWriteTime);
+            Console.WriteLine(info.Attributes);
+
+            foreach(DirectoryInfo i in info.GetDirectories("*.*",SearchOption.AllDirectories))
+            {
+                Console.WriteLine(i.FullName);
+            }
+
+Example: File and FileInfo - Write/Append text & bytes and read text & bytes
+
+           string fileName = @"c:\csnet\sample.txt";
+
+            if (File.Exists(fileName))
+                Console.WriteLine(File.GetCreationTime(fileName));
+
+            string[] lines = { "First", "SEcond line", "Third line" };
+           // File.AppendAllText(fileName, "The red sun\n\n and red rose");
+           // File.AppendAllLines(fileName, lines);
+
+            File.WriteAllText(fileName, "The red sun\n\n and red rose");
+            File.WriteAllLines(fileName, lines);
+
+
+            Console.WriteLine(File.ReadAllText(fileName));
+            foreach (var line in File.ReadLines(fileName))
+                Console.WriteLine("\t" + line);
+
+
+Example: Meta info
+
+            FileInfo info = new FileInfo(@"C:\csnet\sample.txt");
+            if (info.Exists)
+            {
+                //info.Delete();
+                Console.WriteLine("Exists");
+                Console.WriteLine(info.Attributes);
+                info.Attributes = FileAttributes.Archive | FileAttributes.ReadOnly | FileAttributes.Hidden;
+                Console.WriteLine(info.Length + " bytes");
+            }
+            else
+                Console.WriteLine("Not Exists");
+
+The Stream classes - System.IO.Stream
+-------------------------------------
+The "Stream" is an abstract class which represents byte oriented stream and offers method to read bytes from the stream and also write bytes into the stream.
+
+We've following sub classes of "Stream" in System.IO namespace:
+
+ 1. FileStream and  -- For disk file read & write 
+ 2. MemoryStream    -- RAM read & write 
+
+There are other sub classes of the Stream which allow us to perform "text" or "char" oriented tasks.
+  StreamReader, StreamWriter, BinaryReader, BinaryWriter etc.
+
+NOTE: Stream are subject to low level IO and uses huge amount of memory and they are IDisposable so always wrap the object with 'using' block;
+
+Example: Write some bytes into stream and also read them
+
+     using (FileStream stream = new FileStream(@"c:\csnet\p1.txt", FileMode.OpenOrCreate)
+            /* File.OpenRead(@"c:\csnet\p1.txt") */
+            /* File.Open(@"c:\csnet\p1.txt",FileMode.Create) */
+            /* new FileStream(@"c:\csnet\p1.txt", FileMode.OpenOrCreate) */)
+        {
+            //Write byte by byte
+            stream.WriteByte(65);
+            stream.WriteByte(67);
+            stream.WriteByte(48);
+
+            //Write array of bytes
+
+            //String to byte array conversion
+            var str = "Hello World";
+            byte[] array = System.Text.Encoding.UTF8.GetBytes(str);
+            stream.Write(array, 0, array.Length);
+
+            //File Pointer position
+            Console.WriteLine("At : " + stream.Position);
+
+
+            //Now, to read the stream, we must have to set the position
+            stream.Position = 0;
+            Console.WriteLine(stream.ReadByte()); // 65
+            Console.WriteLine(stream.ReadByte()); // 67
+            Console.WriteLine("At : " + stream.Position);
+
+            //Read all bytes one by one till end of file has not reached
+            int b = 0;
+
+            while(  (b=stream.ReadByte()) > 0)  // -1 stands for end of file
+            {
+                Console.WriteLine(b + " "  + (char)b);
+            }
+
+            //Read array of bytes (block of bytes)
+            byte[] buffer = new byte[500];
+            int numReads = 0;
+            stream.Position = 0;
+
+            while( (numReads = stream.Read(buffer,0,buffer.Length)) >0)
+            {
+                //byte array to string 
+                 Console.WriteLine("Bytes read : " + numReads + "  " + System.Text.Encoding.UTF8.GetString(buffer,0,numReads));
+            }
+        }
+
+Example: Write & read primitive values into the the stream - BinaryWriter writes bytes into the underlying stream.
+         Similarly BinaryReader reads the underlying stream and returns primitive equivalent value using ReadXXXXX() 	methods.
+
+        using (var stream = new BinaryWriter(File.Create(@"c:\csnet\p1.txt")))
+        {
+            stream.Write(10); // writes 4 byte
+            stream.Write(10.10); // write 8 bytes
+            stream.Write("Hello World");
+        }
+        using (var stream = new BinaryReader(File.OpenRead(@"c:\csnet\p1.txt")))
+        {
+            Console.WriteLine(stream.ReadInt32());
+            Console.WriteLine(stream.ReadDouble());
+            Console.WriteLine(stream.ReadString());
+        }
+
+Example: Copy a file to another file
+Example: Print the content of a file by adding line number
+e.g
+
+1. .....
+2. .....
+
+Example: Write "Emp(id,Name)" records into emp.txt" and also read them
+Example: We've following data file (csv - comma separated value)
+emp.csv
+---------
+10,Rajesh,40000
+20,Manish,88888
+
+Write a program to read the emp.csv and prepare a list of Emp ( List<Emp> )
+
+Example: Assume that we've List<Emp>. Write a program to create "emp.csv" to save the content.
+Example: Program to uppercase all leters of a given file.
+Example: PRogram to search a given "token/word" in a given file.
+Example: Program to count occurences of given token/work in a given file.
+
+The MemoryStream class - To read/write byte/bytes from/to the RAM
+------------------------------------------------------------------
+using(var stream = new MemoryStream())
+{
+  stream.WriteByte(65);
+  stream.WriteByte(67);
+  stream.WriteByte(48);
+  Console.WriteLine("At : " +stream.Position);
+  byte []ar = System.Text.Encoding.ASCII.GetBytes("The Red Sun");
+  stream.Write(ar,0,ar.Length);
+  stream.Position = 0;
+  //Write memory stream to other stream
+  stream.WriteTo( File.Create(@"c:\csnet\t1.txt") );
+}
+
+
+  

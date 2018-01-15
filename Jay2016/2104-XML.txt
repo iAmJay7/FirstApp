@@ -1,0 +1,287 @@
+XML - Extensible Markup Language
+=================================
+
+XML is not a language (Hence its name is misnomer) but it is a standard to create a new markup language. The XML standard include rules or guideline and you must follows the XML standard in order to create your own markup language.
+
+For example, here I'm going to create a new markup language called "Student Markup" to represent student data.
+
+
+<?xml version="1.0"?>  <------ It is called pre-processor and it is used to inform/instruct the XML parser that
+			       which standard revision is to be used. At present there is only one revision and
+			       it is 1.0.
+
+<students>             <----- XML document must have one and only one root element
+		       <----- Element name is case sensitive
+		       <----- All elements must be strictly nested. You can't intersect them
+                       <----- Attribute value must be enclosed with single or double quote
+                       <----- To form an tag, use < > and / sign. e.g <roll></roll>   or <roll/> (empty tag)
+                       <----- Use Entity reference in case a char confuse the document structure.
+				e.g <math-expr>a+b>c</math-expr> is invalid because it contains a+b>c
+				    so use &gt; instead of >  <math-expr>a+b&gt;</math-expr>
+  <student className="1st">
+     <roll>10</roll>
+     <name>Rajesh</name>
+  </student>
+  <student className='2nd'>
+     <roll>20</roll>
+     <name>Mohan</name>
+  </student>
+  <student>
+     <roll>30</roll>
+     <name>Tanesh</name>
+  </student>
+</students>            <----- Whitespaces are preserved. (In HTML whitespaces are ignored).
+
+
+How to read or write data from the device or into the device of XML type respectively?
+-----------------------------------
+As we know that the XML is a standard ( Data Interchange Standard) and hence we've two standard APIs to read/write
+XML markup programtically.
+
+ 1. DOM - The Document Object Model. This APIs creates a document-tree and loads all markup objects into memory (RAM)
+		at once. It means this APIs will uses huge amount of memory for very large XML documents.
+ 2. SAX - Simple API for XML is another API to read / write document serially (sequantially) -- just like a write &
+	  read into/from the device IO.
+
+There are number of non-standards APIs out there including Linq-XML, XML serialization and many more.
+
+
+DOM APIs - Create XML document
+------------------------------
+
+First of all import the System.XML; a namespace contains DOM and SAX APIs.
+
+And then write following code in web/win/console app as you like: (Webapp code)
+
+
+    public ActionResult Create()
+        {
+            string virtualPath = "~/Files/student.xml";
+            string absolutePath = Server.MapPath(virtualPath);
+
+            XmlDocument document = new XmlDocument();
+
+            XmlProcessingInstruction xp = document.CreateProcessingInstruction("xml", "version=\"1.0\"");
+            XmlElement root = document.CreateElement("students");
+            var student1 = CreateNode(document, "10", "Rajesh", "1st");
+            var student2 = CreateNode(document, "20", "Suresh", "1st");
+            root.AppendChild(student1);
+            root.AppendChild(student2);
+            root.AppendChild(CreateNode(document, "30", "Tan", ""));
+
+            document.AppendChild(xp);
+            document.AppendChild(root);
+            document.Save(absolutePath);
+
+            return RedirectToAction("Index");
+        }
+        private XmlElement CreateNode(XmlDocument doc, string roll,string name, string classname)
+        {
+            var student = doc.CreateElement("student");
+            student.SetAttribute("className", classname);
+            var _roll = doc.CreateElement("roll");
+            _roll.AppendChild(doc.CreateTextNode(roll));
+            var _name = doc.CreateElement("name");
+            _name.AppendChild(doc.CreateTextNode(name));
+            student.AppendChild(_roll);
+            student.AppendChild(_name);
+            return student;
+        }
+
+
+Read the XML document (assume that we've a class name "Student(Roll,Name,ClassName)"
+-------------
+      public ActionResult Read()
+        {
+            string virtualPath = "~/Files/student.xml";
+            string absolutePath = Server.MapPath(virtualPath);
+
+            XmlDocument document = new XmlDocument();
+            document.Load(absolutePath);
+            var list = new List<Student>();
+
+            var nodeList = document.GetElementsByTagName("student");
+            for(int i=0;i<nodeList.Count;i++)
+            {
+                var ele = nodeList.Item(i) as XmlElement;
+                if(ele!=null)
+                {
+                    var s = new Student();
+                    if(ele.HasAttribute("className"))
+                       s.ClassName = ele.GetAttribute("className");
+                    s.Roll = ele.ChildNodes[0].InnerText;
+                    s.Name = ele.ChildNodes[1].InnerText;
+                    list.Add(s);
+                }
+            }
+            ViewBag.List = list;
+
+            return View();
+        }
+Write a "StudentRepository" component which contains following methods
+  1. Add(Student student) or Add(roll,name,className)
+  2. DeleteByRoll(roll) or DeleteBtName(name)
+  3. Update(Student student)
+  4. List<Student> GetAllStudents()
+
+Similarly you can create "NewsRepository" to repsent news headings, description, publish date, visible or hide status, path or name of image (news)" etc.
+  
+Note: Some of the webapp actions are to be designed in such ways that they can be easily run even database or database server is not running. For example, you should save web site meta -- title, description , author, owner in web.config's appSettings or event you can create your own markup if you want to present them outside the web.config.
+
+
+How to get the reference of document's root?
+---------------------------------------------
+
+ The "DocumentElement" property represent the root of your document.
+
+e.g
+
+  XMLDocument document = new XMLDocument();
+  document.Load(...)
+  var root = document.DocumentElement;  <--- This will be your "students".
+
+
+SAX - Simple API for XML
+------------------------
+
+This APIs is used when you want to read huge/large XML documents and also to create the document. SAX uses serial/sequence approach in which tag & text is written using text or character input/output stream. (char by char).
+
+XmlWriter and XmlReader are two abstract classes that are used to write & read XML documents serially.
+
+Examle: Create XML document
+
+            virtualPath = "~/Files/emp.xml";
+            string absolutePath = Server.MapPath(virtualPath);
+
+            using (XmlWriter writer = XmlWriter.Create(absolutePath, new XmlWriterSettings() { Indent=true }))
+            {
+                writer.WriteStartDocument();
+                writer.WriteStartElement("emps");
+
+                writer.WriteStartElement("emp");
+                writer.WriteAttributeString("company", "ABC Ltd");
+
+                writer.WriteStartElement("id");
+                writer.WriteString("10");
+                writer.WriteEndElement();
+
+                writer.WriteStartElement("name");
+                writer.WriteString("Rajesh Shah");
+                writer.WriteEndElement();
+
+                writer.WriteEndElement();
+
+                writer.WriteEndElement();
+                writer.WriteEndDocument();
+            }
+
+
+XmlReader.Create() returns an instace of XmlReader class (You can also uses XmlTextReader which is a sub class of XmlReader).
+
+The Read() method returns boolean; so we can use to read chars till end of file is not encountered.
+
+The NodeType property allow us to examine the type of node - whether it is text node, element or processing instruction.
+
+The GetAttribute("name") returns the value of attribute if exists.
+
+Example:
+
+          var path = @"c:\csnet\ConsoleApplication1\ConsoleApplication1\emp.xml";
+            using (XmlReader r = XmlReader.Create(path))
+            {
+                while (r.Read())
+                {
+                    if (r.IsStartElement())
+                    {
+                        Console.WriteLine(r.Name);
+                        Console.WriteLine(r.GetAttribute("company"));
+                    }
+                    if(r.NodeType == XmlNodeType.Text)
+                    {
+                        Console.WriteLine(r.ReadString());
+                    }
+                }
+            }
+
+Populate the List<Emp>
+======================
+
+public class Emp
+{
+  public int Id {get;set; }
+  public string Name {get;set;}
+  public string Company {get;set;}
+}
+code:
+....
+string data = "";
+var list = new List<Emp>();
+var emp = new Emp();
+           while (r.Read())
+                {
+                    if (r.IsStartElement())
+                    {
+                        if (r.Name.Equals("emp"))
+                        {
+                            emp = new Emp();
+                            emp.Company = r.GetAttribute("company");
+                            list.Add(emp);
+                        }
+                        name = r.Name;
+                    }
+                    if (r.NodeType == XmlNodeType.Text)
+                    {
+                        if (name.Equals("id")) emp.Id = int.Parse(r.ReadString());
+                        if (name.Equals("name")) emp.Name = r.ReadString();
+                    }
+                }
+            }
+            foreach(var e in list)
+            {
+                Console.WriteLine(e.Id + " " + e.Name + " " + e.Company);
+            }
+       
+
+XML to Linq
+----------- 
+This is non-standard or native APIs but it uses DOM and SAX implicitly and hence this APIs is popular because we can easily traverse, update, add or delete elements.
+
+So, we need to import the "System.Xml.Linq" namespace here.
+
+For example, to display company, id, name of all emps.
+
+
+...
+using System.Xml.Linq;
+....
+....
+//code in Main
+var doc = XDocument.Load(@"your-file-path");
+
+          //Traverse all descendent of "emps"
+
+           foreach (var ele in doc.Descendants("emp"))
+            {
+                Console.WriteLine(ele.Attribute("company") 
+                    + "  " 
+                    + ele.Element("id").Value + " "
+                    + ele.Element("name").Value);
+            }
+
+
+            //Will returns value if element object is cast to string
+            Console.WriteLine((string) doc.Element("emps").Element("emp").Element("id"));
+            foreach (var ele in doc.Descendants("id"))
+            {
+                Console.WriteLine( (string)ele);
+            }
+
+            var id = "120";
+            var result = doc.Descendants("id").FirstOrDefault(x => x.Value == id);
+            if (result != null) Console.WriteLine("Found");
+            else Console.WriteLine("Not Found");
+
+            //Root element
+            Console.WriteLine(doc.Document);
+            Console.WriteLine(doc.Document.Descendants().Count());
+

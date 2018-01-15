@@ -1,0 +1,35 @@
+Date object
+===========
+
+To represent the local date & time.
+
+<script>
+  var dt = new Date();
+  console.log( dt );
+  console.log( dt.getDate(), dt.getMonth(), dt.getYear());  // month begins with 0 and add 1900 to the year
+  console.log( dt.getFullYear());
+</script>  
+
+Example: Millis and date
+
+<script>
+  var dt = new Date(0); //epoch date 
+  console.log( dt );
+  dt = new Date( 1000000000 ); //millis to date
+  console.log(dt);
+
+  dt = new Date(); // current date
+  console.log( dt.getTime() ); // millis
+</script>
+
+Example: Add or subtract year, months, days, seconds, minuts and hours and display the new date time using DOMs.
+Example: Display a calendar of given month and year.
+Example: Assume that we've some appointments of the March - 2017:
+  Day Month Year  Appoinment Text
+  1-3-2017        Meeting
+  4/3/2017        Visiting
+  10-3-2017       Working....
+
+ Display a calendar and highlight the appointment days.
+
+  

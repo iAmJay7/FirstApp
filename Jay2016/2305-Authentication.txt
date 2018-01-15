@@ -1,0 +1,287 @@
+Authentication, Authorization and Authorize Filter
+===================================================
+
+First thing first - Never save plain text passwords into files or database. Always use Hashing algorithms; but don't
+			create your own algorithms to generate the hash of the password instead uses industry standard
+			hashing algorithms. 
+
+			In ASP.NET (.NET Framework), we will use "System.Web.Helpers.Crypto" class to compute the
+			hash (hash means to generate some text from the given data) from the plain text and
+			also compare the hashes. (hashed passwords).
+
+			The Crypto class uses hash-salt technique to hides the actual hash of plain text (using
+			an hash-salt algorithm) so one can easily guess what will be the actual password text.
+
+			Hash-salt algorithms uses twice, thrice or even more time to compute hash of hash with some
+			unknown quantity of numbers and text.
+
+For example, we want to create "admin" account with "admin@gmail.com" and "admin" (password). So first of all we need to compute the hash of "admin" word and then write/save that hash into the database.
+
+Code in Index() action
+
+var plainText = "admin";
+var hashPassword = Crypto.HashPassword(plainText);
+ViewBag.Hash = hashPassword;
+return View();
+
+and print the hash in Index.cshtml
+<h1>
+ <code>
+  @ViewBag.Hash
+ </code>
+</h1>
+
+NOTE: Use minimum 100 character length of password field in database. You can also use MAX property too with MSSQL server database.
+
+After successfully verfying the email and hash password in Login() action you want redirect the user to appropriate controller or action.
+
+Pseudo Code in Login action (Post):
+
+ 1. Compare user input email against the database
+ 2. Compare user input plain text password against the hashed password in the database
+
+    var s = db.UserAccounts.FirstOrDefault(x=>x.Email.Equals(model.Email));
+    if(s !=null) 
+    {
+      if(Crypto.VerifyHashedPassword(s.Password, model.Password)) 
+        {
+          //Validates or Authenticated
+        }
+     }
+
+
+ 3. Setup Session or Cookie fields/properties and compare the authorization flag for each action or the all action of
+	a controller.
+
+For example, To ensure that only "Admin" user can access a specific action in HomeController.
+
+public ActionResult AdminOnly()
+{
+  1. if user's role is not "Admin" then tranfer it to Index action
+  2. and rest of the code goes here
+}
+
+If you want to protect all actions of a particular controller then write the very same code in constructor of your controller.
+
+e.g
+
+public class DashboardController ....... 
+{
+   public DashboardController()
+    {
+      if user's role is not "Admin" then redirect to /home/index
+      ...
+    }
+}
+
+Code:
+
+
+namespace AuthApp.Models
+{
+    public class LoginViewModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+
+        public string Password { get; set; }
+    }
+
+    public class UserAccountViewModel
+    {
+        public int Id { get; set; }
+        [Required]
+        public string Email { get; set;}
+        public string Role { get; set; }
+        public DateTime Created { get; set; }
+        public DateTime LastLogin { get; set; }
+        public bool Active { get; set; }
+        [Required]
+        public string FullName
+        {
+            get; set;
+        }
+        [Required]
+        public string Address{ get; set; }
+
+        [Required]
+        public string Photo{ get; set; }
+        [Required]
+        public int CityId { get; set; }
+        [Required]
+        public int StateId{ get; set; }
+        [Required]
+        public int CountryId{ get; set; }
+
+        [Required]
+        [Display(Name = "Password")]
+        public string Password { get; set; }
+        [Required]
+        [Compare("Passowrd")]
+        [Display(Name = "Confirm Password")]
+        public string ConfirmPassword { get; set; }
+    }
+}
+
+namespace AuthApp.Models
+{
+    public class UserAccountBao
+    {
+        public static UserAccountViewModel Login(LoginViewModel model)
+        {
+            using (var db = new ProductDbEntities())
+            {
+                var s = db.UserAccounts.FirstOrDefault(x => x.Email.Equals(model.Email));
+                if (s == null) return null;
+                if(!Crypto.VerifyHashedPassword(s.Password, model.Password)) return null;
+                var m = new UserAccountViewModel();
+                m.Id = s.Id;
+                m.Role = s.Role;
+                m.Email = s.Email;
+                m.FullName = s.UserProfile.FullName;
+                m.CityId = s.UserProfile.CityId ?? 0;
+                m.StateId = s.UserProfile.City.StateId;
+                m.CountryId = s.UserProfile.City.State.CountryId;
+                m.Address = s.UserProfile.Address;
+                m.Photo = s.UserProfile.Photo;
+                return m;
+            }
+        }
+    }
+}
+
+
+ 
+namespace AuthApp.Models
+{
+    public class SessionWrapper
+    {
+        public static int UserId
+        {
+            get
+            {
+                if (HttpContext.Current.Session["UserId"] == null) return 0;
+                return int.Parse(HttpContext.Current.Session["UserId"].ToString());
+            }
+            set
+            {
+                HttpContext.Current.Session["UserId"] = value;
+            }
+        }
+        public static string Role
+        {
+            get
+            {
+                if (HttpContext.Current.Session["Role"] == null) return "";
+                return HttpContext.Current.Session["Role"].ToString();
+            }
+            set
+            {
+                HttpContext.Current.Session["Role"] = value;
+            }
+        }
+        public static string Name
+        {
+            get
+            {
+                if (HttpContext.Current.Session["Name"] == null) return "";
+                return HttpContext.Current.Session["Name"].ToString();
+            }
+            set
+            {
+                HttpContext.Current.Session["Name"] = value;
+            }
+        }
+        public static bool IsLogin
+        {
+            get
+            {
+                return SessionWrapper.UserId != 0;
+            }
+        }
+
+        public static void Authorize(string role)
+        {
+            if(!SessionWrapper.Role.Equals(role))
+            {
+                HttpContext.Current.Response.Redirect("~/Home/Login");
+            }
+        }
+
+        public static void Logout()
+        {
+            HttpContext.Current.Session.Abandon();
+            HttpContext.Current.Response.Redirect("~/Home/Index");
+        }
+    }
+}
+
+
+
+public class HomeController : Controller
+    {
+        // GET: Home
+        public ActionResult Index()
+        {
+            
+            return View();
+        }
+
+        [HttpGet]
+        public ActionResult Login()
+        {
+            return View(new LoginViewModel());
+        }
+
+        [HttpPost]
+        public ActionResult Login(LoginViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                var user = UserAccountBao.Login(model);
+                if(user!=null)
+                {
+                    SessionWrapper.UserId = user.Id;
+                    SessionWrapper.Role = user.Role;
+                    SessionWrapper.Name = user.FullName;
+
+                    string url = string.Format("~/{0}/Dashboard", user.Role);
+                    return Redirect(url);
+                }
+                else
+                {
+                    ViewBag.Message = "Invalid user email and password!";
+                }
+            }
+            return View(model);
+        }
+
+        public void Logout()
+        {
+            SessionWrapper.Logout();
+        }
+
+        public ActionResult AdminOnly()
+        {
+            SessionWrapper.Authorize("Admin");
+            return Content("I'm an admin");
+        }
+        public ActionResult MemberOnly()
+        {
+            SessionWrapper.Authorize("Member");
+            return Content("I'm a member");
+        }
+
+        public ActionResult Both()
+        {
+            if(!SessionWrapper.IsLogin)
+            {
+                return RedirectToAction("Index");
+            }
+            return Content("I'm a member or admin");
+        }
+
+    }

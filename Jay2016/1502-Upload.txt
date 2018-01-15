@@ -1,0 +1,47 @@
+Upload a file
+==============
+
+To copy a file/files from client to server location.
+
+In order to upload a file, the <form> element must include method="post" and enctype="multipart/form-data" attributes.
+
+Because the file we want to upload contains bytes then the <form> envelop creates a mixed - text & binary form and send each form with two or more parts; simple text data and one or more binary (bytes) data.
+
+upload.cshtml
+--------------
+
+@{ 
+    if(IsPost)
+    {
+        HttpPostedFileBase file = Request.Files["file"];
+        if(file!=null)
+        {
+            if(file.ContentLength!=0)
+            {
+                var dest = Server.MapPath("~/Files/" + file.FileName); //Assume that we've "Files" folder at root
+                file.SaveAs(dest);
+            }
+            <p>@file.ContentLength</p>
+            <p>@file.ContentType</p>
+            <p>@file.FileName</p>
+            
+        }
+    }
+}
+
+<form method="post" enctype="multipart/form-data">
+    <input type="text" name="name"/>
+    <input type="file" name="file" accept="image/*"/>
+    <button>Submit</button>
+</form>
+
+
+Restrict size and content type
+-----------------------------
+if(file.ContentLength>=1 && file.ContentLength<=1024*1024*10) ///10 KB
+{
+  if("image/png,image/jpeg,image/gif".Contains(file.ContentType)) 
+   {
+      //code to save or process the file
+    }
+}

@@ -1,0 +1,151 @@
+The ASP.NET View Engine and programmable pages
+==================================================================================
+ASP.NET ONE has two official View Engines - (1) ASPX and (2) Razor and number of unofficial or third party open source view engines.
+
+What is a "View Engine"?
+
+  Well, it is a "parser" kind of tool or APIs that allows users to write server and client code into a single page (file or programmable web page), later it will be analyzed and separate the client code (HTML/CSS/JavaScript) from server code, compiles the server code, compiled code then submitted to the CLR so the CLR can execute and produce the output and produced output again merged with HTML/CSS/JavaScript and finally the merged output is sent to the clients.
+
+In other words, "View Engine allows developer to write server & client code into a single page and it generate dynamic content of HTML/CSS/JavaSCript when that page is requested by the client."
+
+ASPX view engine is suitable for "WEB FORM Application" however it is also used with ASP.NET MVC.
+
+Razor view engine is suitable for ASP.NET MVC and Web Pages application -- The "Razor" is introduced with ASP.NET MVC and it is much more lightweight than the ASPX. There are number of advantages of RAZOR view over ASPX View engine and
+these are:
+   1. RAZOR allows complete control over the markup (HTML/CSS/JavaScript) whereas we must have to choose the ASPX's
+	ways (special syntax and non HTML/CSS/JavaScript approach for example - Skin, Themes, Controls and also too many
+	rules) & its rules.
+   2. ASPX view engine also produce some extra code/text and if it is not understood properly then it delays the
+	transmision time. RAZOR, on other hand, is so simple and no extra cluttered code.
+   3. ASPX view engines has its own UI and in come case it might not support the new standards - HTML/CSS/JavaScript       because these UI were written in back 2005 to 2008.
+	Razor don't have any UI lib or UI controls -- we must have to use the current standards of HTML/CSS/JavaScript.
+
+The Razor View Engine
+======================
+
+The web document saved with .cshtml is a programmable page or class written using C# and .vbhtml is the class written in VB.NET.  Every .cshtml or .vbhtml is a class and it is a sub-class of the "WebPage".
+
+In .cshtml, we use following syntax to embed to C# code. Note that the Razor view engine is not a language but its describes the way to embed/write C# code in a page.
+
+Syntax   : Razor syntax begins with @  (at the rate)
+-------
+
+1. @*   This is a comment -- Razor view engine will skip this line *@
+2. @expression            -- Razor view engine execute the expression and insert its output into a file where this
+				expression is exists.
+3. @{ ... }               -- Block - you can write one or more C# statements and client code (HTML/CSS/JavaSCript)
+4. @statement { ...}      -- Statement block -- if, swith, while, do while, using etc 
+5. @:text-and-expression  -- Insert the text and also execute the expr if exists.
+
+
+Examples  : Create a "WebApplication" or WebSite  (Empty) and add Index.cshtml page via "Project Menu" or right
+=========   mouse click on solution explorer + Add new item + Razor + Web page 
+
+1. 
+
+@* This is the Razor comment *@
+<!-- This is the HTML Comment -->
+
+@{
+  /* This is C# comment */
+  var title = "My First Programmable Page";
+  var now = DateTime.Now;   //C# comment
+}
+
+<!doctype html>
+<head>
+  <title>@title</title>
+</head>
+<body>
+  <h1>Appleman Pvt Ltd</h1>
+  <p>Today @now.ToLongDateString() - @now.ToShortTimeString()</p>
+  @for(var i = 1; i<=10; i++)
+   {
+     <p>Value : @i</p>
+    }
+</body>
+
+IMPORTANT
+==========
+ 1. @ and opening curly brace must appear together with the block syntax.
+     
+@{    <--- valid
+ ...
+}
+
+@   <-- Error
+{
+
+}
+
+2. Embed html markup inside the block and statement block:
+
+@{
+ var no = 10;
+ var name = "Rajesh";
+ <p>My name is @name and <strong>@no<strong> is my roll</p>
+}
+
+but you can't embed text directly (following is invaild)
+   
+@{
+  var no  = 10;
+  var name = "Rajesh";
+  My name is @name and <strong>@no</strong> is my roll  <-----------ERROR
+}
+
+To embed text inside the block or statement block, use @: or <text> syntax:
+
+  @:My name is @name and <strong>@no</strong> is my roll
+
+Or 
+
+ <text>My name is @name and <strong>@no</strong> is my roll</text>
+
+3. Any @expression will be coerse to cast to string automatically
+
+<table border="1">
+@for(var i = 1;i<=10;i++)
+ { 
+   <tr>
+    @for(var j = 1;j<=10;j++)
+     {
+       <td>@i*j</td>
+     }
+  }
+</table>
+
+<p>@10+20</p>
+
+So, use parentheis to avoid string cast and also error.  @(10+20)  and @(i+j)
+
+Example: Add "Emp.cs" and create objects into the web page.
+
+(Assume that your Emp class is created inside "WebApp1" namespace)
+
+@using WebApp1 
+
+@{
+ WebApp1.Emp a = new WebApp1.Emp { Id = 10, Name = "Ram" };
+ var b = new Emp { Id = 20, Name = "Man" };
+}
+<dl>
+  <dt>ID</dt>
+  <dd>@a.Id</dd>
+  <dt>Name</dt>
+  <dd>@a.Name</dd>
+</dl>
+
+<dl>
+  <dt>ID</dt>
+  <dd>@b.Id</dd>
+  <dt>Name</dt>
+  <dd>@b.Name</dd>
+</dl>
+
+<p>
+  <label>ID <input type="number" value="@a.Id" /></label>
+</p>
+<p>
+  <label>Name <input type="text" value="@a.Name" /></label>
+</p>

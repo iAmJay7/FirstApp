@@ -1,0 +1,192 @@
+The ViewModel and Model property of the View.
+----------------------------------------------
+
+The "ViewModel" is a plain CLR object - basic properties (mostly using simple types). We will use any naming pattern but for the sake of understanding we'll use "ViewModel" suffix to the component.
+
+Firstly, create ViewModes.cs into Models folder (or you may create separate .cs file for each component):
+
+namespace EmpApp.Models
+{
+    public class EmpViewModel   /* class having get and set proeprties */
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal BasicSalary { get; set; }
+        public string Dept { get; set; }
+        public DateTime JoinDate { get; set; }
+        public bool Married { get; set; }
+    }
+}
+
+Now, create two actions; possibly same named (However you can choose different names too):
+
+ code in HomeController:
+
+        [HttpGet]
+        public ActionResult Emp()
+        {
+            var model = new EmpViewModel {  };
+            return View(model);
+        }
+        [HttpPost]
+        public ActionResult Emp(EmpViewModel model)
+        {
+            //TODO
+            return View(model);
+        }
+And the Emp.cshtml would be :
+
+@{
+    ViewBag.Title = "Emp";
+}
+@model EmpApp.Models.EmpViewModel
+<h2>Emp</h2>
+
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.LabelFor(x=>x.Id)
+        @Html.EditorFor(model=>model.Id)
+        @Html.ValidationMessageFor(x=>x.Id)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.Name)
+        @Html.EditorFor(model => model.Name)
+        @Html.ValidationMessageFor(x => x.Name)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.BasicSalary)
+        @Html.EditorFor(x => x.BasicSalary)
+        @Html.ValidationMessageFor(x => x.BasicSalary)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.Dept)
+        @Html.EditorFor(x => x.Dept)
+        @Html.ValidationMessageFor(x => x.Dept)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.Married)
+        @Html.EditorFor(x => x.Married)
+        @Html.ValidationMessageFor(x => x.Married)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.JoinDate)
+        @Html.EditorFor(x => x.JoinDate)
+        @Html.ValidationMessageFor(x => x.JoinDate)
+    </p>
+
+    <p>
+        <button>Submit</button>
+    </p>
+    <div>
+        @Html.ValidationSummary()
+    </div>
+}
+<div>
+    @Html.DisplayForModel()
+</div>
+<div>
+    @Html.EditorForModel()
+</div>
+
+
+NOTE: @Html.DisplayForModel() - shows all properties values
+      @Hrml.EditorForModel() - Show all properties values enclosing in HTML Tags.
+
+Controll the properties of Plain CLR ViewModel by setting attributes - The Annotations
+========================================================================================
+You can enhance the use of "ViewModels" just by setting attributes classes located at System.ComponentModel.DataAnnotations namespace. The @Html helper method are designed for the
+very same purpose to expose or carry out the said behavior into the web page (view).
+
+For instance, If you want to a field must be non-empty then just set the [Required] attribute.
+              There are number of [Attributes] to control the properties behaviors.
+
+Example: Just change the code of EmpViewModel 
+
+ public class EmpViewModel
+    {
+        [Required(ErrorMessage = "Employee number is required")]
+        [Range(1,100)]
+        public int Id { get; set; }
+
+        [Required]
+        [RegularExpression(@"[a-zA-Z ]{5,50}",ErrorMessage = "Name allows alphabets and space char only.")]
+        public string Name { get; set; }
+
+        [Required]
+        [Display(Name = "Basic Salary Rs.")]
+        [DataType("System.Int32")]
+        [Range(1,10000)]
+        public decimal BasicSalary { get; set; }
+        [Required]
+        public string Dept { get; set; }
+
+        [Required]
+        [DataType(DataType.Date)]
+        [Display(Name = "Date of join")]
+        public DateTime JoinDate { get; set; }
+        [Required]
+        [Display(Name = "Married ?")]
+        public bool Married { get; set; }
+    }
+
+It is important to note that the attribute validations for the properties are performed into the server code; especially action method. In action method, there is a collection that represent the "Model' and its present state; including error message and model data.
+
+So, you must have to check at server code whether the received data are correct (or in correct form) as per attributes of the properties. 
+
+Example:
+
+        [HttpPost]
+        public ActionResult Emp(EmpViewModel model)
+        {
+            if(ModelState.IsValid)
+            {
+                //TODO - Valid data (Server Side Validation)
+                //Data & Database Operations...
+            }
+            return View(model);
+        }
+
+The "ModelState.IsValid" returns true if all the attributes (validation) satisfied and data are valid.
+
+
+Example: Create EmpController that uses "Id,Name,Salary,JoinDate,Dept" database fields to perform list, add, delete and update employees. (Use the @Html.xxxxxFor, ViewModel and data annotations).
+
+
+@Html.ActionLink() method
+--------------------------
+To generate hyperlink based upon given parameters.
+                 
+                                         |--- id or params
+                                         V
+@Html.ActionLink("Create New","Create", null, new { @class="btn btn-info" })    
+                   Label        Action              ^
+				of the current      |----- extra / additional html attributes
+				controller   
+
+@Html.ActionLink("Edit record","Edit", new { 10 })
+
+@Html.ActionLink("Edit record","Edit", new { varName }, new { @id="testBtn", @class="btn btn-info"} )
+
+
+Additional HTML attributes to the <form>
+-----------------------------------------
+ @using(Html.BeginForm()) {} automatically adds "action" and "method" attribute and you can add more HTML attributes or update the default values of these attributes:
+
+ @using(Html.BeginForm("ActionName","ControllerName",FormMethod.Post, new { @class="your-css-sel",  @id="form1" }))
+ {
+  }
+
+<form> to upload a file,
+
+ @using(Html.BeginForm("ActionName","ControllerName",FormMethod.Post, new { @enctype="multipart/form-data" }))
+ {
+  }
+
+In helper methods there is an (anonymous) object parameter named "htmlobject" which is used to set attributes of the existing html helper.
+
+ @Html.LabelFor(x=>Name, new { @class="control-label" } )
+ @Html.TextBoxFor(x=>Name, new {@class="form-control" })
+
+
+

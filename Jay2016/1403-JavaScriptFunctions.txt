@@ -1,0 +1,94 @@
+Closures
+======================================================
+A "Closure" is an object that wraps and persists data along with functions.
+
+
+How to create a closure?
+-----------------------
+
+The simplest way is to call a function and that called function returns another function and that is a "closure".
+
+Syntax:
+
+function myFunc(argc..) {
+  return function() {   <---- This is closure object/function
+     ....
+     .....
+  }
+}
+
+( function( args .... ) {
+
+   return function() {      <---- Closure
+       ....
+       ....
+   }
+
+})(value...);
+
+
+function functionName(args...) {
+  return {                       <--- An object contains two closure functions
+     "prop1": function() {      
+                    .....
+      },
+      "prop2": function() {
+                     ....
+      }
+  }
+}
+
+Return value of a function is "a function" or "functions" is the way to create a closure. A closure persists the data (variable created inside the functions) and parameters along with function itself.
+
+Example:
+
+<script>
+  function myClosure(no) {
+    return function() {
+        console.log( no );
+    }
+  }
+
+  //obtain the closure
+  p1 = myClosure( 10 );
+  p2 = myClosure( 20 );
+
+  //Call the closure function
+
+  p1();
+  p2();
+
+  ar = [];
+  for (i = 1; i <= 10; i++) {
+      ar.push(myClosure(i));
+  }
+
+  for (i in ar) {
+      ar[i]();
+  }
+</script>
+
+Example: Returns JSON 
+
+<script>
+    function counter(n) {
+        return {
+            "incr": function () {
+                n++;
+                console.log(n);
+            },
+            "decr": function () {
+                n--;
+                console.log(n);
+            }
+        }
+    }
+
+    var cnt = counter(5);
+    cnt.incr();
+    cnt.incr();
+    cnt.incr();
+    cnt.decr();
+    cnt.decr();
+</script>
+

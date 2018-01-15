@@ -1,0 +1,800 @@
+ASP.NET MVC - Model View Controller Framework
+=============================================
+
+
+ASP.NET ONE is the core ASP.NET and upon the core there are four sub-frameworks:
+  1. WebForm 
+  2. Web Pages (Razor Pages)
+  3. MVC and
+  4. Web APIs
+
+So, all things we've learnt under the name of "ASP.NET" is equalilly available to all four frameworks (e.g. Request, Response, Cookies, Session and many other things).
+
+What is MVC?
+-----------
+
+MVC is application design pattern to keep certain things separate in order to maintain, debug, test and ease of developement of the code (source code).
+
+Natually, this MVC has nothing to do with clients, peoples or server frameworks but it is for the "developers" who develp their products/APIs in such manner so this products/APIs can be easily updated, maintained, tested without affecting the existing code base.
+
+So the prime concept of MVC is a code separation; it means source code separation. In this application design pattern, your code should be written into three separate files instead of single file as we tried & used to develop "WEb Pages" web app or Desktop (winform) or Java's AWT/Swing app. In all previous attempt to develop an application, we wrote code into a file that contains code for database and code for controlling things and also code for the output.
+
+
+M - Model - A model class carries the data & database or file or any other code that is for data.
+
+V - View  - This class represent the user interface UI - may be it is HTML/CSS, Java's Swing APIs, or WinForm's controls
+
+C - Controller - As per name suggest this class controls "things"; it receive the data from the "View" or "Models" and
+    pass them to "View" or "Models" and perform some serious tasks that include comparison of objects, sortig, 	filterings, network related, IO tasks and many more.
+
+So MVC is the case of "Separting things" from one another.
+
+ASP.NET MVC Project Template
+=============================
+ASP.NET MVC Project Template create a skenton or project structure for the web app using "MVC" separation feature. The ASP.NET MVC also an API for us which helps us to guide and sometimes instructs us. The core API of MVC framework is its "Route" or "Router" - is a server code which intercepts the each and every request from the clients, parse and validate the requests and then invoke the appropriate "Controller"; creates an object of Controller class and call appropriate methods of controller class.
+
+ So, the ASP.NET MVC Project include basic settings file to configure the "Router" and some special folders for us to
+ create "Views", "Models" and "Controllers".
+
+ASP.NET MVC is an open source framework (currently its version 5.0) and the project template we used to create the ASP.NET MVC App adds appropriate version of APIs (assemblies). You can see the list of libraries added into the project via Solution explorer + Project Name + References.
+
+You can also install latest APIs of ASP.NET MVC by Nuget Package Manager.
+
+Project Structure and Naming Conventions
+----------------------------------------
+ASP.NET NVC uses "standard" naming conventions over the coding to configure the comonents (classes or other things). 
+
+By "standard naming conventions" means - using the absolute "name" to configure the component.
+ For example,
+     "Controllers" folder is configured to store the "controller classes". However you are free to create the controller
+		classes but we need to configure them manually and it might not approproate in early stage of 
+		ASP.NET MVC learning and development stage.
+
+      Similarly "Models" and "Views" names are reserved for "Model classes" and "Views - .cshtml, .html, or .aspx" 	pages.
+
+So, standard naming conventions for files and folders is part of "ASP.NET NVC" configuration; auto configuration.
+
+Secnodly, there is a "class" name convention for "Controller" category of class.
+
+  Any Class you create with "Controller" suffix and sub class of "Controler" will be the controller class.
+
+	For example,
+
+  public class HomeController : Controller {}  <--- This is called "Home" controller class.
+
+  public class ProductController : Controler { } <--- This is "Product" controler class. 
+
+	The ASP.NET MVC allow us to use "Home" or "Product" names simply.
+
+
+   
+  Global.asax
+  -----------
+
+  The "global.asax" is application event file which contains number of "handlers - event handlers" which will be 
+  raised by the application server on various actions including -- start up of or creation of application domain (ie. start the application), stop the application, errors raised in app, session created (user's first request), session ends (user's leave or session timeout), on each request, and on each response.
+
+  So, the application event file is for the developers to plug his/her code into the event handler if they are
+  interested to perform a specific tasks in various events.
+
+  The "application event file" must be located at the "root" of web app if it is exists. It is mandatory for ASP.NET MVC
+  but it is optional for WebForm, WebPages apps.
+
+  ASP.NET app domain and lazy initialization 
+  ------------------------------------------
+    ASP.NET app is bootstraped by the IIS (ISSExpress) webserver; The application server creates an appDomain or     create a process when a request is recieved from the client very first time and then this appDomain remains
+    alive till the IIS is not shutdown or an error encountered into the app.  The "appDomain or process" will be
+    automatically shutdown and re-started on error condition to ensure the continious service available to all clients.
+
+    AppDomain can be re-started on update or changes occurs on "configuration" files; the web.config files.
+
+  Example: Creates an Empty web app + Add "Global.aspx" and write following code inside the handlers:
+
+        protected void Application_Start(object sender, EventArgs e)
+        {
+            File.AppendAllText(@"c:\csnet\info.txt", "AppStart : " + DateTime.Now + "\r\n");
+        }
+
+        protected void Session_Start(object sender, EventArgs e)
+        {
+            File.AppendAllText(@"c:\csnet\info.txt", "SessStart : " + DateTime.Now + "\r\n");
+        }
+
+        protected void Application_Error(object sender, EventArgs e)
+        {
+            File.AppendAllText(@"c:\csnet\info.txt", "AppError : " + DateTime.Now + "\r\n");
+        }
+
+        protected void Session_End(object sender, EventArgs e)
+        {
+            File.AppendAllText(@"c:\csnet\info.txt", "SessEnds : " + DateTime.Now + "\r\n");
+        }
+
+        protected void Application_End(object sender, EventArgs e)
+        {
+            File.AppendAllText(@"c:\csnet\info.txt", "AppEnds : " + DateTime.Now + "\r\n");
+        }
+   Also create some pages .cshtml and request them.
+
+   Also change the "web.config" and save; in this case appDomain will be restarted.
+
+   
+   Application Configuration file - web.config
+   -------------------------------------------
+   Each web application must have a web.config at root of the app folder. This is XML text document contains
+   our application specific settings.
+
+   This web.config is also inherits the machine wide configuration files from x:\window\Microsoft.NET\Frameworks\v***   \Config -- machine.config and web.config files.  Do not change these files because they will affect all apps on the
+    machine.
+
+    We need to change app settings for individual app and hence we will have to update web.config available at root
+    of the our app. The web.config can be more than one; each sub-folder inside the app can override settings of "root"
+    web.config.
+
+   
+    Example: <appSettings> and <connectionStrings> are two direct sections under main/root <configuration>
+
+    Open web.config (or add it)
+
+<configuration>
+  <appSettings>
+    <add key="title" value="ABC Site"/>
+    <add key="licence" value="33939923"/>
+  </appSettings>
+  <connectionStrings>
+    <add name="MyCn" connectionString="My New Connnnn" providerName="System.Data.SqlClient"/>
+  </connectionStrings>
+  ....
+</configuration>
+
+  *** IMPORTANT : Any error in web.config file will be consider as application error and hence appDomain will be not 			started.  The XML elements are case-sensitive.
+
+   the <appSettings> section allow us to add key-value pair of data (our personal) for the use in webapp whereas the
+   <connectionStrings> section allow us to configure the database connection strings.
+
+ You can access these two (and also other sections) of web.config via,     "System.Web.Configuration.WebConfigurationManager" class and its methods.
+
+  code in index.cshtml 
+  ---------------------
+  System.Web.Configuration.WebConfigurationManager.AppSettings["title"]
+  @System.Web.Configuration.WebConfigurationManager.ConnectionStrings["MyCn"].ConnectionString
+
+
+  The Router Engine of ASP.NET MVC
+  --------------------------------
+  The Route Engine is the prime or core or heart of the ASP.NET NVC. This Route object is initialized immediately when
+  an appDomain is created. You may exmine the code in "Global.asax's" Application_Start event.
+  There is a folder named "App_Start" that contains code to initialize the Route's url configuration and that   initialization take place when appDomain is created.
+
+   In MVC, any request from client is made to the following pattern
+
+            /controller/action/id
+
+   Where the URL is case-insensitive and the part "controller" is the name "Controller class",
+                                                  "action" is the name of "public method" and
+                                                  "id" is optional atomic (single integer or string without decimal)
+								value.
+    Above, url is set a default instruction to the Route engine to receive the URL. If the given URL is not is above     form then Route reject the communication.
+
+    The configuration of URL in Route table, "Home" is a default name of "controller" and "Index" is the default
+						action name.
+
+    *** NOTE: URL is case-insensitive so it can be /Home/Index or /PRPDUCT/Add or /Product/Add or /product/add
+
+YOU CAN'T REQUEST A FILE (Web Resource File) DIRECTLY in ASP.NET MVC App
+-------------------------------------------------------------------------
+YES, We can't. Because of Route Engine. Every request has a finit syntax /controller/action/id. This syntax tells us that we can only request to the controller's action method and not even the page or file name. 
+
+                                   
+Create your First controller "HomeController" -- the name "Home" is a default controller name configured in route table.
+---------------------------------------------------------------
+1. Right mouse click on "Controllers" folder + Add + Control + Empty Controller + HomeController + Add
+2. Add following code in HomeController
+
+public class HomeController : Controller
+{
+  public string Index() 
+   {
+     return "This is the Index method";
+    } 
+  public int No()
+   {
+    return 10;
+   }
+  public string Now()
+   {
+     return DateTime.Now.ToString("dd-MM-yyyy");
+    }
+}
+
+3. Press F5 or Ctrl+F5 to launch app
+
+At browser, change following urls,
+
+URLS		Output
+/		will request /home/index  "This is the Index method"
+/home		will request /home/index  "This is the Index method"
+/home/index	will request /home/index  "This is the Index method"
+/home/no	10
+/home/now	04-04-2017
+/HOME/NO        10
+
+Action methods
+--------------
+Methods inside the controller class are called "Action" methods (Just like regular methods) but they should be public.
+
+Action method might takes parameters and also returns the result of simple type and string. In MVC API, the class named "ActionResult" is used to denote the return type of the action method.
+
+For example,
+
+  An action method might returns anything but in the form of "string" and it can be:
+     1. number (which will be coerce into string automatically) by calling ToString()
+     2. DateTime, bool, char and 
+     3. Any object that override a ToString() method.
+
+  In addition, the result produced and returned by the action method can be, XML data, JSON data, or HTML tag & text,
+     CSS content, and JavaScript.
+
+ If we create an action that might returns number or string or JSON or File content depends upon the condition or criteria defined in an action method and in that case we need to specify the generic return type instead of string or int or an object or file.
+   So, here we've "ActionResult" class which returns the following kind of content. In fact following are the sub-   classes of ActionResult (The "ActionResult" is the super class):
+         1. Content - returns text as well the content described via "MIME" property - ContentType. e.g 		ContentType="application/json" or 'text/plain" text/xml or text/html or application/zip etc.
+         2. View - Reurns the content of .html, or .cshtml or .aspx pages
+         3. Json - Returns the Json object string
+         4. File - Returns the file content (of any kind)
+         
+    The sub class of ActionResult are - ContentResult, JsonResult, FileResult, StreamResult and many more and also
+	we can create our own kind of "ActionResult" by creating sub-class for our own purposes.
+
+        The Content(), View(), Json() and File() are helper or extension methods which returns the object of         "ActionResult".
+
+Example: code in HomeController
+
+public ActionResult Index()
+{
+  return Content("Hello World!");
+}
+
+ You can return text as given MIME type.
+   
+   1. return HTML tag as text
+       return Content("<h1>Hello World</h1>","text/plain");
+   2. return string as json
+       return Content("[10,20,30,40]", "application/json");
+
+Example: Returns JSON by calling Json() which returns Json string of CLR Object or array or collection.
+
+    public ActionResult Index()
+        {
+            var emp = new { Id = 10, Name = "Raj" };
+            return Json(emp, JsonRequestBehavior.AllowGet);
+        }
+
+Example: Returns a file content or produce a downloable link
+
+    public ActionResult Index()
+        {
+            string str = "No,Name\r\n10,Rajesh\r\n20,Mohan";
+            //return Content(str, "text/csv");
+            byte[] array = System.Text.Encoding.UTF8.GetBytes(str);
+            return File(array, "text/csv", "a1.csv");
+        }
+
+Example:
+ 
+  public ActionResult Index()
+        {
+            string str = "<html><h1>Welcome</h1><b>This is the</b> bold text</html>";
+            byte[] array = System.Text.Encoding.UTF8.GetBytes(str);
+            return File(array, "application/winword", "a1.doc");
+        }
+
+Example: Assume that there is a file at "Files" folder at root of your app e.g /Files/help.pdf
+
+  public ActionResult Index()
+   {
+     var relFile  = "~/Files/help.pdf";
+     var absFile = Server.MapPath( relFile );
+     return File( absFile , "application/pdf" ); // will open a file in browser
+    }
+  
+   To download a file (force), 
+          return File( absFile , "application/pdf", "any-name-you-wish.pdf" );
+
+  
+The View() method
+------------------
+Content, Json, and File() methods deals with text or stream whereas the View() method is different than these three and it deals with the .cshtml or .aspx or .html (it means views) pages.
+
+public ActionResult Index()
+{
+   return View();  // without any argument this View() method examines 
+                   // the "Index.xxxxx file inside the  ~/Views folder".
+}
+      The index.cshtml, index.vbhtml, index.aspx, index.ascx etc.
+
+     The View() returns a file whose name matches with the action name. It means if this method is called in About() action then About.xxxxxx page will be searched.
+
+     If "search" is success then it returns the content of file or may be the output of processed file/page.
+
+    If the View("view-file-name") method has a name and this name is the name of "view - .cshtml or .aspx or .vbhtml"     page.
+
+public ActionResult About()
+{
+  return View("Help"); <---- This will examine "Help.xxxxx" view inside the /Views folder.
+}
+
+In ASP.NET MVC, you can use one of the two types of VIEWS - ASPX and RAZOR. ASPX is used with "WinForm" whereas RAZOR is used with Web Pages and MVC. However you MVC app can also uses ASPX but we should avoid the use of ASPX.
+
+The ~/Views folder
+------------------
+The ~/Views folder contains the web pages. This is pre-configured and you can't change the folder location. Inside the ~/Views folder, we have sevral other folders whose names will be same as the "Controllers" you created.
+
+ For example, on creation on "HomeController" a folder ~/Views/Home will be created to persits the all views belongs to
+						Home controller.
+ Similarly, for "ProductController", ~/Views/Product
+                "CategoryController", ~/Views/Category and so on.
+
+ There is another "name" called "Shared" is used to create a folder whose content can be shared across the controllers or you can save "Layouts" in it.
+
+ 
+Creating views using VS
+-------------------------
+1. You can create/add using Add new item menu and set appopriate page name.
+Or
+2. You can open Controller class, right mouse click on "ActionName" at which you've added the code + Add View + [x] unchekced or cheked the Layout page (Initially unchecked this feature).
+
+Working with Action method and Views
+-----------------------------------
+
+The "View"; which is made of HTML,CSS and JavaScript can display data or take user input and nothing else. The computions, calculations, comparisions and many other serious & important tasks will be performed either in the "Action" method directly or indirectly (code in Models too).
+
+Here, we will learn "How to pass or push" data into the "View" from the Action's of Controller.
+
+    In Action method of Controller and inside the "View (.cshtml)" page we've a dynamic dictionary object called 
+    the "ViewBag". The "ViewBag" object acts as a carrier or bridge between "Action of the Controller" and its     associated "View - .cshtml" page. Note that this is one-way communication. Whatever data we need inside the "Views"
+    to display, we must pass via "ViewBag" object.
+
+Example: Action in HomeController
+
+   public ActionResult Index()
+        {
+            ViewBag.No = 10;
+            ViewBag.Name = "Rajesh";
+            ViewBag.Now = DateTime.Now;
+            return View();
+        }
+
+Index.cshtml
+--------
+<br/>@ViewBag.no
+<br/>@ViewBag.Address
+<br/>@ViewBag.NaME
+<br/>@ViewBag.NOW
+
+
+IMPORTANT***   
+
+   Keys of ViewBag are case-insensitive.
+
+   If given key is not exists then it represents the null and null will be coerce into empty string if you're trying to
+   display the content of such property. (see ViewBag.Address )
+
+Example:
+
+ public ActionResult About()
+   {
+     ViewBag.Info = new string[] { "Training", "Software Testing", "Software Installation" };
+     return View();
+    }
+
+About.cshtml
+-------------
+<h2>Our services</h2>
+@foreach(var s in ViewBag.Info)
+{
+  <h4>@s</h4>
+}
+
+Example: List Emps (EmpDbEntities )
+public ActionResult EmpList()
+{
+   using(var db = new EmpDbEntities())
+    {
+     ViewBag.Emps = db.Emps.ToList();
+     }
+   return View();
+}
+
+and in  EmpList.cshtml
+
+<table>
+ @foreach(var e in ViewBag.Emps)
+   {
+    <tr><td>@e.Name</td><td>@e.Salary</td></tr>
+   }
+</table>
+
+
+Actions that receives the requests - Request data using "Request" property
+---------------------------------------------------------------------------
+The "Action" method uses "Request" property to read the request data.
+
+Example: Actions in HomeController
+
+      public ActionResult Create()
+        {
+            return View();
+        }
+        public ActionResult Save()
+        {
+            var no = int.Parse( Request["no"] ?? "0");
+            var name = Request["name"] ?? "";
+            ViewBag.Message = "Value received : " + no + " " + name;
+            return View();
+        }
+    
+ Create.cshtml
+ --------------
+ <form method="post" action="/Home/Save">
+         <p>No : <input type="number" name="no"/></p>
+         <p>Name : <input type="text" name="name" /></p>
+         <p><button>Submit</button></p>
+ </form>
+ Save.cshtml
+ -------------
+ @ViewBag.Message
+
+Example: You can request same "Action" for GET and POST
+
+public ActionResult Create()
+{
+   var no = int.Parse( Request["no"] ?? "0");
+   var name = Request["name"] ?? "";
+   ViewBag.Message = "Value received : " + no + " " + name;
+   return View();
+}
+
+Create.cshtml
+--------------
+.....same as previous Create.cshtml
+<p>@ViweBag.Message</p>
+
+Dispatch different view other than the current action's view
+------------------------------------------------------------
+By default, the View() method returns very same view whose name is same as the action method. You can pass the "viewNAme" (without extension) to the View() method to dispatch the different view other than current/active view.
+
+public ActionResult Save()
+{
+   var no = int.Parse( Request["no"] ?? "0");
+   var name = Request["name"] ?? "";
+   if(no == 0 && string.IsEmptyOrNull(name)) 
+    {
+       ViewBag.Message = "Invalid data";
+        return View("Fail"); // will displach the "Fail.cshtml"
+     }
+   ViewBag.Message = "Valid Data : " + no + " " + name;
+   return View("Success");
+}
+
+The "Save()" action do not require the "Save.cshtml" and hence you can specify the "void" return instead of ActionResult.
+ 
+ public void Save() { ... }
+
+Redirect to another action from within the action of controller
+----------------------------------------------------------------
+
+ We can call the method from within the action: 
+
+   return RedirectToAction("Name-of-Action-Method");
+
+
+You can also use Response.Redirect("~/url") method to transfer the user programatically from one action to another via web-browser's request.
+ 
+   Note that the RedirectToAction() transfer the user from one action to other within the controller.
+
+
+Read the client <form> or querystring data via FormCollection collection
+--------------------------------------------------------------------------
+The FormCollection object will be created and populated automatically as per the client's input fields.
+
+[Previous example  - Create and Save actions]
+
+Just change the code in Save()
+
+  public ActionResult Save(FormCollection coll)
+   { 
+   var no = int.Parse( coll["no"] ?? "0");
+   var name = coll["name"] ?? "";
+   if(no == 0 && string.IsEmptyOrNull(name)) 
+    {
+       ViewBag.Message = "Invalid data";
+     }
+    else 
+    {
+      ViewBag.Message = "Valid Data : " + no + " " + name;
+     }
+    return View();
+   }
+
+Save.cshtml
+------
+<p>@ViewBag.Message</p>
+
+
+Read the client input (request data) via method parameters of action method
+----------------------------------------------------------------------------
+This is the third (another) way to read the client data.
+
+You can just simply create parameters of appropriate types with the property name that matches the value of "name" attribute in <form> element of <input>.
+
+For example,
+
+Create.cshtml page
+------------
+<form method="post" action="/home/save">
+  <input type="text" name="no"/>
+  <input type="text" name="name">
+  <button>Submit</button>
+</form>
+
+then the Save() action will be:
+ 
+public ActionResult Save(int no, string name)
+{
+   ViewBag.Message = no + " and " + name + " received.";
+   return View();
+}
+
+The primitive or simple type parameters should be created as "Nullable" to prevent data-type mismath as well null pointer exception if the given "name" attribute value is not exists in <form>.
+
+ So, the new definition would be:
+
+public ActionResult Save(int? no, string name)
+{
+
+   ViewBag.Message = ( no ?? 0 ) + " and " + name + " received.";
+   return View();
+}
+
+
+Get and Post request type for an action
+-----------------------------------------
+
+By default, every action method can be request using "Get" as well as "Post" request method.
+
+  For example, you can request /Home/Save?no=100&name=Raj and in this can no need to request /home/create in order to
+				submit the data. In fact, this is the wrong situation here. We will have to use POST
+				request method to submit any kind of data to the server app and here it fails.
+
+  In MVC, we've two attributes [HttpGet] and [HttpPost] (In fact there are other attributes for Http verbs but they
+			are used in Web APIs.
+
+	[HttpGet]
+         public ActionResult Create()  { return View(); }  
+
+                 Now the "Create" method can only be request vai Get and only Get request method.
+
+       [HttpPost]
+       public ActionResult Save() { ... } 
+
+                and the "Save" is only requested by the "Post" method. 
+
+		Just try, /Home/Save will shows an error - given resource is not found.
+
+
+Example: Write actions to perform add/update/delete/view and list the employees
+
+create table Emp
+(
+  Id int primary key identity,
+  Name varchar(100) not null,
+  BirthDate Date,
+  Salary Decimal(18,2),
+  Dept Varchar(20)
+  )
+[This example uses EDM DbContext object which is not a good practice to use it directly into the controller's action however here we just wish to learn how these things are arranged and how to interact actions with views. In future, we must have to create separate ViewModels and BAO or DAO for database IO].
+
+
+Create a controller named - EmpController with following actions
+
+public ActionResult Index()
+{
+  //Lists the Employees
+  ViewBag.Emps = new EmpDbEntities().Emps.ToList();
+  return View();
+ }
+
+        [HttpGet]
+        public ActionResult Create()
+        {
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Create(string name, DateTime? birthdate, decimal? salary, string dept)
+        {
+            using (var db = new EmpDbEntities())
+            {
+                var e = new Emp
+                {
+                    BirthDate = birthdate ?? DateTime.MinValue,
+                     Dept = dept,
+                      Name = name,
+                       Salary = salary ?? 0
+                };
+
+                db.Emps.Add(e);
+                db.SaveChanges();
+                ViewBag.Message = "Employee added";
+                return View();
+            }
+        }
+
+       
+        [HttpGet]
+        public ActionResult Edit(int? id)
+        {
+            using (var db = new EmpDbEntities())
+            {
+                var e = db.Emps.FirstOrDefault(x => x.Id == id);
+                if (e == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                ViewBag.Id = e.Id;
+                ViewBag.Name = e.Name;
+                ViewBag.BirthDate = (e.BirthDate ?? DateTime.MinValue).ToString("yyyy-MM-dd");
+                ViewBag.Dept = e.Dept;
+                ViewBag.Salary = e.Salary;
+
+            }
+                return View();
+        }
+        [HttpPost]
+        public ActionResult Edit(int? id,string name, DateTime? birthdate, decimal? salary, string dept)
+        {
+            using (var db = new EmpDbEntities())
+            {
+                var e = db.Emps.FirstOrDefault(x => x.Id == id);
+                if(e!=null)
+                {
+                    e.Name = name;
+                    e.Salary = salary;
+                    e.Dept = dept;
+                    e.BirthDate = birthdate;
+                    db.SaveChanges();
+                    ViewBag.Message = "Employee update";
+
+                    //to embed the data
+                    ViewBag.Id = e.Id;
+                    ViewBag.Name = e.Name;
+                    ViewBag.BirthDate = e.BirthDate.Value.ToString("yyyy-MM-dd");
+                    ViewBag.Dept = e.Dept;
+                    ViewBag.Salary = e.Salary;
+                }
+               else
+                {
+                    return RedirectToAction("Index");
+                }
+                return View();
+            }
+        }
+
+        [HttpGet]
+        public ActionResult Delete(int? id)
+        {
+            using (var db = new EmpDbEntities())
+            {
+                var e = db.Emps.FirstOrDefault(x => x.Id == id);
+                if (e == null)
+                {
+                    return RedirectToAction("Index");
+                }
+                ViewBag.Id = e.Id;
+                ViewBag.Name = e.Name;
+                ViewBag.BirthDate = e.BirthDate.Value.ToString("yyyy-MM-dd");
+                ViewBag.Dept = e.Dept;
+                ViewBag.Salary = e.Salary;
+
+            }
+            return View();
+        }
+
+        [HttpPost]
+        public ActionResult Delete(int? id,string dummy)
+        {
+            using (var db = new EmpDbEntities())
+            {
+                var e = db.Emps.FirstOrDefault(x => x.Id == id);
+                if (e != null)
+                {
+                    db.Emps.Remove(e);
+                    db.SaveChanges();
+                }
+            }
+            return RedirectToAction("Index");
+        }
+        [HttpGet]
+        public ActionResult FastDelete(int? id)
+        {
+             Same as Delete Post action             
+        }
+
+Index.cshtml
+------------
+     <h3><a href="/Emp/Create">New Employee</a></h3>
+    <table>
+        @foreach(var e in ViewBag.Emps)
+        {
+            <tr>
+                <td>@e.Id</td>
+                <td>@e.Name</td>
+                <td>@e.BirthDate</td>
+                <td>@e.Salary</td>
+                <td>@e.Dept</td>
+                <td>
+                    <a href="/Emp/Edit/@e.Id">Edit</a>
+                    <a href="/Emp/Delete/@e.Id">Delete</a>
+                    <a href="/Emp/FastDelete/@e.Id">Fast Delete</a>
+                </td>
+            </tr>
+        }
+    </table>
+
+Create.cshtml
+-------------
+    <h3><a href="/Emp/Index">Back</a></h3>
+     <form method="post" action="/Emp/Create">
+         <p>
+             Name : <input type="text" name="name"/>
+         </p>
+         <p>
+             Date : <input type="date" name="birthdate" />
+         </p>
+         <p>
+             Salary : <input type="number" name="salary" />
+         </p>
+         <p>
+             Dept : <input type="text" name="dept" />
+         </p>
+         <p>
+             <button>Add</button>
+         </p>
+         <p>@ViewBag.Message</p>
+     </form>
+Edit.cshtml
+-------------
+    <h3><a href="/Emp/Index">Back</a></h3>
+    <form method="post" action="/Emp/Edit">
+        <input type="hidden" value="@ViewBag.Id" name="id"/>
+        <p>
+            Name : <input type="text" value="@ViewBag.Name" name="name" />
+        </p>
+        <p>
+            Date : <input type="date" value="@ViewBag.BirthDate" name="birthdate" />
+        </p>
+        <p>
+            Salary : <input type="number" value="@ViewBag.Salary" name="salary" />
+        </p>
+        <p>
+            Dept : <input type="text" value="@ViewBag.Dept" name="dept" />
+        </p>
+        <p>
+            <button>Update</button>
+        </p>
+        <p>@ViewBag.Message</p>
+    </form>
+Delete.cshtml
+------------
+    <h3><a href="/Emp/Index">Back</a></h3>
+    <form method="post" action="/Emp/Delete">
+        <input type="hidden" value="@ViewBag.Id" name="id" />
+        <h3>Are you sure to remove this record?</h3>
+        <ul>
+            <li>Name : @ViewBag.Name</li>
+            <li>BirthDate : @ViewBag.BirthDate</li>
+            <li>Salary : @ViewBag.Salary</li>
+        </ul>
+        <p>
+            <button>Delete</button>
+        </p>
+    </form>

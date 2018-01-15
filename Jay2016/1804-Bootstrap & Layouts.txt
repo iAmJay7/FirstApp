@@ -1,0 +1,11 @@
+ASP.NET MVC - CSS framework bootstrap & layouts
+-----------------------------------------------
+By default MVC App uses "bootstrap" css framework when you choose the "scafolding" technique to create your views; especially the layout. However, you can choose different or your own css framework too.
+
+
+MVC project template automatically add bootstrap resources (however you may use nuget package manager to update or install it) to the project template.
+
+The "Layouts" pages often saved into "Shared" folder under the /Views folder and here is a very special file located under the /Views folder called "_ViewStart.cshtml" that is used to set the default "layout" for the views (.cshtml).
+That means you don't have to set the "Layout" property for each and every view. However if you're not willing to the use the default layout then you must have to set the 'Layout' property manually for a particular page (view).
+
+

@@ -1,0 +1,321 @@
+jQuery - a JavaScript function object library 
+---------------------------------------------
+jQuery is an open source JavaScript lib which allow us to use the common JavaScript code on different browsers - ie. cross-browser without affecting the performance of the code. You can use jQuery or not is not a big question; the jQuery library is nothing new but it exposes the great functionality of JavaScript in easy manner.
+
+For example, we've document.getXXXXXX methods but the jQuery uses these methods under the single name called $(). 
+Have a look at following code:
+
+ <div id="test">The red sun</div>
+ 
+ <script>
+   $("#test").css("color","red");  //jQuery code 
+ </script>
+ and you the JavaScript code:
+        document.getElementById("test").stye.color = "red";
+
+Download the jQuery source code from the jQuery.com. There are two files - jquery-x-x.js for developers (debug version) so the developers can update/manipulate the code or contribute the code and second one is jquery-x-x-min.js -- minified or compressed or production file that is small size with condenced content.
+
+Note that you can use PM>Install-package jQuery , Package Manager in VS to install/update the jQuery in your current project/website.
+
+Embed jQuery debug or minified JavaScript files and setup the environment.
+
+1. Copy the jQuery-x-x-x.js file into your project (say under the "/Scripts" folder or any folder you named it).
+2.
+
+<script src="/Scripts/jquery-x-x-x.js"></script>
+<script>
+  //code
+</script>
+
+The "jQuery" or "$" is a reference variable which represent the jQuery object reference and which is added into the global namespace. i.e window.$ or window.jQuery
+
+The jQuery Selectors 
+====================
+The power of jQuery is lie in its CSS style selectors to obtain the node or node list.
+
+1. $("*") - Returns an object of jQuery that wraps a nodelist
+2. $("#id") - returns an object by "id" attribute value
+3. $(".className") - returns an object by "class" attribute value
+4. $("tagName") - returns an object by tag name
+5. $("selector1 > selector2")
+6. $("selector + selector2")
+7. $("selector ~ selector2")
+8. $("selector1,selector2,..") returns node or node list accordingly.
+
+To create a DOM
+---------------
+9. $("<tagName>") syntax to create a dom
+
+To manipulate the DOM
+-------------------
+10. val(value) - set value
+11. val()      - get a value
+12. html(html) - set HTML text
+13. html()     - get the HTML text
+14. text(text)  - set the text
+15. text()      - returns the text
+
+16. attr(name,value) - set attribute
+17. attr(name) - get an attribute
+
+18. css(name,value) - set css property
+19. css(name) - get css property
+
+20. addClass( cssClass ) - add css class
+21. removeClass( cssClass) -remove css class
+22. toggleClass( cssClass ) - add or remove css classs
+
+23. hide([interval]) - hide the object
+24. show[interval]) - show the object
+25. toggle([interval]) - hide/show the object
+
+26. obj.append( child-obj) - append "child-obj" into "obj"
+27. child-obj.appendTo( selector or parent) - append a "child-obj" to parent object
+
+28. empty() - remove all child
+29. remove() - remove an object
+
+
+Ajax functions
+-----------------
+30. $.get() - get request
+31. $.post() - post request
+32. $.ajax( { } ) - main or root ajax function and it is used by $.get and $.post and many other functions
+33. $.getJSON() - get requet with JSON result
+
+Events name handlers
+--------------------
+jQuery ommit "on" prefix to name the event. In JavaScript it is "onclick" but in jQuery it is "click".
+
+Example-1 
+
+<!doctype html>
+
+<h1>The</h1>
+<p>Red</p>
+<button>Sun</button>
+<input type="text" />
+<input type="email" />
+ <div id="info">
+     <p>Para1</p>
+     <p>Para2</p>
+     <div>
+         <p>Para3</p>
+     </div>
+ </div>
+
+<script src="~/Scripts/jquery-3.1.1.js"></script>
+<script>
+    console.log($("*"));
+    $("*").css("border", "1px solid red")
+          .css("color", "blue");
+    $("p").css("background", "green");
+    $("input[type='text']").css("background", "yellow");
+
+    $("#info").css("border", "6px solid blue");
+    $("#info > p").css("background", "red");
+</script>
+
+Example: 
+
+ <h3>Title1</h3>
+ <div>Description1</div>
+ <div>Description1.1</div>
+ <h3>Title2</h3>
+ <div>Description2</div>
+
+ <script src="~/Scripts/jquery-3.1.1.js"></script>
+ <script>
+   $("h3 + div").color("color","#f00").hide();
+ </script>
+
+Example:
+
+<input type="text" id="no1"/>
+<input type="text" id="no2" />
+<div id="out"></div>
+<button onclick="doAdd()">Add</button>
+<script src="~/Scripts/jquery-3.1.1.min.js"></script>
+ 
+<script>
+    function doAdd() {
+        var result = parseInt($("#no1").val()) + parseInt($("#no2").val());
+        if (result) {
+            $("#out").html("Result <strong>" + result + "</strong>");
+        } else {
+            $("#out").html("");
+        }
+    }
+</script>
+
+Example: append and appenTo functions
+<div id="out"></div>
+
+<script>
+  var btn = $("<button>"); // new object
+  btn.html("Click Me");
+  btn.click = function() {
+     console.log('Button clicked');
+  };
+  
+  $("#out").append( btn ); //add button to "out"
+
+  var h1 = $("<h1>");
+  h1.html("Hello World");
+  h1.appendTo( "#out" );
+
+  $("#out").append( $("<h2>").html("Hi") );
+  $("#out").append( $("<h3>How's going</h3>") );
+
+  $("<intput>").attr("type","text").appendTo( "#out" );
+</script>
+
+Example:
+
+<a href="#" id="incr">A+</a>
+<a href="#" id="decr">A-</a>
+
+<script>
+  function FontSize(initSize) {
+     $("body").css("font-size",initSize + "em");
+     return {
+          "incr": function() {
+                 initSize = initSize + 0.1;
+                  $("body").css("font-size",initiSize + "em");
+           },
+          "decr": function() {
+                 initSize = initSize - 0.1;
+                  $("body").css("font-size",initiSize + "em");
+           }
+      }
+  }
+
+  var size = FontSize(1);
+  $("#incr").click = size.incr;
+  $("#decr").click = size.decr;
+</script>
+
+Example: Add, remove the css class selectors
+
+ 
+ <h1 class="help">Hello World</h1>
+ <style>
+     .help {
+         color: green;
+     }
+     .bk-blue {
+         background: blue;
+     }
+ </style>
+ <button onclick="removeBk()">Remove Background color</button>
+ <button onclick="toggleBk()">Add/Remove Background color</button>
+<script>
+    $("h1").addClass("help");
+    $("h1").addClass("bk-blue");
+    function removeBk() {
+        $("h1").removeClass("bk-blue");
+    }
+    function toggleBk() {
+        $("h1").toggleClass("bk-blue");
+    }
+</script>
+
+jquery-dom.load(resource) - To request the resource and insert the result into "innerHTML" of the given DOM
+---------------------------
+Example:
+
+Index.cshtml
+-------------
+ <h1>Site Name</h1>
+<nav>
+    <a href="#" onclick="request('home.cshtml')">Home</a>
+    <a href="#" onclick="request('about.cshtml')">About</a>
+    <a href="#" onclick="request('contact.cshtml')">Contact us</a>
+</nav>
+ <hr/>
+<select id="country"></select>
+<div id="out"></div>
+<script>
+    function request(page) {
+        $("#out").load(page);
+    }
+    $("#country").load("countries.cshtml");
+</script>
+
+home.cshtml, about.cshtml, contact.cshtml pages contains page specific markup and text.
+
+countries.cshtml 
+----------------
+<option>India</option>
+<option>UK</option>
+
+Example: Display server date
+
+  setInterval(() => {
+        $("#out").load("getdate.cshtml");
+  }, 1000);
+
+
+Example: $.ajax( { } ) - Low level ajax function
+
+1.
+
+<div id="out"></div>
+<script>
+    $.ajax({
+        "url": "getdate.cshtml",
+        "type": "post",
+        "success": function (result) {
+            $("#out").html(result);
+        }
+    });
+</script>
+
+2.
+
+<input type="text" id="no" />
+<input type="text" id="name" />
+<button onclick="doSave()">Submit</button>
+<div id="out"></div>
+
+<script>
+    function doSave() {
+        var data = {
+            "no": $("#no").val(),
+            "name": $("#name").val()
+        }
+        $.ajax({
+            "url": "empsave.cshtml",
+            "type": "post",
+            "data": data,
+            "success": function (result) {
+                $("#out").html(result);
+            },
+            "error": function (xhr) {
+                $("#out").html('Something is improper!Error');
+            }
+        });
+    }
+</script>
+ 
+$.get(url,data,callback), $.post(url,data,callback) - uses $.ajax() function
+----------------------------------
+$.get("empsave.cshtml",data, function(result) {
+  $("#out").html(result);
+});
+$.post("empsave.cshtml",data, function(result) {
+  $("#out").html(result);
+});
+
+Example: Populate country, state and city dropdown (select element) via AJAX functions.
+Example: User account creation
+
+Email : _____________________  [Available/Not Available] <-- Display message by checking user's email in database
+Password: _____________________ [Streanth check and display appropriate message]
+Confirm PAssword ______________
+[Submit] <--- Submit data asynchoniously  via AJAX function
+
+Example: List the user account data
+
+Email  |   Date created | ...... |    Via ajax function (Json data) and add sort by feature for each column.      
+

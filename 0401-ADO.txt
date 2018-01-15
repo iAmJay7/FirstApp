@@ -1,0 +1,794 @@
+ADO.NET - Database Integration APIs (Library)
+==================================================================================================================
+ADO stands for "Active DataSet Object"; The term "DataSet" means cache of data or in-memory representation of data; The "DataSet" was evolutionary achievement in early version of .net framework (1.0 and 1.1) and it was widely popular before the .net framwork version 2.0 (In 2.0, Generics was introduced and so there is collections of generics and in .net framework version 3.1 we have LINQ). Nows day this feature "DataSet" is not used because of "Generics" and "Linq". However the old apps still uses "DataSet -- a kind of collections".
+
+The System.Data and System.Xml namespaces constitute the ADO.NET library.
+
+There are two category of TYPEs under ADO.NET library:
+
+ 1. DataSet classes -- It is an API to represent data into memory just like a data into the databases. Yes, in 			the form of "Tables". DataSet is a collection of "DataTable" objects. DataTable is
+			Collections of DataColumn and DataRow.
+
+ 2. Data Provider classes - Classes responsible to connect with database (Any known popular database - Ms-Access,
+				Excel, Oracle, MSSQL, MySql etc), perform database operations and return the result.
+
+The "Data Provider"
+====================
+
+The "Data Provider" is a protocol (just like JDBC for Java). It is a set of interfaces that tells the database vendors to implement same set of interfaces to provide the use of their database product to the .net applications.
+
+In other words, any database vendor who wants their database product be used in .net app then they must have to design a library using "Data Provider" guideline. 
+
+Under System.Data namespace we've number of interfaces:
+
+  1. IDbConnection - The connection interface describes the nature of connection object- connect to the database server
+			by setting database connection info called "ConnectionString"; user name, password, server name
+			etc.
+  2. IDbCommand    - The "command" object stands for SQL statement, procedure, functions; to prepare statements,
+			execute them and returns the result.
+  3. IDataReader   - To read the data (fetch from) from the database (tables).
+
+   (In Java, it was COnnection,Statement and Resultset)
+
+
+The System.Data.OleDb Data Provider (OleDb Data Provider)
+----------------
+This library is already installed in our machine (integrated with .net framework) for the lagecy (very old databases - foxpro, dbase, old versions of oracle etc), text or csv, excel, Ms-Access etc.
+
+A Different data providers uses diff prefix to name the Connection, Command, DataReader and other classes but they have common set of methods.
+The classes in this API begins with OleDb; OleDbConnection, OleDbCommand, OleDbDataReader etc
+
+
+The System.Data.SqlClient Data Provider (SqlClient Data Provider)
+---------------
+This lib is also installed and is for Microsoft SQL Server (version 7, 2000,2006,2008,2010,2012,2014,2016); MSSQL Server is also known as "Sequel Server". (SqlConnection, SqlCommand, SqlDataReader)
+
+
+Download Oracle or MySql or other Data providers from their websites. For example, you can download ODP.NET Oracle Data Provider from oracle website and MySql .Net Connector data provider from MySql website.
+(OracleConnection, OracleXXXXXXX, MySqlConnection, MySqlxxxxxxx).
+
+
+
+The Data Provider APIs (General)
+-----------------------------------
+1. XXXXXConnection  -- 1. Constructor of this class allow us to set connect information so this component connect or 
+				extablish the database connection (or create a database session).
+			2. ConnectionString = "connection string"; Property is used to set or get connect info,
+			3. Open() - Establish the database connection.
+			4. Close() - Terminate the database connection. (Again you can use Open() to re-connect)
+			5. Dispose() - Implementation of IDisposable interface. It will dispose the object and terminate
+					the connection.
+
+			Almost all ADO objects/resources uses huge amount of memory and these resources must be released
+			once we finished tasks. The Dispose() method do the same so we must have to invoke/called it 
+			before leaving the program.
+
+			It is a best practice use using() block.
+
+			using(var cn = new SqlConnection()) { }
+                        using(OleDbConnection cn = new OleDbConnection()) {}
+2. XXXXXCommand -      1. Constructor - set CommandText and Connection reference
+			2. Connection - To set connect object reference.
+			2. CommandText - To set SQL statement or name of procedure or function
+			3. CommandType - Default nature of command is "SQL or Text" and you must have to change 
+					 to "Stored Procedure" if CommandText contain the name of "provcedure or 					function" name.
+			4. Parameters - It is a collection XXXXXParamater() objects to set parameter name and parameter
+						value.
+					OleDb and SqlClient providers uses "@" prefix to name the parameters.
+					e.g  insert into category values (@p1,@p2)
+ 					Oracle uses : and MySql uses ? or &
+
+			5. int ExecuteNonQuery() - This method execute the "CommandText" and returns the count of
+					affected rows. Use this method to execute all statements except "SELECT".
+
+			6. XXXDataReader ExecuteReader() -- This method execute the query (especially SELECT) and
+					returns cursor (pointer to the data) in the form of XXXXXDataReader object.
+					Later, with the help of methods of DataReader, we can examine the curosr or
+					fetch the rows.
+
+			7. object ExecuteScalar() -- This method returns value from first column and first row 						(especially SELECT). The return value can be anything but a single
+						value - null, int, string date, byte array etc.
+3. XXXXDataReader -  The "ExecuteReader()" method of XXXXCommand creates an instance.
+			1. bool Read() -- Read a row from the database and returns true if that row has data; returns
+						false otherwise.
+			2. object [columnindex | columnname] -- Column index or column name to get the value from the 				currently read row.
+			3. XXXXX GetXXXXX(int columnindex) - REturns value from the given column number by casting to
+								appropriate type.
+					e.g  GetInt32(0);  returns int from the 0 (1st) column
+						GetString(1); string from (1) 2nd col 
+						GetDateTime(2); datetime from 3rd column
+			4. FieldCount - Count of fields in a row
+			
+Note: Connection, Command and DataReader have implemented IDisposable so use using() to dispose objects gracefully.
+
+
+Examples: Working with Ms-Access Database (Local file system database)
+--------------------------------------------------------------------------------------------
+Excel, Ms-Access, Dbase or CSV data files are saved into a project folder (local folder of app) so they can be moved or used along with project.
+
+In ASP.NET Web app, there is a special folder for storing  "database files" or "data documents" and it is "App_Data" folder. So always store your data files into App_Data folder. This folder is ASP.NET Reserved folder and its content never be exposed to the users/clients directly. (It means the content of App_Data is secured).
+
+The App_Data folder's physical path is retrieved by the special path substitute - |DataDirectory|. The |DataDirectory| indicates the path of Add_Data folder.
+
+    So, in order to set the location of data files in our project code, we can use following code:
+ 
+                |DataDirectory|\ProductDb.accdb  or |DataDirectory|\my.xml etc
+
+Note: Never use absolute path! e.g c:\xyc\yourapp\file.accdb"; This path won't work if your app is deployed on different location.
+
+1. Create or Open the web app + Add the App_Data folder + Paste (copy+paste) the Ms-Access data file into App_Data (Or use Add Existing Item via Project or Solution Explorer's shorthand menu).
+2. Double click on "Database file" (ProductDb.mdb); a file just pasted into App_Data. This action open "Server Explorer"  (View Menu + Server Explorer) and it shows the Ms-Access database and its objects (tables).
+
+  Once, you navigate the database in Server Explorer, we can obtain the connection info via Right mouse click on Database name in Server explorer + Properties + Copy the content of "ConnectionString" property:
+
+
+Provider=Microsoft.Jet.OLEDB.4.0;Data Source=c:\csnet\MsAccessApp\MsAccessApp\App_Data\ProductDb.mdb;Persist Security Info=True                                     ^
+                                              |
+                     We will have to change this path; convert it to relative path,
+				|DataDirectory|\ProductDb.mdb 
+
+3. Write following code in class's method or .cshtml page:
+
+@using System.Data.OleDb
+
+@{
+  using(OleDbConnection cn = new OleDbConnection())
+   {
+    cn.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=|DataDirectory|\ProductDb.mdb;Persist Security Info=True"; // copy + past 
+    using(OleDbCommand cmd = new OleDbCommand())
+     {
+        cmd.Connection = cn;
+        cmd.CommandText = "insert into category values (@p1,@p2)"; //you can use property param name too
+        cmd.Parameters.AddWithValue("@p1",10);
+        cmd.Parameters.AddWithValue("@p2","Pencil");
+        cn.Open();
+        cmd.ExecuteNonQuery();
+        <p>Category added successfully!</p>
+      }
+    }
+}
+
+Note: SQL queries are case insensitive but the parameter names in our query are case sensitive. It is good practice to use proper parameter names.
+
+        cmd.ComandText = "insert into Category Values (@CategoryId, @CategoryName)";
+        cmd.Parameters.AddWithValue("@CategoryId",10);
+        cmd.Parameters.AddWithValue("@CategoryName","Pencil");
+
+"Parameters" is a collection of "XXXXXParameter" class objects and each parameter has name, value, datatype and range or size/length.  You can use Add() method of Parameters collection too.
+
+         Parameters.Add("@CategoryId",OleDb.Int, 4).Value = 10;
+                                        Type     size
+         Parameters.Add("@CategoryName",OleDb.Varchar,30).Value = "Pencil";
+
+
+Example: USe Update and Delete queries
+
+   cmd.CommandText = "Update Category Set CategoryName=@CategoryName where CategoryId=@CategoryId";
+   ....
+
+Example: Fetch Category records
+
+@{
+ using(var cn = new OleDbConnection())
+  {
+    using(var cmd = new OleDbCommand())
+     {
+       cn.ConnectionString = @"Copy+Paste+here";
+       cmd.Connection = cn;
+       cmd.CommandText = "select * from category";
+       cn.Open();
+       using(var dr = cmd.ExecuteReader())
+        {
+          while(dr.Read())
+           {
+              <p>@dr[0]  @dr["CategoryName"]</p>
+            }
+         }
+      }
+   }
+}
+
+dr[column_index or column Name] returns value in "Object" form and you need to cast it. Instead of this, you can use dr.GetInt32(0) and dr.GetString(1) methods.
+
+    while(dr.Read())
+     {
+         <p>@dr.GetInt32(0)   @dr.GetString(1)</p>
+      }
+
+
+To examine the database NULL (not an object null), use IsDBNull(columnIndex) bool property
+ 
+ <p>@(dr.IsDBNull(1) ? "Not Available" : dr.GetString(1))</p>
+
+
+Example: 
+
+@using System.Data.OleDb
+
+@{
+    var CategoryId = Request["CategoryId"].AsInt();
+    var CategoryName = Request["CategoryName"] ?? "";
+    var cmd = Request["cmd"];
+    var message = "";
+
+    if ("Add".Equals(cmd))
+    {
+        using (var cn = new OleDbConnection())
+        {
+            using (var cmd1 = new OleDbCommand())
+            {
+                cn.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=c:\csnet\MsAccessApp\MsAccessApp\App_Data\ProductDb.mdb;Persist Security Info=True";
+                cmd1.Connection = cn;
+
+                cmd1.CommandText = "insert into category values (@p1,@p2)";
+                cmd1.Parameters.AddWithValue("@p1", CategoryId);
+                cmd1.Parameters.AddWithValue("@p2", CategoryName);
+
+                cn.Open();
+                cmd1.ExecuteNonQuery();
+                message = "Record added";
+
+            }
+        }
+    }
+
+
+}
+ 
+<form method="post">
+    <p>
+        <label>ID <input type="number" name="CategoryId" value="@CategoryId" /></label>
+    </p>
+    <p>
+        <label>Name <input type="text" name="CategoryName" value="@CategoryName" /></label>
+    </p>
+    <p>
+        <button name="cmd" value="Add">Add</button>
+    </p>
+    <p>@message</p>
+</form>
+
+@{
+    using (var cn = new OleDbConnection())
+    {
+        using (var cmd1 = new OleDbCommand())
+        {
+            cn.ConnectionString = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=c:\csnet\MsAccessApp\MsAccessApp\App_Data\ProductDb.mdb;Persist Security Info=True";
+
+            cmd1.Connection = cn;
+            cmd1.CommandText = "select * from category";
+            cn.Open();
+            using (var dr = cmd1.ExecuteReader())
+            {
+                while (dr.Read())
+                {
+                    <p>@dr[0]  @dr["CategoryName"]</p>
+                }
+            }
+        }
+    }
+}
+
+Example: Search by PK (primary key) ; It returns single or or nothing.
+
+...
+cmd.CommandText = "select * from Category Where CategoryId = @CategoryId";
+cmd.Parameters.AddWithValue("@CategoryId",10);
+
+cn.Open();
+using(var dr = cmd.ExecuteReader())
+{
+  if(dr.Read())
+   {
+     <p>Found  : @dr[0]  @dr[1]</p>
+    }
+ else
+   {
+     <p>Not found</p>
+   }
+}
+....
+
+Example: Search - pattern using WHERE .. Like expression; The column type must be varchar/string for LIKE expression.
+
+ e.g  SELECT * FROM CATEGORY Where CategoryName like 'A%'; Any category name begins with A
+                                                     'Pe%; Any name begins with Pe
+						     '%ed%'; Any name that contains 'ed' token
+
+cmd.CommandText = "select * from category where categoryname like @p1";
+cmd.Parameters.AddWithValue("@p1", "A%");
+
+cn.Open();
+using(var dr = cmd.ExecuteReader())
+{
+  while(dr.Read())
+   {
+     <p>@dr[0]  @dr[1]</p>
+    }
+}
+
+Example: Display product name and catgory name:
+   select Product.ProductName, Category.CategoryName 
+		From Product 
+ 			Join Category On Product.CatetoryId = Category.CategoryId
+OR
+ select Product.ProductName,
+        Category.CategoryName
+           from Product
+		where Category.CategoryId = Product.CategoryId
+
+
+Example: Category input/edit/search and list
+================================================
+@using System.Data.OleDb
+
+@{
+    var CategoryId = Request["CategoryId"].AsInt();
+    var CategoryName = Request["CategoryName"] ?? "";
+    var cmd = Request["cmd"] ?? "";
+    var message = "";
+    var canAdd = false;
+    var edit = false;
+    var CnStr = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=|DataDirectory|\ProductDb.mdb;Persist Security Info=True";
+
+    /* ----- Add ----*/
+    if ("Add".Equals(cmd))
+    {
+        using (var cn = new OleDbConnection())
+        {
+            using (var cm = new OleDbCommand())
+            {
+                cn.ConnectionString = CnStr;
+                cm.Connection = cn;
+                cm.CommandText = "select categoryId from category where categoryId=@CategoryId";
+                cm.Parameters.AddWithValue("@CategoryId", CategoryId);
+
+                cn.Open();
+                using (var dr = cm.ExecuteReader())
+                {
+                    if (!dr.Read())
+                    {
+                        canAdd = true;
+                    }
+                    else
+                    {
+                        message = "Duplicate category. Re-enter the Id";
+                    }
+                }
+            }
+        }
+
+        using (var cn = new OleDbConnection())
+        {
+            using (var cm = new OleDbCommand())
+            {
+                cn.ConnectionString = CnStr;
+                cm.Connection = cn;
+                cm.CommandText = "select categoryId from category where CategoryName=@CategoryName";
+                cm.Parameters.AddWithValue("@CategoryName", CategoryName);
+
+                cn.Open();
+                using (var dr = cm.ExecuteReader())
+                {
+                    if (!dr.Read())
+                    {
+                        canAdd = true;
+                    }
+                    else
+                    {
+                        canAdd = false;
+                        message = "Duplicate category. Re-enter the Id Or Name";
+                    }
+                }
+            }
+        }
+
+        if (canAdd)
+        {
+            using (var cn = new OleDbConnection())
+            {
+                using (var cm = new OleDbCommand())
+                {
+                    cn.ConnectionString = CnStr;
+                    cm.Connection = cn;
+                    cm.CommandText = "insert into category values (@CategoryId, @CategoryName)";
+                    cm.Parameters.AddWithValue("@CategoryId", CategoryId);
+                    cm.Parameters.AddWithValue("@CategoryName", CategoryName);
+
+                    cn.Open();
+                    cm.ExecuteNonQuery();
+                    message = "Category added successfully";
+                }
+            }
+        }
+    }
+    /* ----- End Add ----*/
+
+
+    /*----SEarch --*/
+    if ("Search".Equals(cmd) || "Edit".Equals(cmd))
+    {
+        using (var cn = new OleDbConnection())
+        {
+            using (var cm = new OleDbCommand())
+            {
+                cn.ConnectionString = CnStr;
+                cm.Connection = cn;
+                cm.CommandText = "select * from category where CategoryId=@CategoryId";
+                cm.Parameters.AddWithValue("@CategoryId", CategoryId);
+
+                cn.Open();
+                using (var dr = cm.ExecuteReader())
+                {
+                    if (dr.Read())
+                    {
+                        CategoryId = dr.GetInt32(0);
+                        CategoryName = dr.GetString(1);
+                        edit = true;
+                    }
+                    else
+                    {
+
+                        message = "Not Found!";
+                    }
+                }
+            }
+        }
+    }
+
+    /*----End SEarch --*/
+
+    /*--- Delete---*/
+    if ("Delete".Equals(cmd))
+    {
+        using (var cn = new OleDbConnection())
+        {
+            using (var cm = new OleDbCommand())
+            {
+                cn.ConnectionString = CnStr;
+                cm.Connection = cn;
+                cm.CommandText = "delete from category where CategoryId= @CategoryId";
+                cm.Parameters.AddWithValue("@CategoryId", CategoryId);
+
+                cn.Open();
+                cm.ExecuteNonQuery();
+                message = "Category deleted successfully";
+                CategoryId = 0;
+                CategoryName = "";
+            }
+        }
+    }
+    /*-- End Delete-- */
+
+    /*--- Update---*/
+
+
+    if ("Update".Equals(cmd))
+    {
+        using (var cn = new OleDbConnection())
+        {
+            using (var cm = new OleDbCommand())
+            {
+                cn.ConnectionString = CnStr;
+                cm.Connection = cn;
+                cm.CommandText = "update Category set categoryname=@CategoryName  where CategoryId= @CategoryId";
+                cm.Parameters.AddWithValue("@CategoryName", CategoryName);
+                cm.Parameters.AddWithValue("@CategoryId", CategoryId);
+
+                cn.Open();
+                cm.ExecuteNonQuery();
+                message = "Category updated successfully";
+                edit = true;
+            }
+        }
+    }
+    /*-- End Update ---*/
+
+    if ("Cancel".Equals(cmd))
+    {
+        CategoryName = "";
+        CategoryId = 0;
+    }
+
+}
+<form method="post">
+    <p>
+        Id : <input type="number" name="CategoryId" value="@CategoryId" />
+        <button name="cmd" value="Search">Search</button>
+    </p>
+    <p>Name : <input type="text" name="CategoryName" value="@CategoryName" /></p>
+
+    @if (edit)
+    {
+        <p>
+            <button name="cmd" value="Update">Update</button>
+            <button name="cmd" value="Delete">Delete</button>
+            <button name="cmd" value="Cancel">Cancel</button>
+        </p>
+    }
+    else
+    {
+       <p>
+            <button name="cmd" value="Add">Add</button>
+        </p>
+    }
+    <p>@message</p>
+</form>
+
+<table>
+    @{
+        using (var cn = new OleDbConnection())
+        {
+            using (var cm = new OleDbCommand())
+            {
+                cn.ConnectionString = CnStr;
+                cm.Connection = cn;
+                cm.CommandText = "select * from category";
+
+                cn.Open();
+                using (var dr = cm.ExecuteReader())
+                {
+                    while (dr.Read())
+                    {
+                        <tr>
+                            <td>@dr[0]</td>
+                            <td>@dr[1]</td>
+                            <td>
+                                <form method="post">
+                                    <input type="hidden" name="CategoryId" value="@dr[0]" />
+                                    <button name="cmd" value="Edit">Edit</button>
+                                    <button name="cmd" value="Delete">Delete</button>
+                                </form>
+                            </td>
+                        </tr>
+                    }
+                }
+            }
+        }
+    }
+</table>
+
+Example: ProductPAge
+
+@using System.Data.OleDb
+
+@{
+ var CnStr = @"Provider=Microsoft.Jet.OLEDB.4.0;Data Source=|DataDirectory|\ProductDb.mdb;Persist Security Info=True";
+}
+<!DOCTYPE html>
+<html>
+    <head>
+        <title></title>
+    </head>
+    <body>
+        <form method="post">
+            <p>
+                Category:
+                <select name="CategoryId">
+                    @using (var cn = new OleDbConnection())
+                    {
+                        using (var cm = new OleDbCommand())
+                        {
+                            cn.ConnectionString = CnStr;
+                            cm.Connection = cn;
+                            cm.CommandText = "select * from category";
+
+                            cn.Open();
+                            using (var dr = cm.ExecuteReader())
+                            {
+                                while (dr.Read())
+                                {
+                                     <option value="@dr[0]">@dr[1]</option>
+                                }
+                            }
+                        }
+                    }
+                </select>
+            </p>
+            <p>Name: <input type="text" name="ProductName"/></p>
+
+        </form>
+    </body>
+</html>
+
+
+Design the "ViewModels" and "Data Access Layer/Object" layers
+-----------------------------------------------------------------
+It is best practice to not write C# code directly into a web page. Instead we need to define classes to keep data and database code separate from the user interfaces (Web or mobile or desktop apps).
+
+Assume that we've two tables:
+
+ 1. Category (CategoryId, CategoryName) and
+ 2. Product  (ProductId, ProductName......)
+
+Now, first of all, define the root namespace; either creating a web application project with meaningful name. 
+ e.g. ShopApp project name then "ShopApp" will be your default namespace
+Or use properties of Project to change the default namespace of your project; the project name will be different than the default namespace.
+
+1. Create "Models" folder into your project
+2. Create "ViewModels.cs" and add following classes
+
+namespace ShopApp.Models
+{
+  public class CategoryViewModel
+   {
+     public int CategoryId { get;set; }
+     public string CategoryName { get;set; }
+    }
+  public class ProductViewModel
+   {
+    public int ProductId {get;set;}
+    public string ProductName {get;set;}
+    public string Unit {get;set;}
+    public decimal Qty {get;set;}
+    public decimal Rate {get;set;}
+    public decimal Discount {get;set;}
+    public decimal Amount
+     {
+       get { return Qty*Rate-Qty*Rate*Discount/100; }
+     }
+    public CategoryViewModel Category {get;set;}  //Composition
+   }
+}
+
+3. Create a "MyConfig.cs" class and add connection string 
+
+namespace ShopApp.Models
+{
+  public class MyConfig
+    {
+      public static const string CnStr = @"Copy+Paste";
+     }
+}
+
+4. Create CategoryDao.cs and write following methods
+ 
+public class CategoryDao
+{
+   public static bool Add(CategoryViewModel model) 
+    {
+       using(var cn = new OleDbConnection())
+        {
+         using(var cmd = new OleDbCommand())
+          {
+            cn.ConnectionString = MyConfig.CnStr;
+            cmd.Connection = cn;
+            cmd.CommandText = "insert into Category (CategoryName) Values (@CategoryName)"; //assume CategoryId is
+											    //autonumber
+            cmd.Parameters.AddWithValue("@CategoryName",model.CategoryName);
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            return true;
+            }
+          }
+      return false;
+    }
+  public static bool Update(CategoryViewModel model) 
+    {
+       using(var cn = new OleDbConnection())
+        {
+         using(var cmd = new OleDbCommand())
+          {
+            cn.ConnectionString = MyConfig.CnStr;
+            cmd.Connection = cn;
+            cmd.CommandText = "Update Category set CategoryName=@CategoryName where CategoryId = @CategoryId"; 
+											    
+            cmd.Parameters.AddWithValue("@CategoryName",model.CategoryName);
+            cmd.Parameters.AddWithValue("@CategoryId",model.CategoryId);
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            return true;
+            }
+          }
+      return false;
+    }
+  public static bool Delete(CategoryViewModel model) 
+    {
+       using(var cn = new OleDbConnection())
+        {
+         using(var cmd = new OleDbCommand())
+          {
+            cn.ConnectionString = MyConfig.CnStr;
+            cmd.Connection = cn;
+            cmd.CommandText = "Delete from  Category  where CategoryId = @CategoryId"; 
+            cmd.Parameters.AddWithValue("@CategoryId",model.CategoryId);
+            cn.Open();
+            cmd.ExecuteNonQuery();
+            return true;
+            }
+          }
+      return false;
+    }
+  public static CategoryViewModel Get(CategoryViewModel model)
+  {
+       using(var cn = new OleDbConnection())
+        {
+         using(var cmd = new OleDbCommand())
+          {
+            cn.ConnectionString = MyConfig.CnStr;
+            cmd.Connection = cn;
+            cmd.CommandText = "select * from  Category  where CategoryId = @CategoryId"; 
+            cmd.Parameters.AddWithValue("@CategoryId",model.CategoryId);
+            cn.Open();
+            using(var dr = cmd.ExecuteReader())
+             {
+               if(dr.Read())
+                {
+                 return new CategoryViewModel
+                   {
+                       CategoryId = dr.GetInt32(0),
+                       CategoryName = dr.GetString(1)
+                    };
+                 }
+               }//end dr
+              }//end cmd
+           }//end cn
+     return null;
+  }
+  
+  public static List<CategoryViewModel> Gets()
+  {
+    var list = new List<CategoryViewModel>();
+      using(var cn = new OleDbConnection())
+        {
+         using(var cmd = new OleDbCommand())
+          {
+            cn.ConnectionString = MyConfig.CnStr;
+            cmd.Connection = cn;
+            cmd.CommandText = "select * from  Category order by CategoryName"; 
+            cn.Open();
+            using(var dr = cmd.ExecuteReader())
+             {
+               while(dr.Read())
+                {
+                 list.Add(new CategoryViewModel
+                   {
+                       CategoryId = dr.GetInt32(0),
+                       CategoryName = dr.GetString(1)
+                    });
+                 }
+               }//end dr 
+              }//end cmd
+           }//end cn
+    return list;
+   }
+}
+
+ProductDao.cs
+--------------
+public class ProductDao
+{
+   public static bool Add(ProductViewModel model) { .. }
+   public static bool Update(ProductViewModel model) { .. }
+   public static bool Delete(ProductViewModel model) { .. }
+   public static ProductViewModel Get(ProductViewModel model) 
+    { 
+     .....
+     cmd.CommandText=@"SELECT Product.*,Category.CategoryName 
+                          FROM Product 
+                          JOIN Category ON Category.CategoryId = Product.ProductId 
+                          WHERE Product.ProductId = @ProdocutId";
+     ...
+     if(dr.Read())
+     {
+        return new ProductViewModel
+          {
+             ...,
+             Category = new CategoryViewModel { CategoryId = dr.GetInt(10) /* assume CategoryId column */,
+                                                CategoryName  dr.GetString(11) }
+           };
+      }
+     ...
+     return null;     
+   }
+   public static List<ProductViewModel> Gets() { .. }
+   public static List<ProductViewModel> Gets(int categoryId) { .. } //by category id
+}
+
+Create .cshtml pages (Category & product) and call these methods.
+
+[Note: CategoryId and ProductId are Autonumber columns]
+
+
+  
+

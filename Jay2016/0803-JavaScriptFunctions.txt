@@ -1,0 +1,297 @@
+The "function" type
+====================
+The "function" is an object and it is used to create simple or complex functions, class (type) and closures.
+
+Syntax to create a function:
+ 
+  1. Declarative syntax
+
+     function functionName( argument1,...... ) {
+        //TODO
+     }
+
+  2. Variable function or anonymous function
+     
+      var varName = function( argument1,.....) {
+          //TODO
+       };
+
+      function( arg.... ) {
+
+      }
+
+      //create and call the function altogether
+
+       ( function(arg...) {
+         //TODO
+         } 
+        )();
+
+       There is lambda syntax also used to create anonymous function
+
+         1.  (arg....) => single-statement;
+         2.  (arg....) => { 
+                //ToDO
+             }
+
+Example:
+<script>
+  function add(no1,no2) {
+    return no1+no2;
+  }
+  var mul = function(no1,no2) {
+     return no1-no2;
+  }
+  var sub = (no1,no2) => no1-no2;
+  var series = (start,end) => {
+     for(i=start;i<=end;i++) {
+       console.log(i);
+     }
+   }
+
+   //Call the functions
+   result = add(10,20);
+   console.log( result );
+
+   console.log( mul(10,2), sub(5,6) );
+   series(5,10);
+</script>
+
+IMPORTANT : A function has no or more parameters but it returns one value if "return" is used within the body.
+	    A function can also take as many as parameters even the argument list is available or not.
+
+<script>
+  function testTheParameter(no1,no2) {
+     console.log(no1,no2);
+  }
+  
+  //call the function
+  testTheParameter();  // undefined undefined
+  testTheParameter(10); // 10 undefined
+  testTheParameter(30,40); // 30 40
+  testTheParameter(33,44,55,66,"Hello"); // 33 44
+</script>
+
+The "arguments" - an implict array argument of function will be created when you call the function it represent the parameters.
+
+<script>
+  function testTheParameter() {
+     console.log( arguments );
+     for(i in arguments ) { 
+       console.log(i, arguments[i]);
+     }
+  }
+
+  testTheParameter();
+  testTheParameter("The",10,"Sun");
+  testTheParameter(11,22,33,44,55,[11,22,33]);
+</script>
+
+Scope - global & local scope of variable
+-----------------------------------------
+<script>
+  var no = 10;
+  function test() {
+      console.log( no );  // 10
+      square = no * no;
+  }
+
+  //call the test
+
+  test();
+
+  console.log( no, square );
+</script>
+
+So, any variable created outside the function is always visible inside the function and also any variable created inside the function "without" adding "var" keyword is visible outside the function and even after the successful execution of  that function.
+
+But, if we create a variable using "var" keyword than this variable has "local" scope automatically.
+
+
+So, little change here, just change the above code:
+
+             ....
+             var square = no * no;
+
+And the statement throws an error "square" is undefined :  console.log( no, square);
+
+How JavaScript engines creates & loads the functions - Declarative or statically typed functions are loaded when the document is loaded in web-browser's environment whereas dynamic functions/anonymous are created when that part of the program is being executed where that function is created.
+
+So, declarative or statically defined function loads very early and these functions also used with the "events" of the HTML tags.
+
+Calling JavaScript functions (Statically defined) with HTML objects event
+-------------------------------------------------------------------------
+There are number of events each HTML object has and its name begins with "on" prefix and that can be expressed via attribute.
+
+e.g
+
+<p onclick="doThis()">Click Here</p>
+<button onclick="doThis()">Click Me</button>
+<h2 onclick="doThis()">Click Here</h2>
+<input type="text" onkeypress="doThat()" />
+
+<script>
+   function doThis() {
+      console.log('This function can be defined anywhere within the document - before or after the HTML code');
+   }
+  function doThat() {
+      console.log('A key is pressed!!!!');
+  }
+</script>
+
+Example: Passing parameters with event handler
+
+<p onclick="doThis(1)">Para</p>
+<div onclick="doThis(2)">Div</div>
+<p onclick="doThis(3)">Para</p>
+
+<script>
+  function doThis(n) {
+    console.log( n );
+   }
+</script>
+
+Note: Use "arguments" array in function (event handler) to receive the argument.
+
+
+The callback - Passing a function to another function and will call by the receiver function not by the directly.
+------------------------------------------------------------------------------------------
+<script>
+  function add(a,b) {
+    return a+b;
+  }
+  var sub = (a,b) => a-b;
+
+  function doAction( func ) {
+    console.log( func(10,2) );
+  }
+
+  doAction( add );  
+  doAction( sub );
+  doAction( (x,y)=>x*y );
+  doAction( (x,y)=> { 
+     var p = 1;
+     while( y ) {
+      p = p * x;
+      y--;
+     }
+   });
+</script>
+
+Example:
+
+<script>
+  nos = [10,20,3,454,1,23];
+  nos.forEach( test );
+
+  function test(e,i) {
+    console.log('This is callback and is called by the forEach of array',e,i);
+  }
+</script>
+
+you can pass method/function to other functions of array object - find, every, sort, filter etc.
+
+
+Example: Visit every element till return value is true
+
+<script>
+  nos = [10,20,3,454,1,23];
+   
+  nos.every((e, i, ar) => {
+      console.log(e, i, ar);
+      if(e!=3)
+        return true;
+  })
+</script>
+
+Example: Filter the elements 
+
+<script>
+  nos = [10,20,3,454,1,23];
+   
+  var result = nos.filter(function (e, i) {
+      if (e % 2 != 0)
+          return e;
+  });
+
+  console.log(result);
+  var srt = nos.sort((x, y) => x - y);
+  console.log(srt);
+  srt = nos.sort((x, y) => y - x);
+  console.log(srt);
+</script>
+
+Example: Employee's id,name, salary collection. Write filter callback to display those employees whose id is between 10 to 50.
+Write a filter that returns emps whose name begins with "ra".
+Write a filter that returns emps whose salary between 3000 to 5000
+
+var emps = [{"id": 1, "name": "Amar", "salary": 3000}, {.... } ];
+
+var result1 = emps.filter( (emp, index)=> {
+                 return emp.id >=10 && emp.id<=50;
+              });
+console.log(result1);
+result1 = emps.filter( function(emp, index) {
+                 return emp.salary >=3000 && emp.salary<=5000;
+              });
+console.log(result1);
+result1 = emps.filter( function(emp, index) {
+                 return emp.name.startsWith("ra");
+              });
+console.log(result1);
+
+//sort by id
+emps.sort( (emp1,emp2) => emp1.id - emp2.id );
+console.log(result1);
+
+//sort by name
+emps.sort( (emp1,emp2) => {
+  if(emp1.name>emp2.name) return 1;
+  if(emp1.name<emp2.name) return -1;
+  return 0;
+});
+console.log(result1);
+
+Example: Product collection - id, name, qty, available, rate, unit, discount, category, company, ratting.
+Write filters to for available/not available, category, company, ratting, name wise etc
+Write sort methods.
+
+setInterval( callback, time-in-millis), setTimeout( callback, millis ) and clearInterval( id )
+-----------------------------------------------------------------------
+
+setInterval invoke the "callback" after successive period of milliseconds specified while calling it. This function returns an id of the "timer" and we can call clearInterval() to stop the execution of the "callback".
+
+setTimeout function invoke the "callback" once after the elapsed millis reaches.
+
+
+<script>
+
+ var tid1 = setInterval( function() {
+    console.log( new Date() ); // current date time
+ }, 1000);
+
+ setTimeout( function() {
+    clearInterval( tid1 );
+ }, 5000); //after five seconds, the callback stops the iterval.
+ 
+
+ //In following example timer will not be stopped
+ var i =1;
+ setInterval( ()=> {
+     console.log( i );
+     i++;
+  }, 100); 
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+  

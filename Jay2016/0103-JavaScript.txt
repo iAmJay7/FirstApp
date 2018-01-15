@@ -1,0 +1,641 @@
+JavaScript
+==========
+
+JavaScript is a client programming language and mostly used to develop the client apps which are executed/run at clients - web browsers in PC or mobile. However, there is a server environment called "NodeJS" that is used to write the server apps using the JavaScript language.
+
+
+JavaScript is a case sensitive programming language.
+
+JavaScript is a specification based programming language. The ECMA - Eupropene Computer Merchant Association is the
+	non-profit organization and it maintan the specification called ECMAScript or ES. The browser vendors (moziall,
+	chrome - google, Microsoft etc) and other vendors develop the JavaScript language and runtime enviornment as
+	per ES or ECMAScript.
+
+	Currently almost all web-browsers supports ECMAScript 5 (ES5) and mostly they are implemting ES6; the new
+	standard of JavaScript in their browsers and tools.
+
+	So, we will use ES5 and ES6 (or you can say JavaScript) language.
+
+
+	JavaScript or ES language is a full feature language.
+
+JavaScript language syntax is derived from C and C++ language.
+
+JavaScript supports an OOP - Object Oriented Paradigm.
+
+JavaScript supports a modular programming - Programming technique to use or create components in such way so
+		they can be removed or replaced or added from/into the current programming without affecting the
+		code base.
+
+JavaScript is a funtional programming language - It is a new program design that sits above the OOP and allows an easy
+		but effective ways to develop the code base.
+
+JavaScript is a dynamic programming language - The "TYPES" of data in JavaScript are determine during program execution/runtime
+		and hence it is called "dynamic" programming. (Similar to the "dynamic" keyword in C#).
+
+		PHP, JavaScript, Ruby etc are example of dynamic programming languages.
+
+
+The JavaScript code and debug and then host it
+-----------------------------------------------
+
+Embed to JavaScript into web-documents using HTML tag <script>:
+
+   <script> tag allows us to embed the JavaScript language code. The <script> can be placed inside the <head> as well
+	in side the <body> but we will choose the location of <script> inside the <body> and just before the use or
+	need of the code.
+
+
+  Example:
+   ...
+   <body>
+      ....
+      ....
+      <script>
+        var no  = 10;
+        var name = "Rajesh";
+        console.log(no,name);
+      </script>
+       ....
+    </body>
+
+  And see the output at "console" tab of Developer Tool in web-browser (Press F12 or CTRL+SHIFT+I to open developer    tool)
+
+
+ Example:
+
+   1. create sample.js file with following code
+
+       var no = 10;
+       var name = "Rajesh";
+       console.log(no,name);
+
+   2. and embed the "sample.js" document in your web-doc
+       ....
+       <body>
+          <script src="sample.js"></script>
+           ...
+       </body>
+
+     Never write anything between <script src="sample.js"></script> if <script> is used to emebd the .js file.
+
+
+In "console" tab of developer tool, we've a "prompt"
+
+  >_
+
+ Where we can test JavaScript code/statement (mostly single line)
+
+  >firstName = 'Rajesh'
+  >typeof(firstName)
+  string
+  >secondName
+    throws an error - secondName is not exists..
+
+          
+
+You can create and test/debug Javascript code using NodeJS environment.
+
+ 1. Install NodeJS (Download NodeJS from the nodejs.org)
+ 2. Open command prompt
+ 3. c:\test> notepad sample.js
+         code in sample.js 
+            var firstName = "Raj";
+            var lastName = "Patel";
+            console.log(firstName, lastName);
+             for(i=1;i<=10;i++) {
+               console.log( i );
+             }
+  4. c:\test>node sample.js  to run the program
+
+JavaScript code style and naming conventions
+============================================
+Strictly follow the code styles and naming conventions.
+
+ 1. The opening curly brace must appear at the very same line of a statement - function, if, swith, loops or block and
+     there must be only one space between the opening curly brace and the statement.
+
+//Good
+if(exp) {
+  //
+} else {
+  //
+}
+//bad
+if(exp){
+  //
+}
+OR 
+if(exp)
+{
+
+}	 
+
+//good
+function testIt() {
+  //
+}
+for(i=1;i<=10;i++) {
+ //
+}
+2. Add a space after and before the operator
+
+  var no = 10; //good
+  var no=10;   //bad
+
+  //good  
+  var no = 10,
+      name = "Rajesh",
+      age = 20;
+
+  if(a >= 20) {
+     //
+  }
+
+3. Use "camelCase" for variables, functions, fields.
+
+4. Use "PascalCase" for "TypeName/ClassName"
+
+5. Use UPPERLETTERS for constants
+
+6. Use //single line or /* multiline */  comment to document your code.
+
+<script>
+ /* Variables */
+ var x = 10,
+     y = 20;
+
+ /* Functions */
+ function doThis() {
+    //
+ }
+ function doThat() {
+    //
+ }
+</script>
+
+
+Types and variables
+=================================================
+JavaScript is untype language. That means there is no named types which exists in C , Java and C# languages (int, char, float etc) but the types have no name and exists into JavaScript environment. The type of data/value is determined by the JavaScript runtime based upon the literal (number or string etc) or some sort of symbols or pattern (e.g [] for array, () for function) or an object.
+
+
+There are two ways to create a variable:
+
+1. Assign value to the variable
+
+   <script>
+      no = 10;
+      nm = 'Rajesh';
+      console.log( no, typeof(no) ); // 10 number
+      console.log( nm, typeog(nm) ); //Rajesh string
+   </script>
+
+2. Create variables using var keyword - you don't have to assign value at the time of declaration.
+
+   <script> 
+      var no,
+          name = 'Rajesh';
+      console.log( no, typeof(no) ); // undefined undefined - no type at all
+      console.log( nm, typeog(nm) ); //Rajesh string
+      no = 101;
+      console.log( no, typeof(no) ); // 101 number
+      no = 10.10;
+      console.log( no, typeof(no) ); // 10.1 number
+      no = [10,20,49];
+      console.log( no, typeof(no) ); // 10,20,49 array
+    </script>
+
+The JavaScript engine will throws an exception/error when a given name is not exists.
+
+ <script>
+   console.log(age);  // because 'age' is not exists in current document/code
+ </script>
+
+So the JavaSCript has following implicit types:
+
+1. number - 64 bits number to represent int, float, double, decimal -- means any number
+2. string - a unicode string either denoted with single or double quotes.
+		e.g 'Hello' or "Hello"
+3. boolean - special values true or false or value from the expressions.
+4. Array   - Array object name or [] subscript literal
+5. Object  - { } - opening and closing curly brace compose an object and this syntax is called "JSON - JavaScript Object
+			Notation.
+6. Regular Expression - /expressoion/  - a pair of forward slashes created a regular expression object
+
+7. function  - It creates a function object
+8. ()        - it creates a function object (alternative)
+9. function  - It creates a new class/type.
+10. Date     - It represent the Date time data
+11. Math     - It represent the maths functions
+
+
+Syntax of JavaScript conditional and loop statements
+------------------------------------------------------
+if, switch, for, while and do while statements have the same syntax as C, Java and C# language. You can use default case in switch and use "break" keyword in switch as well as loop statements to break the loop.
+
+The namespace - window
+=======================
+Any entity you create - whether it is variable, class, function, object of any kind will be added automatically into the "window" namespace. It means "window" is the default namespace. However we can create a our own namespace to prevent the name mangling.
+
+<script>
+  window.no = 10;
+  firstName = "Rajesh";
+  var lastName = "Shah";
+
+  console.log( window.no, window.firstName, window.lastName );
+  console.log( no, firstName, lastName);
+</script>
+
+[NOTE: "window" is a built-in object and acts as a namespace]
+
+
+The number type
+================
+The number in JavaScript is 64 bits long and can represent integral as well as real values.
+
+<script>
+    no = 1000.612;
+
+    //Number to string conversion
+    console.log(typeof (no), typeof (no.toString()));
+    
+    console.log(no, no.toString(), no.toFixed(2), no.toExponential(2));
+
+    //To binary, octal and hexa
+    no = 10;
+    console.log(no.toString(2), no.toString(8), no.toString(16));
+</script>
+
+
+parseFloat(str) and parseInt(str) - functions parse the string into number
+---------------------------------
+These two functions returns NaN error (Not a number) when parse failed.
+
+<script>
+  var str = '100.44';
+  var no1 = parseInt(str);
+  var no2 = parseFloat(str);
+
+   console.log(str, typeof(str));
+   console.log(no1, typeof(no1));
+   console.log(no2, typeof(no2));
+</script>
+
+
+The strings
+============
+You can use single quoted to string the escape double quote and vice versa double qupted string to escape the single quote.
+
+<script>
+ var info1 = '<input type="text" value="10"/>';
+ var info2 = "<input type='text' value='10'>";
+ var info3 = "<input type=\"text\" value=\"10\">";  //Or escape manually
+ console.log(info1, info2, info3);
+</script>
+
++ to concat the strings
+-----------------------
+Value of any type used with string context will be automatically coerce into the string (converted or will call toString() method).
+
+<script>
+ var no1 = 10,
+     no2 = 20;
+
+ console.log('Sum of ' + no1 + ' and ' + no2 + ' is ' + no1 + no2 );
+ console.log('Sum of ' + no1 + ' and ' + no2 + ' is ' + (no1 + no2) );
+</script>
+
+Mathematical operators - * / % with strings to parse the string into number
+----------------------------------------------------------------------------
+
+<script>
+  var str = "10.23";  //also set diff value e.g str = "10a"; 
+  var n1 = str - 0; 
+  console.log( n1, typeof(n1) );
+  n1 = str * 1;
+  console.log( n1, typeof(n1) );
+  n1 = str / 1;
+  console.log( n1, typeof(n1) );
+</script>
+
+[Returns NaN is parse failed]
+
+
+Testing the string methods
+-------------------------
+<script>
+    var str = "The red sun and red rose";
+    console.log(str.length);
+    console.log(str.toUpperCase());
+    console.log(str.charAt(0), str.charAt(1));
+    console.log(str.anchor("Site"));
+    console.log(str.big());
+    console.log(str.indexOf("sun"));
+</script>
+
+IMPORTANT - In JavaScript, everthing is an object and each object carries data and methods - We've learn number and string objects and now other things will be objects.
+
+Mathematical operators for number type
+------------------------------------
+Use + / - * % ++ and -- operators to manipulate the number objects.
+
+Relational operators can be used with - numbers, strings, arrays 
+-----------------------------------
+The relational expression always returns boolean - true or false. 
+
+In JavaScript following values are falsy (represents false):
+
+""
+''  - Empty string
+0
+0.0 - number
+null
+false
+NaN  - not a number
+
+Example:
+
+<script>
+    var str = ""; //str = 1; or str = 0;
+    if (str) {
+        console.log("Value exists - Truthy");
+    } else {
+        console.log("Value exists - Falsy");
+    }
+</script>
+
+Example:
+
+<script>
+  var str = "10p0.12";
+  var no = str ? parseFloat(str) : 0.0; //safe parse
+  console.log( no, str );
+  
+ //Or
+  if(str) {
+    no = parseFloat(str);
+  }
+</script>
+
+prompt() function to imput a value - a input dialog
+confirm() function to display confirmation dialog and returns true/false
+alert() function to display alert/message dialog
+--------------------------------
+<script>
+  var str = prompt('Enter your Id (numeric) ');
+  if( str ) {
+     id = parseInt(str);
+     if( id ) {
+        status = confirm('Are you sure to delete this record?');
+        if( status ) {
+             alert('Record deleted');
+        } else {
+             alert('Record abandon.');
+        }
+    } else {
+       alert('Please input integer value');
+    }
+ } else {
+   alert('Please input value and it must be integer.');
+ }
+</script>
+
+
+The Arrays
+==========
+JavaScript arrays are dynamic list and we can append, insert, remove or replace one or more elements. 
+
+Syntax:  
+   
+   var varName = Array();  or   var varName = Array(element1,element2,..)
+   OR
+   var varName = []; Or var varName = [element1,element2,....]
+
+
+Example:
+
+<script>
+    var nos = Array();
+    var names = Array("Raj", "Man");
+    var cities = ["Surat", "Meh"];
+    console.log(nos, names, cities);
+</script>
+
+
+The for in loop - JavaScript array elements always accessed via "index" but the index can be random.
+
+Example:
+
+<script>
+  var nos = [10,20,30];
+  console.log( nos[0], nos[1], nos[2] ); 
+  console.log( nos.length ); // count of elements - 3
+
+  //set the element at index
+  nos[10] = 100;  // will creates a new index and assign a value
+  
+  console.log( nos.length ); // count of elements - 11 
+
+  //traverse using simple loop
+  for(i=0;i<nos.length;i++) {
+    console.log( nos[i] );  10,20,30, undefined - 7 times, 100
+  }
+
+  //traverse using for in loop
+
+  for(i in nos) {
+    console.log(i, nos[i]); // "i" represent the index of element
+  }
+</script>
+
+Syntax:
+   
+   for(index in arrayName) {
+      ....
+   }
+
+the "index" variable will be created and reassigned with the element's index of the array during the loop execution.
+
+
+Array methods
+---------------
+1. array.push(element) -- add at the end of list 
+2. array.pop() - removes the element from the top
+
+   [Implementation of stack - LIFO]
+
+3. array.splice( index, range-index, element1,element2,....)
+
+   To insert an element
+     array.splice( atIndex, 0 , newElement1)
+    
+   To insert elements
+     array.splice( atIndex, 0 , newElement1,newElement2,....)
+
+   To replace (delete) and insert an element
+     array.splice( atIndex, 2 , element1) - Remove 2 elements from "atIndex" and insert "element1"
+
+Example:
+
+<script>
+  var nos = [10,20,30];
+  nos.push(40);
+  nos.push(50);
+  console.log( nos.pop(), nos.pop(), nos.pop() );
+
+  nos = [10,20,30];
+
+  //insert 60,70 before the "20"
+  nos.splice(2,0,60,70);
+  
+  //delete element at 3 index
+  nos.splice(3,1);
+
+  console.log( nos );
+
+  //replace some elements withe some elements
+
+  nos.splice(2, 2, 444,555,666,777);
+
+  console.log( nos );
+</script>
+
+4. indexOf(element) - returns index of found element; returns -1 otherwise.
+5. lastIndexOf(element) - returns index of found element (begins search from the last) ; returns -1 otherwise.
+6. reverse() - reverse the elments
+7. sort() - sort the elements
+
+The Custom Object using object initializer syntax - JSON JavaScript Object Nocation Syntax
+=============================================================================================
+
+Syntax:
+ {
+   "property1": value1,
+   "property2": value2,
+    .....
+  }
+
+Array of objects (List)
+ [ {...}, {...} , {..},....]
+
+The property name must be string but value can be anything of JavaScript object - Number, bool, array, function, object
+	etc.
+
+The subscript operator [] or member access operator is used to access the properties of object.
+
+<script>
+
+ var emp = {
+   "id": 10,
+   "firstName": "Rajesh",
+   "lastName": "Patel",
+   "address": {
+         "city": "Mehsana",
+         "pin": 384001
+   }
+ };
+
+ console.log( emp ); //dump the object
+
+ console.log( emp.id, emp.firstName, emp.lastName, emp.address.city, emp.address.pin );
+ //OR
+ console.log( emp["id"], emp["firstName"], emp["lastName"], emp["address"]["city"], emp["address"].pin);
+
+ //Add new property
+
+ emp.middleName = "Mohan";
+ emp.address.area = "Highway";
+
+ emp.experience = { }; // create an object
+ emp.experience.company = "ABC";
+ emp.experience.fromYear = 2010;
+ emp.experience.toYear = 2014;
+
+ emp.salary = { "Jan": 30000, "Feb": 4000, "March": 5000 };
+
+ console.log( emp );
+ console.log( emp.salary.March, emp.experince.company);
+
+
+ //Replace/set property
+ emp.id = 99991;
+
+
+ //Delete a property
+ delete emp.salary;
+ console.log( emp );
+ 
+</script>
+
+Example: Traverse the properties using for in loop
+
+<script>
+ ....
+ ....
+ for( property in emp ) {
+   console.log( properyt, emp[property] );
+ }
+</script>
+
+Example: List of emp
+
+<script>
+ var emps = [];
+ emps.push( {"id": 10, "name": "Raj" } );
+ emps.push( {"id": 1, "name": "Man" } );
+ 
+ emps.splice(1,0, {"id": 2, "name": "Suraj" } );
+ console.log( emps );
+
+ for(i in emps) {
+   emp = emps[i];
+   console.log( emp.id, emp.name );
+ }
+</script>
+
+Create your own namespace - {}
+===============================
+<script>
+  var APP = {};
+
+  APP.id = 10;
+  App.name = "Rajesh";
+  APP.counter = 0;
+
+  while( APP.counter <= 10 ) {
+    console.log( APP.counter );
+    APP.counter++;
+  }
+
+  console.log( APP.id, APP.name );
+</script>
+
+You can use either ALL Caps or "PascalCase" to name your namespace.
+
+
+JSON object and its methods
+----------------------------
+JSON.stringfy() format the JSON object to string and JSON.parse parses the json string and returns the JSON object
+
+<script>
+  str = "{\"no\": 10, \"name\": \"Raj\"}";
+  obj = JSON.parse( str );
+  console.log( obj.no, obj.name);
+  s = JSON.stringfy( obj );
+  console.log( s );
+</script>
+
+
+
+
+
+
+
+
+
+
+  
+     
+ 
+

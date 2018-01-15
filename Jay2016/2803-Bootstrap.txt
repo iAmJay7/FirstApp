@@ -1,0 +1,62 @@
+Bootstrap - a HTML/CSS Framework  (www.getboostrap.com) 
+============================================================
+
+Bootstrap or Twitter Bootstrap is an open source HTML/CSS Framework to define responsive layout & content for various display devices (mobile, tablet, desktop PC and laptop) screen.
+
+Bootstrap implicitly uses "jQuery" so we need to download or add jQuery reference to our app. jQuery.js must be embeded before the embeding the bootstrap.js file.
+
+Nuget Package Manager will update/install the latest bootstrap library. However, the Visual Studio's Web App Demo Projects and ASP.NET MVC templates have "bootstrap apis & folders --- /Content, /Scripts and /Fonts".
+
+
+Bootstrap the "Bootstrap Framework" to your web pages
+-------------------------------------------------------
+1. Assume that we'have /Scripts, /Content and /Fonts folder
+2. First of all add <meta> to set the viewport settings (inside the <head></head>)
+3. Then after embed the minified bootstral css file  and 
+4. Then add your (custom) .css files inside the <head>
+5. At the end and just before the </body>, add jquery and bootstrap js file.
+
+Example:
+
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <title>Bootstrap</title>
+        <meta name="viewport" content="width=device-width, initial-scale=1" />
+        <link href="~/Content/bootstrap.min.css" rel="stylesheet" />
+        <!--- Custom CSS Files -->
+        <link href="~/Content/Style.css" rel="stylesheet" />
+    </head>
+    <body>
+        <!-- Setup the .container or .container-fluid selector -->
+        <div class="container">  
+
+        </div>
+        <!--- End of body -->
+        <script src="~/Scripts/jquery-3.1.1.min.js"></script>
+        <script src="~/Scripts/bootstrap.min.js"></script>
+        <script>
+            //code
+        </script>
+    </body>
+</html>
+
+6. The main selector to layout the document is "grid selectors - .row, .col-lg-1 to 12, .col-md-1 to 12, .col-sm-1 to 12
+   .col-xs-1 to 12"
+
+   <div class="row">
+       <div class="col-md-3"> Logo Image </div>
+       <div class="col-md-9"> Title </div>
+   </div>
+   <div class="row">
+        <div class="col-md-2">Left Side</div>
+        <div class="col-md-8">Center</div>
+        <div class="col-md-2">Right Side</div>
+   </div>
+  
+
+
+
+
+
+

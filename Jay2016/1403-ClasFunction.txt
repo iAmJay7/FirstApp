@@ -1,0 +1,153 @@
+
+Creating custom object - class and object
+================================================================
+The function keyword also used to create a "class/type".
+
+Syntax: (We will use PascalCase to name the class however we can choose "camelCase" too).
+
+function YourTypeName( arguments... /* constructor parameters */ )  {
+  this.field1 = value1;
+  this.field2 = value2;
+
+  this.field3 = function() {
+       ....
+  };
+  this.memberName = value;
+}
+
+
+Important - The class members are created if they are qualifed with "this". They will be consider as regular variables otherwise.
+
+To creates an object:
+
+ var refName = new YourTypeName( param... );
+
+Example:
+
+<script>
+  function Emp( id, name ) {
+     this.id = id;
+     this.name = name;
+
+     this.print = function() {
+         console.log( this.id, this.name );
+     }
+     this.setId = function(id) { this.id = id; }
+     this.getId = function() { return this.id; }
+     this.getName = function() { return this.name; }
+     this.setName = function(name) { this.name = name; }
+  }
+
+ var e1 = new Emp();
+ e1.print();
+ e1.setId(4);
+ e1.setName("raj");
+ console.log( e1.getId(), e1.getName() );
+
+ var e2 = new Emp(10,"Mira");
+ e2.print();
+</script>
+
+
+Example: Create a Timer type which controls start and stop and also allow us to set the "callback".
+
+<script>
+    function Timer(interval, callback) {
+        this.interval = interval;
+        this.callback = callback;
+
+        this.start = function () {
+            this.id = setInterval(this.callback, this.interval);
+        }
+        this.stop = function () {
+            clearInterval(this.id);
+        }
+    }
+    var first = new Timer(100, () => {
+        console.log(new Date());
+    });
+    first.start();
+    setTimeout(() => first.stop(), 2000);
+    var index = 10;
+    var second = new Timer(10, () => {
+        console.log( index-- )  ;
+    });
+    second.start();
+    setTimeout(() => second.stop(), 2000);
+</script>
+Example: Notify the user after the ellapsed to "n" seconds (or minutes or hours or days) and repeat very same task till program is running.
+
+For example,
+
+ var alarm = new Alarm( 1 /* second */, () => { ... your task ... } );
+ new Alarm( 3600 /* seconds*/ , ()=> {...} );
+
+
+function Alarm( seconds, callback) {
+  this.seconds = seconds;
+  this.callback = callback;
+  setTimeout( this.callback, this.seconds *  1000);
+}
+
+OR
+
+<script>
+    function Alarm(seconds, callback) {
+        this.seconds = seconds;
+        this.callback = callback;
+        setTimeout(this.callback, this.seconds * 1000);
+    }
+
+    //Repeat the task
+    function taskOne() {
+        console.log(new Date());
+        new Alarm(1, taskOne);
+    }
+
+    taskOne();
+</script> 
+
+OR
+
+<script>
+    function Alarm(seconds, callback) {
+        this.seconds = seconds;
+        this.callback = callback;
+        this.flag = false;
+        this.isRepeat = function () {
+            return this.flag;
+        }
+        this.setRepeat = function (repeat) {
+            this.flag = repeat;
+        }
+        this.start = function() {
+            this.callback();
+            if (!this.flag) {
+                setTimeout(() => this.start(), this.seconds * 1000);
+            }
+        }
+        this.stop = function () {
+            this.flag = true;
+        }
+    }
+    p = new Alarm(1, () => {
+        console.log(new Date());
+    });
+    p.start();
+    setTimeout(() => p.stop(), 3000);
+</script>
+
+Math object
+============
+Math object carries mathmetical functions.
+
+<script>
+  var sqrt = Math.sqrt( 5 );
+  console.log( sqrt );
+  console.log( Math.pow(43,5) );
+  console.log( Math.random() );
+</script>
+
+Example: Shuffle the array elements randomly.
+
+  

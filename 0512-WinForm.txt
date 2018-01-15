@@ -1,0 +1,79 @@
+The WinForm APIs (Introduction to Windows API or Desktop App API or WinForm APIs)
+===================================================================================
+
+The namespaces "System.Window" and System.Drawing  define the "WinForm" API to develop the dekstop or standalone applications -- application which will be executed on the machine where the .Net framework is installed.
+
+
+(Create WinForm Application Project -- You will have some files - program files and config/setting files in a project/solution  explorer)
+
+The "Entry" point Main() method
+===============================
+Every Desktop GUI must have an entry point Main() method and it will be added into "Program.cs" of your project.
+
+The "Form" -- The primary GUI component
+======================================
+A "Form" is a window (A container with varities of types of border/styles & control box - minimize,maximize,restore etc buttons).
+
+In order to create a custom form, you must have extends the "System.Windows.Forms.Form" class.
+
+The Visual Studio allow us to design the Win Form by adding UI elements (Buttons, TextBoxes etc) into a separate designer .cs file -- so we have a two .cs file (partial class) that represent the sub-class of "System.Windows.Forms.Form".
+
+You can drag & drop the other UI elements also called "Controls" via the VS designer and set properties via the "Property Window".
+
+
+Handling the events
+=========================================
+Each UI control including the "Form" itself have number of events and they can be handled (attached and detached) via code as well as the "Properties Window's Event section".
+
+For example,
+
+  Open the "Form1" designer Or Select the "form1" designer + Proeprties Windows + Click on Event icon (Lightening icon)
+  + Select event and double click on it Or Just type the name of handler and press enter.
+
+Example: Add handler for "Load" and "Resize" or other event  and use the MessageBox.Show("Your Message") Or just use "Debug.WriteLine" method to view the intermediate result into output windows.
+
+
+NOTE:
+Add "Namespace" while typeing the TYPE name.
+
+    For example,
+ 
+        
+            Debug<--- Now press Ctrl + . After you type Debug class name and a popup will be opened suggesting that
+					 you wanted to import the namespace or write a fully qualified name.
+
+
+Other way to handle the events (via code):
+
+  You can write event handling code any where but if you want that your UI compoent respond the events very begininig then add your event handling code in side the Form's constructor and after the "InitializedComponent()" method.
+
+ For example,
+       public Form1()
+        {
+           InitializedComponent();
+           
+           this.Load+=Press Tab to create the handler.....
+           this.Ressize+=(sender,eventArgs)=> Debug.WriteLine("Form resized");
+          }
+
+The uniformity of event handler in .net event system
+-----------------------------------------------------
+Every event handler has a two parameters -- 
+		first parameter must be "object sender" -- An object where event has been raised
+		second parameter must be an object of System.EventArgs or its subclass
+
+
+ What is "InitializedComponent()" and why it is added automatically?
+================================================
+The VS designer add/remove code into a separate designer file and that code is enclosed into the "InitializedComponent" method which is called into the main Form class's constructor. If you don't want to use the Visual Studio's designer then no need to have such a method -- that means you have to write necessary code into the constructor of your form class.
+
+For example,
+
+public class MyWin : Form
+{
+   public MyWin()
+    {
+       this.Text = "This is my Win";
+    }
+}
+

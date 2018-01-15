@@ -1,0 +1,232 @@
+The "Model" Property and Razor's HTML helper methods
+=====================================================
+
+As we've learnt that the "ViewBag" dictionary is used to carry data from action method to the views (Razor pages). Here we've another way to pass data from action of controller to the "views" and this is done via "Model" property or "Model" object. It is important to note that the "Model" object's type is dynamic so you can pass any kind of data to the View from within the action of controller.
+
+
+  With ViewBag, we can have as many as keys (key-value pairs) and value but here there is only one copy of "Model" per   an action method and a view. So, your "Model" object can be of primitive type (int, string etc) or complex type.
+
+
+  To pass the "Model" object to the "View":
+
+      Pass model object parameter to the View(model-object) method.
+
+  e.g
+
+     public ActionResult Test()
+      {
+        return View(10);   // 10 int object which will be assigned to "Model" property in the View
+       }
+
+ and Test.cshtml
+
+     <p>@Model</p>
+
+  Note that the "Model" is a dynamic property and wont support intelisense of Visual Studio and that's way there is an
+  instruction for the "View" about the "DataType" of "Model" and that instruction is @model directive.
+
+ Syntax: In Razor page
+   @model Namespace.SubNamespace.YourType
+
+     This syntax explains that the "Namespace.SubNamespace.YourType" is the type of "Model" property and VS will allows
+	intelisense for the "Model" property.
+
+ It is mandatory to use @model directive if the model object is too complex.
+
+Example: Assume that we've EmpViewModel (Id,Name)
+
+public ActionResult Test()
+{
+  var model  = new EmpViewModel { Id = 10, Name = "Raj" };
+  return View(model);
+}
+
+Test.cshtml
+-----------
+@model YourApp.Models.EmpViewModel
+
+<p>@Model.Id</p>
+<p>@Model.Name</p>
+
+NOTE: The Type of Model cannot be anonymous. It must be "typed".
+
+The @Html Extension Methods - Helper Methods
+=============================================
+
+@Html is a class or component hhas many methods which either produces dynamic content of HTML, CSS, JavaScript or manipulate the (encode-decode or Text to entities and vice versa) the data.  The methods of @Html are failsafe for us where we might forget some of the important attributes of HTML tags and help us to avoid the script injection or insert extra script while sending or receiving the data (ie. request & response of resource).
+
+Example: How Razor help us to encode the script (or prevent script injection)?
+
+public ActionResult Test()
+{
+  ViewBag.Data = "<h1>This is the HTML Heading</h1>";
+  ViewBag.Info = "<script>window.open('http://www.xxxxxx.com');</script>";
+
+  return View();
+}
+
+code in Test.cshtml
+
+@ViewBag.Data
+@ViewBag.Info
+
+The output of above page will display the content of Data & Info in plain text because the Razor automatically convert all special characters into the entities.
+
+@Html.BeginForm() method and @using() block
+---------------------------------------------
+This method will render <form> tag with mandatory attributes but the </form> is added via @using() directive.
+
+ Syntax:
+
+@using(Html.BeginForm())
+{
+
+}  
+Closing } automatically adds the </form>
+
+@Html.XXXXXX() and @Html.XXXXXXFor() methods
+---------------------------------------------
+@Html.TextBox and @Html.TextBox
+@Html.CheckBox and @Html.CheckBoxFor 
+@HTml.Editor and @Html.EditorFor etc are somewhat similar methods found in @Html objects.
+
+Methods with "For" suffix uses "Model" object to populate the <form> elements - Text, Number, Email, Check, Radio, 			TextArea, Select and many more.
+
+Methods with "For" suffix uses "ViewBag" keys (properties) to embed the ViewBag property value into HTML tags.
+
+
+Example: ViewBag and @Html.XXXXXX methods
+
+
+      public ActionResult Index()
+        {
+            ViewBag.Name = "Rajesh";
+            ViewBag.Test = 10;
+            ViewBag.Best = true;
+            ViewBag.Address = "12.PQR Society\n\nMehsana";
+            return View();
+        }
+
+Index.cshtml
+-------------
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.TextBox("name")
+    </p>
+    <p>@Html.CheckBox("Best")</p>
+    <p>@Html.Editor("Test")</p>
+    <p>@Html.Editor("Best")</p>
+    <p>@Html.TextArea("Address")</p>
+}
+
+Example: 
+       [HttpGet]
+        public ActionResult Create()
+        {
+            ViewBag.roll = 0;
+            return View();
+        }
+        [HttpPost]
+        public ActionResult Create(int roll,string name,string cmd)
+        {
+            ViewBag.roll = roll;
+            ViewBag.name = name;
+            ViewBag.cmd = cmd;
+            return View();
+        }
+
+Create.cshtml
+---------------
+<style>
+    .sel { background: #ffd800;}
+</style>
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.Label("roll")
+        @Html.Editor("roll")
+    </p>
+    <p>
+        @Html.Label("name")
+        @Html.Editor("name")
+    </p>
+    <p>
+        <button class="@(ViewBag.cmd.Equals("Add") ? "sel" : "")" name="cmd" value="Add">Add Record</button>
+        <button class="@(ViewBag.cmd.Equals("Update") ? "sel" : "")" name="cmd" value="Update">Update Record</button>
+        <button class="@(ViewBag.cmd.Equals("Delete") ? "sel" : "")" name="cmd" value="Delete">Delete Record</button>
+    </p>
+}
+ NOTE: Always use @("Add".Equals(ViewBag.cmd)) because the "cmd" might not exists in some point.
+
+
+Dropdown or combo - @Html.DropDownList
+--------------------------------------
+
+DropDropList method requires an object of IEnumerable<SelectListItem> (namespace System.Web.Mvc) so create a class with static method to populate the collection:
+
+
+public class Lists
+    {
+        public static IEnumerable<SelectListItem> GetStandards()
+        {
+            yield return new SelectListItem { Value = "1", Text = "First" };
+            yield return new SelectListItem { Value = "2", Text = "Second" };
+            yield return new SelectListItem { Value = "3", Text = "Third" };
+            yield return new SelectListItem { Value = "4", Text = "Fourth" };
+        }
+   }
+
+and code in .cshtml
+
+ ...
+ @Html.Label("standard)
+ @Html.DropDownList("standard", YourApp.Models.Lists.GetStandards(),"select standard")
+ ...
+
+
+ Example: @Html.RadioButton
+
+    <p>
+        @Html.Label("Gender")
+        Male
+        @Html.RadioButton("gender","M")
+        Female
+        @Html.RadioButton("gender","F")
+    </p>
+
+
+Example: @Html.Display and @Html.DisplayName - To show the ViewBag entry
+
+
+@Html.DisplayName("roll")
+@Html.Display("roll")
+@Html.DisplayName("name")
+@Html.Display("name")
+
+ These two method write data in plain text without using any HTML tag (or embeding HTML tag).
+
+Example: Add server side error to the each field:
+
+Code in Post method of "Create" action
+
+ [HttpPost]
+ public ActionResult Create(int roll,........)
+  {
+          if(string.IsNullOrEmpty(standard))
+            {
+                ModelState.AddModelError("standard", "Please select standard.");
+            }
+           //Add here some more validation code
+
+
+            //Peform some actions when validation rules are satisfy
+            if(ModelState.IsValid)
+            {
+                ViewBag.Message = "OK!";
+            }
+           ......
+   }
+and add validation message using 
+
+  @Html.ValidationMessage("standard") after the @Html.DropDownList(...)

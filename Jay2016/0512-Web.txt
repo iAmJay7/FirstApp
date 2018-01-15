@@ -1,0 +1,250 @@
+The Web Platform
+====================================================================================
+In order to develop a web app, we must have to learn "client" and "server" platforms. The .Net framework is a server platform that allow us to use the C# or CLS compliant language to write code that will be executed remotely or the machine on which an application is deployed or installed.
+
+The "client platform" is a web-browser ( PC, Laptop or mobile device) and it is responsible to render the content, perform some serious tasks and send/receive data to/from the "server side" applications.
+
+The HTTP or Web Server
+======================
+HTTP server is the main service software that receive data from the clients (client platforms) and forward them to the "servers (platforms)". It is important to note that the "HTTP" or Web server cannot execute the process the "request" nor it produces result (generate output). It just acts as a bridge between client and server app.
+
+
+There are number of Web server products including "Apache Web Server", "IIS - Internet Information Service", and many more but we will use "IIS" for the .NEt web app. There are two types of IIS -- Commercial version (which you can install via Windows Store (Add remove program features)) and a free (for the developer) edition called "IISExpress" that is shipped with "Visual Studio".
+
+NOTE: As you know that each "service" software uses a "PORT number" so the user of this "service" software can request it. The Web server generally uses "80" port number. However you can change to any valid number between 0 to 65535 --- but don't use first 1024 port numbers because some of them are reserved by the OS.
+
+You can test web-server's presence by typing  "http://127.0.0.1:80" or "http://127.0.0.1" (no need to specify port if web server is running on 80 port) or "http://localhost:80" or "http://localhost"
+
+
+Install / Configure the IIS commercial
+--------------------------------------
+Connect to the net + Control Panel + Programs & Features + Turn on/off windows features + [x] Internet Information Service  + [x] choose .NET framework version from Application component node.
+
+After installing IIS, you can view the settings or change/update settings via "Control Panel + Administrator Tools+ IIS Manager" applet. 
+By default, IIS uses c:\inetpub\wwwroot folder where it creates a default app but you can change or choose other folder location.
+
+Creating an app (Create & Deploy) (empty app) via IIS Manager
+-----------------------------
+Right mouse click on "Default website" node + Add Application + Set the "alias" and path of folder that acts as a web app. 
+   For example,
+                App name :   /first
+          and folder where your webapp will be deployed is c:\csnet\first-web
+
+Creating web apps via Visual studio
+-------------------------------------
+
+There are two ways to create web app in Visual studio:
+
+1. Via "File + New + WebSite" -- This approach is only used when you want an app that contains small amount of code
+				 and programmable resources. 
+				-- "WebSite" app allow each programmable resource (file) to be compiled independently
+				    and each programable resource generate a .dll (Assume that there are 100 pages/files
+					then there will be 100 Dlls)
+				-- "WebSite" is mainly used to learn web programming things and creates small scale app.
+				-- "WebSite" can be created locally (that uses IISExpress), remotely (via FTP or HTTP).
+2. Via "File + New + Project + Web + ASP.NET Project" 
+				-- This kind of application development template always creates an app locally and
+				   it produces a single .DLL from the number of programmable resources.
+				-- This kind of app allows source control -- using "GIT" or "Mercury" or "Visual 					Studio Team" protocols you can allow more than one member to work on
+					single project.
+				-- Once you app is finished then use the "Visual Studio's" publisher tool to publish
+				   the app (or deploy the app).
+
+
+The Web Resources
+===========================================
+There are two types of Web Resources -- 
+
+ 1. Static web resources -- Files whose content cannot be changed once it is added or written & saved. These resources
+			 are .html, .htm, .js, .css, images, video/audio etc.
+
+			The "web server" delivers these static resources if they are requested to the client and also
+			shoot the "error page" if requested resource is not exists in deployment directory or folder.
+
+2. Dynamic web resources -- These are programs written using C# or CLS compliant programming languages or pre-compiled
+				assemblies (.DLLS).
+			 -- .cshtml, .vbhtml, .aspx, .master are some special purpose programmable web pages (special
+				classes) that allow both client & server code to written into a single file.
+
+			The "web server" forward the request of dynamic resources to the .NET Framework (ASP.NET) and
+			the .net framework's system process the request, produce the result and return back to the
+			web server. And the web-server will return back the produced result to the client.
+
+The Modules & Handlers
+============================================
+
+Modules & Handlers are built-in application component which are installed with IIS (web server) and ASP.NET that are used to receive the client requests, process them accordingly, produce / generate output (varities of output - HTML/CSS/JavaScript, XML, JSON, Images, Video/Audio and even more) and forward the generated output to the web-server.
+
+Client1
+(Webbrowser1) ------------|
+                          |---->Requests---> |--- Http Server ---|
+Client2       ------------|                  |  (Web Server)     |
+(Webborwser2)             |<---Responses---- |-------------------|
+....                      |                       ||     /\
+.....                                             ||     ||
+                                             |--------------------|
+                                             | Handlers & Modules |
+                                             | (Programs that     |
+                                             | perform request &  |
+					     | response related   |
+                                             | tasks              |
+                                             | ------------------ |
+                                             | .NET Framework CTS |
+                                             | & CLR              |
+                                             | -------------------|
+                                             |                    |
+                                             | |-------| |------| |------->  Databases
+                                             | | app1  | | app2 | |<-------
+                                             | |-------| |------| |
+                                             |  app3, .... app4.. |-------> Mail/Identity services 
+                                             |--------------------|<-------
+
+The .Net Framework + Http Server bundle is also known as "Application Server".
+
+ASP.NET ONE 
+======================================================================================
+ASP.NET ONE (Active Server Pages .NET platform one) is a single server web platform that allow us to use this web platform using one or more ways or sub architectures (sub platforms):
+
+1. ASP.NET Web Form Architecture  -- This is the first architecture introduced since 2002 and it is the same as its
+					version 2.0. No major changes means this architecture is not used to develop	
+					the web applications however it is not deprecated but it has its own issues.
+
+				  -- This is the complex architecture for the web-developers because:
+					> It never allow fully control over the markup (You must reply on the
+						classes of ASP.NET)
+					> It generate some extra code (hidden code) that might not needed in some
+					  sort of apps.
+					> It has a UI controls -- and developer has to learn UI controls in order to
+						develop the webapp. 
+					> Too difficult to separate the code -- i.e single page that contains
+					  HTML/CSS/JavaScript & C# code. You need to choose different approach to
+					  re-use the code/components.
+					> .aspx, .master, .ascx web pages uses WebForm architecture.
+
+2. Single Page Architecture        -- This architecture allow us to create a single page app just like PHP app. This
+					architecture uses "RAZOR View Engine" --- It is a name of the "modules/handers"
+					used to parse,process & execute the .cshtml, .vbhtml pages.
+
+				   	We must use "single page" architecture because:
+					  > We have fully control over the markup, CSS and JavaSCript
+					  > Easily separate the code using different method that RAZOR supports.
+					  > Use this framework when web app /site is very small.
+
+3. ASP.NET MVC Architecture        -- This is the standard & proven architecture (Used almost all server & client plat
+					forms) which separate "View" code from "Model/Database/Data" from controller
+					code (Model - View - Controller).
+					
+ 				    -> You can use "ASPX" or "CSHTML (Razor)" view to define "View" in the ASP.NET
+					MVC App. However, we should use "Razor" over the "ASPX" engine.
+4. Web Apis			   -- This architecture allow us to write a component whose methods are exposed via
+					HTTP protocol and remote programs can request these methods using GET/POST etc
+					protocols. Web APIs are useful when your webapp has different kind/category
+					of users -- web-browser, Android App, IOS App, Win Phone and other third party
+					clients.
+
+Now all above mentioned architectures are at single location and that's why it is called ASP.NET ONE. Cookies, Session, Login (Authentication & Authorization), Cache and many more things are same for all the different architectures.
+
+
+[NOTE: WEB/HTTP server acts as a bridge between "Client Platform" and "Server Platform" i.e web-browsers/mobile are client platforms and Java/.NETFramework/PHP are server platforms. With the help of web server, clients & server programs communicates]
+
+
+Web server receives client request ( program or page name, data & instructions) and forward them to the "Application Servers - Java/.NETFramework/PHP etc. The Application servers process that reuqest and produce appropriate output/response and finally the application servers return back the "output/response" to the web-server so the web-server can forward the this "output" to the "clients".
+
+HTTP - Hypertext transfer protocol is a "communication rules/standard" and it is implemented by the "Web-Browser", "Web-Server" and "Application Servers". It is request-response based stateless protocol.
+
+     Client requests and server reponds it and then both (client & server) forget the communication like they were never talked with each other and that kind of request-response way is called "Stateless -- no communication record is saved by the client nor server application; every communication consider as a fresh communication or new communication".
+
+
+The HTML - Hypertext Markup Language
+===================================================================================================================
+
+HTML is a markup language to present data on the web. In fact HTML is a standard and it is maintained by the W3C - World Wide Web Consortium (W3C defines Standards for Web that includes - HTML, CSS, SVG, SGML, MathML etc) and this standard is then implemented by the browser vendors (google, mozilla, mocrosoft etc).
+
+Current HTML standard is 5 (Note that it is not a version or edition) - HTML5 and previous standards were HTML2,4. It is important to note that the new standard carries all the features of old standards.  Some of the old features are marked as "depricated" in new standard because of their absurd use in current standard of web. 
+   For example,  <font> HTML tag is depricated (retired) because there are some better alternatives with great    significance are available in new standards but if you use <font> then web-browser will not complain because this
+   tag is retired but not removed.
+
+
+The HTML elements
+------------------
+
+The markup or tag or element of HTML is enclosed in < (less) and > (greater) sign and we've two types of markup:
+ 
+1. closed element/tags and 
+2. open elements
+
+For example,    <input type="text">   <--- There is not such a symbol that ends or terminates the <input>
+
+		<p>
+                  Thi is closed tag
+                 </p>
+
+However, open tags can be written with empty body:
+              <input type="text" />     The / in /> indiates that there is no body of the element. 
+So, following two syntax are valid:
+  <input type="button" />
+  <input type="button" >
+
+Each html tag will be an Element (object) because each markup you write is a "class". 
+For example, 
+
+  Tag ===>   <p> .. </p>
+Class ===>   HtmlParagraphElement
+And the web browser will creates four objects for the following content:
+
+     <p>This is my first para</p> 
+     <p>This is my second para</p>
+     <p>This is my third para</p>
+     <p>This is my fourth para</p>
+
+You can learn more about Html objects & Elements via "Developer Tool" -- Press F12 (Ctrl+Shift + I) at web-browser.
+
+Each web-browser has a "Developer Tool" to test, debug and learn things related to request, response, cookies, client code - objects - CSS properties etc.
+
+
+HTML Elements are falls into two group based upon their display. 
+--------------------------------------------------------------------
+These elements are:
+  1. Block Elements   --- Block element's width will be the width of their parent elements. The height of the block
+  			 elements is depends upon the content they hold.
+
+  2. Inline Elements  --- Inline elements's height & width are computed from the content/text they represent and we
+				can't change height & width of "inline" elements.
+
+			Note that the block element's height & width can be changed via CSS properties but inline's 
+			height/width can't be changed.
+
+Some of the HTML elements support both - block & inline display. So these elements are known as "block-inline or inline-block" elements.  <input> elements are example of inline block.
+
+The <!doctype html>
+---------------------------------------------
+The <!doctype html> is an instruction to the browser to select current (new) standard of HTML to create HTML objects. If this preprocessor (<!doctype > is called preprocessor) is missed then your browser will entered into "quirk mode" and that generate HTML objects from old or new or mixed standard and hence the output of the brower will always surprise you.
+
+So, the web document must begins with <!doctype html> and this statement instructs browser to select HTML5 standard.
+
+
+Example: Remove <!doctype html> and test this page on diff browsers and then add <doctype> and see the result
+
+@{ 
+    var title = "Never misses the doctype";
+}
+<!DOCTYPE html>
+<html>
+<head>
+    <title>@title</title>
+    <style>
+        html {
+            background: red;
+        }
+        body {
+            background: blue;
+        }
+        h1 {
+            background: yellow;
+        }
+    </style>
+</head>
+<body>
+    <h1>Welcome</h1>
+</body>
+</html>

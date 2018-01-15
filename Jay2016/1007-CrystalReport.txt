@@ -1,0 +1,166 @@
+Crystal Report - A Report Writer Tool
+=====================================
+
+In order to display, print and export your data in varities of form, we will use the report writer tool from the SAP (Business Object Corp) Crystal Report. 
+
+You may install this tool with any version of Visual Studio. This tool provide report designer + report runtime. You can also download report runtime if required.
+
+
+Note that the report writer tool is for display, print or export simple or complex form of data including the statements of records or a detailed report which is break in one or more major-minor break.
+
+
+In order to develop crystal reports for our business app, we must have to follow the steps:
+
+ 1. Define your source of data. Crystal report can use different kind of data sources including file, xml, databases,
+    and objects (in-memory representation of data).
+
+    Once your app has a data source then you might go to second step.
+
+ 2. Design the crystal report using Visual Studio and Crystal Report Designer tool.
+
+ 3. Deploy the crystal report which then execute the crystal report component and produce the result or output.
+
+We will use one of the two approach to design the data source.
+  
+  1. Database objects/tables via DataSet and
+  2. Database objects/tables via EF Or Custom Objects
+     
+
+Example-1
+
+Create a public component
+
+Emp.cs
+-------
+public class Emp 
+{
+  public int Id {get;set;}
+  public string Name {get;set;}
+  public string Dept {get;set;}
+  public DateTime JoinDate {get;set;}
+  public Decimal Salary {get;set;}
+}
+
++
+
+Build your project. That way the SAP Crystal Report Engine uses the compiled code of "Emp" component (Custom Objects)
+
+Now, create a sub-folder into your project "Reports" (or you name it any)
+
+Right mouse click on "Reports" + Add New Item + Reporting Tool + Crystal Report + Name the class designer file name. Extension of this file is .rpt. The .rpt is report designer template file and based upon the .rpt, crystal engine generate C# code (class code).
+
+  First of all, a report template selection dialog box will be appear.
+ 
+  Choose the "Using Report Wizard" + OK 
+
+  Next step will be "Data" and in this dialog select,
+
+     + Project Data +  .NET Objects + Select the "Emp" component 
+
+     +  And click on  ">>" button to add that component into the report's domain
+
+ Next step is "Field" - Select and add necessary fields that you wanted them into the report.
+
+ Click the "Finish" to end this task.
+
+ 
+ After the clicking on "Finish" button, a designer will be opened into VS and it shows following sections:
+
+   ---------------------------------------
+   Report Header  (Content of this section will appear at top of the very first page of the report
+   ---------------------------------------
+   Page Header section (Content of this section will appear at the copy of each and every page)
+   ---------------------------------------
+   Details  section  (In this section, data from data source will be displayed. The page orientation and page size
+   (e.g A4, Letter) etc will be customized.
+
+   -----------------------------------------
+   Report Footer ( Content of this section will be appear at the end of report (i.e last page of report))
+   -----------------------------------------
+   Page Footer ( Content will be displayed at the bottom of each page. e.g page no, print date etc)
+
+
+ So, basically a crystal report is made up with number of sections whose height/width can be set at design time as
+     well at runtime.
+
+In crystal report designer, you can use tools from "Toolbox" to add lines, textboxes, boxes etc into the report file.
+
+
+Add following code into an action method to deploy and run the report object:
+
+    public ActionResult EmpReport()
+        {
+            //1. Design the data source
+            var list = new List<Emp>
+            {
+                new Models.Emp { Id=1, Name = "Rajesh Shantilal Patel", Dept = "Accounting", JoinDate = DateTime.Parse("1/1/2002"), Salary= 9999.44m  },
+                new Models.Emp { Id=1, Name = "Rajesh Shantilal Patel", Dept = "Accounting", JoinDate = DateTime.Parse("1/1/2002"), Salary= 9999.44m  },
+                new Models.Emp { Id=1, Name = "Rajesh Shantilal Patel", Dept = "Production", JoinDate = DateTime.Parse("1/1/2002"), Salary= 9999.44m  },
+                new Models.Emp { Id=1, Name = "Manish Shantilal Patel", Dept = "Accounting", JoinDate = DateTime.Parse("1/1/2002"), Salary= 77777m  },
+                new Models.Emp { Id=1, Name = "Rajesh Shantilal Patel", Dept = "Production", JoinDate = DateTime.Parse("1/1/2002"), Salary= 12000m  },
+                new Models.Emp { Id=1, Name = "Rajesh Shantilal Patel", Dept = "Accounting", JoinDate = DateTime.Parse("1/1/2002"), Salary= 5600.0m  },
+            };
+
+            //2. Create report class object
+            var rep = new Reports.RepEmp();
+
+            //3. Set data source to the report object
+            rep.SetDataSource(list);
+
+            //4. Export/Generate the crystal report
+            var stream = rep.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+
+            
+            return File(stream, "application/pdf");
+            //Download the file
+            //return File(stream, "application/pdf","emp.pdf");
+        }
+
+
+ Filter the records just before exporting the content
+ -----------------------------------------------------
+
+ 1. String data type filter formula.
+
+    Syntax:
+
+     {YourType.Field}='value'
+
+ 2. Number datatype
+
+     {Type.Field}=1  
+ 
+     You can use "and" "or"  and other operators > >= < <= = and <> 
+
+ 3. Date datatype
+
+    {Type.Field}=#12-31-2002#  
+
+     You can also use > >= < <=  = <> and "and, or" operators
+
+Example:
+
+ ...
+rep.RecordSelectionFormula = "{CrystalApp_Models_Emp.Dept}='Production'";
+
+//4. Export/Generate the crystal report
+var stream = rep.ExportToStream(CrystalDecisions.Shared.ExportFormatType.PortableDocFormat);
+.....
+
+
+Example: Salary between 3000 to 13000
+
+var s1 = 3000m;
+var s2 = 13000m;
+rep.RecordSelectionFormula = "{CrystalApp_Models_Emp.Salary}>=" + s1 + " and {CrystalApp_Models_Emp.Salary}<=" + s2;
+....
+
+Example: Date wise
+
+var d1 = DateTime.Parse("1/2/2002")
+rep.RecordSelectionFormula = "{CrystalApp_Models_Emp.JoinDate}=#" + d1 + "#";
+...
+
+
+
+

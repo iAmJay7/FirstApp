@@ -1,0 +1,407 @@
+HTML Elements
+============================================================
+
+There are number of categories of HTML elements but initially we can classify these elements based upon the "display" property of these elements. 
+
+Some of them are "block", some of them are "inline" and some of them have "block & inline -- mixed" display property.
+
+Example:
+
+<!doctype html>
+
+<head>
+  <title>Test-No need to add html doctype is added</title>
+  <style>
+    * {
+      border: 1px solid red;
+      padding:3px;
+    }
+   </style>
+</head>
+<body>  
+  <h1>This is block element</h1>
+  <div>This is block..</div>
+  <span>This is inline</span>
+  <label>This is also inline</label>
+  <div>
+    I'm block.
+     <p>
+       I'm a block.
+        <code>HTML</code>,<code>CSS</code> and <code>JavaScript</code> are web client programming elements.
+        Please press <kbd>CTRL+SHIFT+I</kbd> or <kbd>F12</kbd> to open the <strong>Developer Tool</strong>
+      </p>
+  </div>
+</body>
+  
+HTML Sementic elements
+========================
+Sementic elements are such elements can be used for one or more purposes -- in fact you can use them in any context for your purpose.
+
+Example of sementic elements are:
+  div, span, label, header, footer, article, aside, section and many more. 
+
+These elements don't have very sepcial display or visual attributes and they are used to acts as a container so these elements might include text and other tags.
+
+For example, suppose we want to structure a web page which looks:
+
+|------------------------------------------|
+| Logo Section | Heading text              |
+|------------------------------------------|
+| Menu or Links                            |
+|------------------------------------------|
+|  Left   | Center               | Right   |
+|  sec    | section              | section |
+|         |                      |         |
+|------------------------------------------|
+| Footer                                   |
+|------------------------------------------|
+
+then our code inside the body should be :
+
+<body>
+ <div>   <!--- main container --->
+   <header>
+       <section>Logo section</section>
+       <section>
+            <div>First Text</div>
+            <div>Second Line</div>
+        </section>
+    </header>
+    <nav>
+       <a href="#">Home</a> .....
+    </nav>
+    <article>
+         <aside>Left Section</aside>
+         <aside>
+             <section>
+                 <header>Heading...</header>
+                 <div>Center Section...</div>
+             </section>
+         </aside>
+         <aside>Right Section</aside>
+     </article>
+    <footer>Footer</footer>
+ </div>
+</body> 
+
+Sementic elements are also known as "Generic Elements".
+
+Heading elements
+========================
+There are six different heading elements to display "text" in pre-defined heading styles and these are h1,h2,h3,h4,h5,h6
+
+code inside the body:
+
+<h1>Heading1</h1>
+<h2>Heading1</h2>
+<h3>Heading1</h3>
+<h4>Heading1</h4>
+<h5>Heading1</h5>
+<h6>Heading1</h6>
+
+Note that these elements can be act as "Container" so you can embed other tags inside these tags.
+
+Text elements
+============================
+Used to describe the text and they don't allows nested block elements.
+Example are :  p, code, label, span, kbd, abbr, text, i, em, strong, u, b etc.
+
+code in body:
+
+<p>
+ This is para element and it is a block but it can't another block child.
+ <strong>You can add/embed inline elements inside the p or other inline elements</strong>
+</p>
+
+
+Form elements
+==============================
+These elements are used to define the UI and read values/data interactively and also submit the data to the application server (via web server). These elements are:
+
+form, input, button, textarea, select etc.
+
+Embed elements
+=============================
+These elements embed to resource into the edisting web document.
+
+Example are : img, link, script, embed, video, audio, picture etc
+
+List elements
+===========================
+To list the items or create group of item
+
+Example:  ul, ol, li, dd, dt etc
+
+Misc elements
+=============================
+a <a href> -- Hyperlink 
+name       -- for bookmark
+summary	   -- display report summary/footnote
+
+
+CSS
+===========
+Cascade Stylesheet Language "style" the DOMs or HTML objects. It is also used with SVG (Scalar Vector Graphics). The CSS language offers number of "Properties" and these properties are "CASE SENSITIVE".
+
+General syntax of property: 
+
+    propertyName: value
+
+CSS language uses properties to create a style for one or more HTML elements and the way in which "CSS properties" are
+used to style the "HTML Elements" are called "SELECTORS".
+
+SELECTOR is a way to create a group in which one or more CSS properties are set and later this "group" is assgined or applied to the specified set of HTML elements.
+
+
+General syntax of selector:
+
+SelectCategory {
+  property1: value1;
+  property2: value2;
+  .....
+}
+
+SELECTOR begins with a "Selector Category" and pair of { and }. Inside the { }, there are number of CSS properties and each pair is separated with ; semicolon.
+
+NOTE: Selectors and their properties are case sensitive and they are always in lower letter so we should use "lower" letter to name our custom selectors.
+
+
+SELECTORS and their usage
+--------------------------
+
+CSS properties or selectors can be used in a web-document using one or all of the following methods:
+
+
+1. Inline CSS properties
+   Each html element has an attribute called "style" and you can set CSS properties via "style" attribute.
+
+code in body:
+
+<p style="color: blue; font-size: 2em">Para-1 with 200% font size</p>
+<p>Regular Para</p>
+<input type="button" value="click me" style="background: red; color: white" />
+
+  Inline CSS via "Style" attribute is very simple approach but we need to set CSS properties for each markup and that's
+  way we should focus on other methods (next two methods).
+
+2. Embed selectors inside the web-document.
+
+   Use <style> HTML tag and embed CSS selectors.
+
+code in body:
+
+<style>
+  p {
+    color: green;
+    font-size: 1.5em;   /* 150% */
+  }
+</style>
+<p>Hello</p>
+<p>World</p>
+  
+   This method is useful but we need to copy the same set of SELECTORS in different pages/documents and think what will happen when we want to change the text color "blue" of all P element in entire website? We need to open each page and update the property value; and that is not a good idea so we will always use third method (External CSS document).
+
+3. External CSS document -- Embed the CSS document
+
+A "Css" document that contains "SELECTORS" or
+A "program" that generate "SELECTORS" can be embed into the web document via <link> html tag.
+
+General Syntax:
+
+ <link rel="stylesheet" href="CSS document path and document name....."/>
+
+For example:
+
+ <link rel="stylesheet" href="http://www.abc.com/style.css "/>
+                              ^
+                              |---- this is absolute path or location 
+                              |
+                              V
+ <link rel="stylesheet" href="http://www.abc.com/mystyle "/>  
+                                                  |
+                                                  |-- a program that produces CSS selectors
+
+ <link rel="stylesheet" href="style.css" /> 
+                                |
+                                |---------------- Relative path of CSS doc. This doc and web-document are
+						  exist in a same website and same folder.
+
+ <link rel="stylesheet" href="/css/style.css"/> --- "style.css" is located under "css" folder in same webside where
+						    as web document can be any where within the webside.
+
+
+   Attributes "rel" stands for "relative" ( a relative to the "stylesheet" category)
+              "href" stands for document reference (hyper ref) or location
+
+
+Here, we have two types of "Path" for the documents (of varying types):
+    1. Absolute path documents (which begins with http://siteNAme/folder/folder.//filename) and
+    2. Relative path documents (documents are exists inside the websire where they are referenced & used)
+
+                              
+CSS SELECTORS
+==============
+
+1. Universal selector  -- SELECTOR glued/applied to all elements
+
+* {
+
+}
+
+* astrisk or star is called "universal selector"
+
+2. Element selector  --- SELECTOR glued to those tags belongs to specified HTML element
+
+Element {
+
+}
+e.g
+h1 {
+  /* for h1 tags */
+}
+div {
+  /* div tags */
+}
+
+3. Class selector   --- A custom selector whose name begins with . (period) and it is glued to HTML tag	
+			via "class" attribute.
+
+.my-box {
+  border: 1px solid red;
+}
+.my-text-color {
+   color: blue;
+}
+.blue {
+  color: blue;
+}
+.red {
+  color: red;
+}
+.padding5 {
+  padding: 5px;
+}
+
+Note: all above class selectors either placed into separate css doc or <style>
+
+<p class="my-box">This para with border</p>
+
+<p class="my-box red">Border and red text</p>
+
+<div class="my-box padding5 blue">My box with 5 padding and blue text</div>
+
+CLASS SELECTORS can be used to any HTML element via "class" attribute and you can apply one or more class selectors
+to the element.
+
+
+
+4. ID selector --- ID CSS selector is a custom selector whose name begins with # and it is glued using "id" attribute.
+
+			The "id" attribute contains scalar/single value and possible unique so the "id" selector
+			name should be unique per page/document.
+
+			The very same "id" attribute is also used by the JavaScript to name of HTML object.
+
+<style>
+  #error-message {
+    color: red;
+    font-variant: italic;
+  }
+</style>
+
+<div id="error-message">Error! Please check your input...</div>
+
+
+Example: CSS document and embed it 
+
+assume that we've following directory structure:
+
+/webapp/
+       |
+       |------/Styles/   <----- Create a folder inside your project (By right mouse click Add new item + New folder)
+       |         Style.css and add "style.css" inside the "Styles" folder.
+       |   
+       |
+       | Index.html, About.html and other web documents.....
+                         Add new items (html pages) inside the root of your website.
+
+/Styles/Style.css
+-------------------
+
+/* CSS uses C style comments */
+body {              
+  font-size: 1.4em;
+}
+
+#page-header {
+  font-size: 4em;
+}
+
+.border-1 {
+  border: 1px solid black;
+}
+.border-2 {
+  border: 2px solid black;
+}
+.text-red { 
+  color: red;
+}
+.text-green {
+  color: green;
+}
+.font-small {
+ font-size: .6em;
+}
+
+/Index.html
+--------------
+.....
+<head>
+  ...
+  <link rel="stylesheet" href="Styles/Style.css"/>  
+</head>
+<body>
+ <div id="page-header">
+   <h1>
+       <span class="text-green">ABC</span>
+       <span class="text-red"> RED</span> Pvt Ltd
+   </h1>
+ </div>
+ <div>
+   <p class="text-red font-small">Note: This is the note....</p> 
+ </div>
+</body>
+
+
+Whitespaces & HTML document
+------------------------------
+
+HTML ignore whitespaces. HTML parser adds a single whitespace automatically if one or more whitespaces exists inside the tag or text.
+
+<p>The     red          sun           and          red   		rose</p>
+ will be displayed as "The red sun and red rose"
+
+HTML Entities
+----------------------------------
+HTML entities are special charset which are represented by a special syntax to embed a text/char.
+
+  &npsp;   &--here-goes-some-chars--;   &nbsp; means space
+  &lt;     less than  symbol  <
+  &gt;     greater than  >
+  &copy;   copyright symbol
+
+Example:
+
+&lt;p&gt; is paragraph tag of paragraph element.
+
+<p>Keep two space between words</p>
+<p>Keep&nbsp;&nbsp;two&nbsp;&nbsp;space...</p>
+
+Or use <pre> html tag to preseve the whitespace:
+
+<pre>The    red  sun
+
+and
+
+rose
+</pre>

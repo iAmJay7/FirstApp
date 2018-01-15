@@ -1,0 +1,998 @@
+The Request Type and HTML elements
+====================================================================================================
+
+Request Type means Request Method - a way to request the web-resources. We've have two general purpose REQUEST METHODS namely - GET (or get) and POST (or post) and also there are some special purpose request methods used by the web apis are : DEBUG, HEAD, PUT, DELETE. However these additional REQUEST METHODS are specify programatically whereas the GET and POST request methods are the fundamental methods.
+
+=> The default request method is the "GET".
+
+   When we type "url or uri" at addressbar or clicking on hyperlinks or submitting forms (submit buttons) or
+   embeding the documents via img, picture, video, audio, link, script, embed etc all are example of GET reuqest method.
+
+   GET request means to "request a resource for read purpose". Mostly GET request returns the result or GET is used to
+	read the resource however it is upto on you that you can also use it as a write purpose request type (it means
+	you can send data/instruction and your code perform actions accordingly).
+   GET request sends plain text data (human readable form) to the servers, so do not send important data & instructions    using this (GET) request method.
+
+   GET request data has a restriction on length/size. Their size is limit the web-browser and it can be 2000 byte or    4000 bytes etc.
+
+   GET don't support file upload (send binary data and also huge amount of data).
+
+=> POST request means to submit data and also read the resources.
+
+   When you want to send data and that data are crucial or serious to your app then use POST method.
+
+   POST Request method encode the form data (submitted data). [It automatically convert special characters which are harmful for communication into harmless characters called "Encoding & Decoding of Text"]
+
+   For example,   We know that the database's varchar field can't hold special char or print control characters and 
+			similar the with web, it consider as harmful chars.
+
+             You type text field content as : 
+
+                 Username :  <h1>Hello</h1>
+              Then the special chars like < > and spaces and other chars are converted into BASE64 Charset.
+
+   BASE64 is a charset name as compare to ANSI or UTF (unicode).
+
+   POST request allow us to send data (huge amount) and files.
+
+EXAMPLE: To learn the encoding of byte array and produce the simple and Base64 strings.
+
+            byte[] ar = { 7,1,66,67,97 };
+            var str = System.Text.Encoding.UTF8.GetString(ar);
+            Console.WriteLine(str);
+            Console.WriteLine(Convert.ToBase64String(ar));
+
+
+The Request Property - ASP.NET page property
+=============================================================================================================
+
+Http Request is received by the application server (ASP.NET) and allow us the "Request" property to access the request data , meta data and other useful information.
+
+In fact the "Request" is an object of HttpRequest class that is created automatically by the ASP.NET for each request. The ASP.NET also create an object called "Response" along with the "Request".
+
+So, "Request" and "Response" are two properties where a programer can interect with the "input (request)" and "output (response)".
+
+Example: Request type
+
+<!doctype html>
+<p>Request method is : @Request.HttpMethod </p>
+
+<a href="Index.cshtml">GET Request</a>
+<form>
+    <button>Submit - GET Request</button>
+</form>
+
+<form method="post">
+    <button>POST Request</button>
+</form>
+
+
+Example: To determines the requested resource name/path (Relative & absolute path)
+
+URL - Uniform Resource Locator      http://localhost  
+URI - Uniform Resource Identifier   http://localhost/abc.html
+URN - Uniform Resource Name         /abc.html
+
+
+~ Root operator (ASP.NET) tells the server side objects to consider the root of the website.
+
+~/  means root path /
+
+Example:
+
+<!doctype html>
+<p>@Request.Url</p>
+<p>@Request.FilePath</p>
+<p>@Request.CurrentExecutionFilePath</p>
+<p>@Request.Path</p>
+<p>@Request.MapPath("/Styles/style.css")</p>
+<p>@Server.MapPath("~")</p>
+
+Server.MapPath("relativePath") or Request.MapPath("relativePath") methods convert relativePath into absolutePath.
+
+GET request that sends data
+----------------------------
+
+URI form of the GET request must be:
+
+ http://siteName/resource?key1=value1&key2=value2......
+                          
+ ? - question mark separates the URI/URL from the data (pairs of key-value)
+
+ query string - Pairs of key-value separated with & sign is called "query string".
+
+To receive requested data, use following Request properties:
+
+  1. Request["key"] -- for GET & POST
+  2. Request.Form["key"] - for POST only
+  3. Request.QueryString["key"] -- for GET only 
+
+Example-1:  type /page2.cshtml?no=10&name=Raj at address bar
+
+page2.cshtml
+--------------
+
+@{
+    var no = Request["no"];  //or Request.QueryString["no"];
+    var name = Request["name"];
+    <p>@no  @name</p>
+}
+<!-- you can set query string with hyperlinks or embed tags -->
+<a href="~/page2.cshtml?no=1&name=Darshan">Meet Darshan</a>
+<style>
+    a {
+        text-decoration: none;
+        padding: 10px;
+        background: red;
+        border-radius: 50%;
+        color: white;
+    }
+    a:hover {
+        background: black;
+    }
+</style>
+@for(int i=1;i<=10;i++)
+{
+    <a href="~/page2.cshtml?no=@i">&nbsp;&nbsp;@i&nbsp;&nbsp;</a>
+}
+<form>
+    No : <input name="no" type="number"/>
+    Name : <input name="name" type="text"/>
+    <button>Submit</button>
+    <input type="submit"/>
+</form>
+
+The "name" attribute of form elements
+=====================================
+The name attribute of an element define a key for the Request (GET or POST). So it is mandatory to set the name attribute for those input/form elements whose data you want to send.
+
+Example: Cross page get request
+
+page1.cshtml
+-------------
+<a href="~/page2.cshtml?no=1&name=Darshan">Darshan</a>
+
+<form method="get" action="~/page2.cshtml">
+                      ^
+                      |------------------------- Request data will be received in "page2.cshtml"
+  <p>No : <input type="text" name="no"/></p>
+  <p>Name : <input type="text" name="name"/></p>
+  <p><button>Submit</button></p>
+</form>
+
+page2.cshtml
+--------------
+@Request["no"]
+@Request["name"]
+
+
+The form element (<form> tag)
+-----------------------------
+The form tag amaas (gether) key-value pairs and prepare a packet or envelop of data. There are other alternatives and mostly with JavaScript language to send data without using <form> tag.
+
+To submit the <form> data, we need to use one of the following elements:
+
+1. <input type="submit" value="Your label" />
+2. <button>Your Label</button>
+3. <input type="image" src="image-path" />
+
+Generally <form> markups are embed into containers like div, section , fieldset and we will select the fieldset for the good practice.
+
+Use the <label></label> inline element to enclose the <input>, <select>, <textarea> etc element. The <label> allow us to set focus automatically to the input field when it is selected or clicked.
+
+Use "placeholder" attribute of input element to show the hint.
+
+Use appropriate value for the "name" attributes.
+
+If action attribute of "form" is not specified then the currently requested page will become the action value.
+
+
+Determine the POST method in the page
+----------------------------------------
+Use "IsPost boolean" property; which returns true if request method is POST.
+@if(IsPost) {
+  ...
+}
+Cast the request data
+----------------------------------------
+All request data are represented by the string type if they exists. And we need to cast them according to their usage.
+
+In Razor view, we've extension method with Request property whose names begins with AsXXXX() -  AsInt(), AsBool etc..
+that automatically uses type.TryParse method to parse the string.
+
+Example:
+
+@if(IsPost)
+{ 
+    var no = Request["no"].AsInt();
+    var name = Request["name"] ?? "";     // ?? is null check operator
+    <p>@no @name</p>
+}
+<!doctype html>
+<body>
+    <fieldset>
+        <legend>Employee Data</legend>
+        <form method="post">
+            <p>
+                <label>No <input 
+                                 type="number" 
+                                 name="no"
+                                 placeholder="Employee Id"
+                                 /></label>
+            </p>
+            <p>
+                <label>
+                    Name <input type="text"
+                              name="name"
+                              placeholder="Employee Name" />
+                </label>
+            </p>
+            <p><button>Add Employee</button></p>
+        </form>
+    </fieldset>
+</body>
+
+Example: Single line text input fields
+
+<input type="text">
+<input type="email">
+<input type="number">
+<input type="tel">
+<input type="date">
+<input type="search">
+<input type="range">
+<input type="password">
+
+All above mentioned input elements uses auto validations if you choose the appropriate "type" attribute. There is also a special attribute called "required" which tells the browser to not submit or send data unless that "required" input is not filled with data.
+
+For example:
+
+   <input type="number" required name="no" />  Or <input type="number" required="required" name="no"/>
+
+Other input fields are:
+
+<input type="hidden"> - don't show the data
+<input type="file">   - file selector
+<input type="color">  - color selector
+<input type="radio">  - option button 
+<input type="checkbox"> - checkbox
+
+
+1. Input no, name and birth date of employee and receive the value in same page  (Use cshtml page)
+---
+ 
+We will use <label for> syntax to set the focus when input item is placed outside the label. The <label for="id-of-input"> tag uses id value of input element.
+
+<!doctype html>
+@{
+    /* Receive the value from request - POST */
+    var no = 0;
+    var name = "";
+    var birthDate = DateTime.Now;
+    var message = "";
+    if(IsPost)
+    {
+        no = Request["no"].AsInt();
+        name = Request["name"] ?? "";
+        birthDate = Request["birthdate"].AsDateTime();
+        message = "Received data : " + no + " " + name + " " + birthDate;
+    }
+}
+
+<form method="post">
+    <p><label for="no">No</label></p>
+    <p><input type="number" required name="no" id="no" /></p>
+    <p>
+        <label for="name">Name</label>
+        <input type="text" required name="name"  id="name"/>
+    </p>
+    <p>
+        <label for="birthdate">Date</label>
+        <input type="date" required name="birthdate" id="birthdate" />
+    </p>
+    <p>
+        <button>Submit</button>
+    </p>
+</form>
+<p>@message</p>
+
+2. Determine which submit button is pressed -- It is important to note that the only one submit button can be pressed or selected at a time and that's why we will use a "common" name for the submit buttons.
+
+<p>@Request["cmd"] button is pressed</p>
+
+<form method="post">
+  <button>First</button>
+  <button name="cmd" value="Second">Second</button>
+  <button name="cmd" value="3rd">Third button</button>
+  <input type="submit" value="Fourth" /> 
+  <input type="image" src="/images/a1.png" name="cmd" value="Fifth"/>
+</form>
+
+[Create a folder named "Images" and add a small size image named a1.png in it]
+
+Note: Add 
+   <button name="cmd" value="Sixth"><img src="/Images/a1.png" alt="Submit Button Image" /></button>
+
+ markup into previous code.
+
+So, only those submit button's value are recived that has a name attribute.
+
+3. Display different messages when diff button is pressed.
+
+@{
+ var cmd = Request["cmd"] ?? "";
+ var no1 = Request["no1"].AsDecimal();
+ var no2 = Request["no2"].AsDecimal();
+ var no3 = 0.0m;
+ if(cmd.Equals("Add")) 
+  {
+    no3 = no1 + no2;
+  }
+ else
+ if(cmd.Equals("Sub"))
+ {
+   no3 = no1 - no2;
+  }
+}
+
+<form method="post">
+ No : <input type="number" name="no1"/>
+ No : <input type="number" name="no2"/>
+ <button name="cmd" value="Add">+</button>
+ <button name="cmd" value="Sub">-</button>
+</form>
+@if(!string.IsNullOrWhiteSpace(cmd))
+{
+  <p>Result : @no3 </p>
+}
+
+[Note: You can choose your own name attribute value instead of "cmd"]
+
+
+4. Sticky form - you've noticed in previous example that the after submitting the form, all the input field are get cleared beacause of the re-render of the entire content.
+
+   We can write the received value to the attribute or other area of the HTML element and this kind of actions are known as re-write data or embed the data.
+
+You can change following code in previous example:
+
+ No: <input type="number" name="no1" value="@no1"/>   
+ No: <input type="number" name="no2" value="@no2"/>
+
+So, this way we can preserve the data inside the page till it is our current page. In ASP.NET, to persists or save or embed data into the currently executed page is also known as "Page scope state management".
+
+5. Set the background color of submitted button
+
+We will write "class" attribute value based upon the value of submit button
+
+@{
+  var cmd = Request["cmd"] ?? "";
+}
+<style>
+  .pressed {
+     background: blue;
+  }
+</style>
+
+<form method="post">
+ <button name="cmd" value="Home" class="@(cmd.Equals("Home") ? "pressed" : "")">Home</button>
+ <button name="cmd" value="About" class="@(cmd.Equals("About") ? "pressed" : "")">About us</button>
+ <button name="cmd" value="Contact" class="@(cmd.Equals("Contact") ? "pressed" : "")">Contact us</button>
+</form>
+
+6. <input type="search" name="search"> will just look like a text field with extra clear button  ( x ) at right of the 					text field.
+
+7. <input type="range" min="1" max="50" name="age"> -- Will provide numeric value selector which starts with min and 					upto max.
+
+8. <input type="hidden" name="name" value="something-that-you-dont-want-to-show" > -- To persist value inside the form 			but will not be displayed.
+
+    Program to display one after one quote from the list/array when [Prev] [Next] button is pressed.
+
+@{ 
+    string[] quotes =
+    {
+        "First quote",
+        "Second quote",
+        "Third quote"
+    };
+
+    var index = Request["index"].AsInt();
+    var cmd = Request["cmd"] ?? "";
+
+    if(cmd.Equals("Prev"))
+    {
+        index--;
+    }
+    else
+    if(cmd.Equals("Next"))
+    {
+        index++;
+    }
+
+    if(index<0)
+    {
+        index = 0;
+    }
+    if (index >= quotes.Length)
+    {
+        index--;
+    }
+}
+<q>@quotes[index]</q>
+<form method="post">
+    <input type="hidden" name="index" value="@index"/>
+    <button name="cmd" value="Prev">&lt;</button>
+    <button name="cmd" value="Next">&gt;</button>
+</form>
+
+Example: We've some images under "/Images" folder (create a folder and past some files). Program to display one after one image when appropriate button is pressed. Also add [First][Prev][Next][Last] buttons.
+
+@{
+ string []images= 
+  {
+    "a1.png","a2.png","a3.png"
+  };
+  .....
+  .....
+}
+<div>
+  <img src="/Images/@images[index]" alt="Image galary" />
+</div>
+....
+....
+
+
+@{ 
+    string[] images =
+    {
+        "a1.png",
+        "a2.png",
+        "a3.png"
+    };
+
+    var index = Request["index"].AsInt();
+    var cmd = Request["cmd"] ?? "";
+
+    if(cmd.Equals("Prev"))
+    {
+        index--;
+    }
+    else
+    if(cmd.Equals("Next"))
+    {
+        index++;
+    }
+
+    if(index<0)
+    {
+        index = 0;
+    }
+    if (index >= images.Length)
+    {
+        index--;
+    }
+}
+<img src="/Images/@images[index]" alt="Image show" />
+<form method="post">
+    <input type="hidden" name="index" value="@index"/>
+    <button name="cmd" value="First">||&lt;</button>
+    <button name="cmd" value="Prev">&lt;</button>
+    <button name="cmd" value="Next">&gt;</button>
+    <button name="cmd" value="Last">&gt;||</button>
+</form>
+
+
+Example: Assume that we've "n" items (array/list). Write a code to display "5" items par page.
+
+Item1
+Item2
+Item3
+Item4
+Item5
+
+[Prev][Next]
+
+[Assume that we've 17 items -- it means 4 screen (5 items per page)]
+  
+@{ 
+    string[] items =
+    {
+        "Item1",
+        "Item2",
+        "Item3","Item4","Item5","Item6","Item7","Item8","Item9","Item10","Item11","Item12"
+    };
+
+    var pageSize = 5;
+    var index = Request["index"].AsInt();
+    var totalPages = items.Length / pageSize;
+    if(items.Length % pageSize!=0)
+    {
+        totalPages++;
+    }
+    var cmd = Request["cmd"] ?? "";
+
+    if(cmd.Equals("Next"))
+    {
+        index++;
+    }
+    else
+    if(cmd.Equals("Prev"))
+    {
+        index--;
+    }
+    if(index<0)
+    {
+        index = 0;
+    }
+    if(index>=totalPages)
+    {
+        index--;
+    }
+    var startIndex = index * pageSize;
+}
+
+<ul>
+    @for (int i=startIndex;i<pageSize+startIndex && i<items.Length;i++)
+    {
+        <li>@items[i]</li>
+    }
+</ul>
+<p>Page @(index+1) / @totalPages</p>
+<form method="post">
+    <input type="hidden" name="index" value="@index"/>
+    <button name="cmd" value="Prev">&lt;</button>
+    <button name="cmd" value="Next">&gt;</button>
+</form>
+
+Example: Add numbers (page numbers) instead of next or prev buttons.
+
+[1][2][3][4]....[n] to navigate the items page wise. (previous example)
+
+Example: Display "n" images pagewise
+
+|------- <  > --------|
+|   1      2      3   |
+|   4      5      6   |
+-----------------------
+
+(Across and then down)
+
+Example: Create a class "Product" and uses the array of Product objects to display those elements like as follow:
+
+[Product Name1]       [Product NAme2]               .....
+    [Image1]              [Image1]                  .....
+ Price : xx per xx    Price: xx per xx
+ [Add To Cart]          [Add To Cart]
+
+ .....                     ......                     ........
+
+
+Example: Add [Text/Search] field to list those products whose name matches with search text.
+
+Search ______________________ [SearchButton]
+
+List the products..... as per... previous example
+
+
+IMPORTANT NOTE about <form>
+============================
+
+The <form> cannot appear inside another <form> so avoid it.
+
+  <form>
+     ....
+     <form> <--- is illegal and won't work
+     ....
+  </form>
+
+There can be one or more <form> tags exists within the same document but they will never use as nested.
+
+Example:
+
+@Request["test"]
+
+@for(int i=1;i<=5;i++)
+{
+  <form method="post">
+    <input type="hidden" name="test" value="@i">
+    <button>Submit</button>
+  </form>
+}
+
+Will create five forms and each form has two input elements.
+
+
+The <q> and <blockquote> elements
+===================================
+<q> stands for "quote" or small quote tag and it inserts opening and closing quotes to the content.
+
+<!doctype html>
+
+<html lang="en">
+
+<body>
+ <q>Now, this will adds smart quotes around the text</q>
+ <blockquote>
+   <p>
+     Block quote is just a block element with extra padding
+     <label>- From WWW Site</label>
+   </p>
+ </blockquote>
+</body>
+
+<style>
+    blockquote {
+        border-left: 5px solid #aaa;
+    }
+    blockquote p {
+         border-left: 5px solid #eee;
+         padding-left: 4px;
+    }
+    blockquote label {
+        display: block;
+        font-style: italic;
+        padding-left: 30px;
+    }
+</style>
+
+Example: Working with radio buttons. We must have to set a common name attribute to create a group of radio buttons.
+
+  For example,
+        @{ 
+            var gender = Request["gender"] ?? "";
+        }
+        <p>@gender</p>
+        <form method="post">
+            <p>Gender</p>
+            <p>                
+                Male  <input type="radio" name="gender"  @(gender.Equals("Male") ? "checked" : "")   value="Male" />
+                Female <input type="radio" name="gender"  @(gender.Equals("Female") ? "checked" : "") value="Female" />
+             </p>
+             <button>Submit</button>
+        </form>
+
+  The <input type="radio"> and <input type="checkbox"> uses "checked" attribute which can be written as,
+      <input type="radio" checked>  Or <input type="radio" checked="checked">
+
+
+Example: Checkboxes -- User may select no or one or more check boxes. So, we must have to use different name for each
+			checkbox and also different value.
+
+@{
+  var read = Request["read"] ?? "";
+  var write = Request["write"] ?? "";
+  var play = Request["play"] ?? "";
+}
+
+<p>@read  @write @play</p>  
+<form method="post">
+   <p>Hobbies</p>
+   <br/>Play cricket<input type="checkbox" name="play" value="play"
+                           @(play.Equals("play") ? "checked" : "") /> 
+   <br/>Read books<input type="checkbox" name="read" value="read"
+                           @(read.Equals("read") ? "checked" : "") /> 
+   <br/>Write poems<input type="checkbox" name="write" value="write"
+                           @(write.Equals("write") ? "checked" : "") /> 
+   <p><button>Submit</button></p>
+</form>
+
+Example: Working with <select> - dropdownlist or combobox. 
+                      <select size="n"> -- Listbox
+
+ We will have to use "selected" in order to set the selection of data in <select> element. (selected or selected="selected" attribute with <option> tag)
+
+   For instance,
+                <select name="city">
+                    <option value="">Select the city</option>
+                    <option value="Mh">Mehsana</option>
+                    <option>Visnagar</option> <!-- The label will be value if value attribute is not speified -->
+                    <option value="Patan">Patan</option>
+                    <option value="Ah" selected>Ahmedabad</option>
+                 </select>
+  To create a list box, set the size attribute,
+        <select name="days" size="4">
+            <option value="1">Sunday</option>
+            <option value="2">Monday</option>
+            <option selected value="3">Tuesday</option>
+            .....
+        </select>
+
+In order to use the <select> and wish to save the selection then we must have to populate the <option> items programatically (array or list of items & a loop)
+
+@{
+  string []cities = { "Mehsana","Patan","Rajkot","Ahmedabad" };
+  var city = Request["city"] ?? "";
+}
+<form method="post">
+  <select name="city">
+    <option value="">Select the city</option>
+    @foreach(var c in cities)
+     {
+       <option @(c.Equals(city) ? "selected" : "")>@c</option>
+     }
+  </select>
+  <p><button>Submitt</button></p>
+</form>
+
+Example: Working with multiline text input <textarea></textarea>. The <textarea> allows whitespace so while embeding the content, be sure that no extra chars or whitespace are added along with your data.
+
+@{
+ var address = Request["address"] ?? "";
+}
+<p>@address</p>
+
+<form method="post">
+  <textarea name="address">
+    @address
+  </textarea>
+
+  <button>Submit</button>
+</form>
+
+[Note: You must write <textarea name="address">@address</textarea> to avoid extra content/whitespaces]
+
+To control height & width, set rows="n" and cols="n" attributes of <textarea rows="5" col="40">.
+
+Example: Write a code to input Employee data - Id, name, gender, address, hobbies, birthdate, date of join, email, department (use dropdown list).
+
+Naming conventions for file and folder names 
+---------------------------------------------
+Always use "ProperCase or PascalCase" to name the File name and Folder names. Don't use "image" but use "Image" or "Images". Use proper singular or plural forms. For example your folder contains one or more style resources then your folder name should be "Styles" Or just "Content".
+
+/YourSite/
+         |
+         |------/Content/
+                        |
+                        |----/Fonts
+                        |
+                        |-- Style.css
+                        |-- Other.css
+                        |
+                        |----/Images
+
+         |
+         |-----/Admin/
+         |
+         |-----/Guest/
+         |
+         |-----/Photos/
+         |
+         |
+         | Index.cshtml
+         | About.cshtml
+         | Contact.cshtml
+         | Product.cshtml etc                    
+
+
+Example: Create a class Product (Id,Name,Category,Unit,Rate,IsAvailable(bool)). Now, write a program that displays products ( create an array of Products ) products based upon the selected category.
+
+The "CategoryPage" lists the name of category using hyperlinks,
+
+  <h3>Category</h3>
+  <p><a href="ProductPage.cshtml?Category=Pen">Pen</a></p>
+  <p><a href="ProductPage.cshtml?Category=Pencil">Pencil</a></p>  
+   ........
+
+and on clicking the category hyperlink, display all products that belongs to the specified category into "ProductPage.cshtml".
+
+Example: Change previous program's CategoryPage.cshtml that uses <form> instead of hyerlinks.
+
+<form method="get" action="ProductPage.cshtml">
+  <select name="Category">
+     <option>Pen</option>
+     <option>Pencil</option>
+      ...
+  </select> 
+  <button>Show</button>
+</form>
+
+OR
+
+<form method="get" action="ProductPage.cshtml">
+  <button name="Category" value="Pen">Pen</button>
+  <button name="Category" value="Pencil">Pencil</button>
+  ...
+</form>
+
+Example: A program shows products based upon the given category.
+
+Select the category : [                 v] [OkButton]
+
+[Product1]        [Product2] ......
+........          ......
+
+Example: List the Products pagewise (i.e five products per page) [First Prev Next Last]
+Example: List the products pagesize (i.e [1] [2] [3] [4] [5] )
+Example: Write a program that allows user to select [n] page for the pagewise list
+
+Number of records you want to show [ 4   v] [OK]
+
+Product1
+Product2
+Product3
+Product4
+[First, Prev,Next,Last]
+
+Example: List the product records with form <input> elements. It means each record must be enclosed in <form>
+
+For instance,
+
+ @foreach(var p in products)
+  {
+   <form method="post">
+     <p><label>ID <input type="number" name="id" value="@p.Id"/></label></p>
+     ....
+   </form>
+  }
+
+[Product1]              [Product2]                  [Product3]
+[Image]                  ....
+[Rate per Unit]
+[Avail or Not Avail]
+[Update][Delete]
+
+
+[Product4]               ............               ...........
+
+
+NOTE: Three Products must be appear per line.
+
+Example: List the available products
+
+[Available Products] [Out of stock]
+------------------------------------------------------------------
+.... list of products ......
+
+
+We've two buttons -- [Available products] and [Out of stock] and display appropriate result when they are pressed.
+
+
+The <table> elements
+=====================
+
+We've a table and elements to have a grid like UI. It is important to note that the table and elements must be arranged in a very specific way beacause if they are not arranged then you won't get the appropriate output or may be you wont see it.
+
+Basic structure of a table:
+
+<table>  			<!--- Parent --->
+  <thead> 			<!--- Optional but should be used -->
+     <tr>			<!---- Table row and it comprises one or more data - th (head) or td (data) -->
+       <th>Head1</th><th>Head2</th>
+     </tr>
+     ....
+  </thead>
+  <tbody>			<!---- thead, tbody and toot are optional but you should use for better structure-->	
+     <tr>
+       <td>Data1</td><td>Data2</td> 
+     </tr>
+     ...
+  </tbody>
+  ....
+  <tfoot>
+    <tr>
+      <td></td><td></td>
+    </tr>
+    ...
+  </tfoot>
+  ..
+</table>
+
+Style the table - especially borders.
+
+table {
+  border-collaspe: collaspe; 
+  border: 1px solid #aaa;
+}
+th, td {
+  border: 1px solid #aaa;
+}
+
+Merge the rows & cols of the table. The td's attributes "colspan" and "rowspan" uses int value to merge the columns and rows respectively.
+
+Example:
+ 
+<style>
+    table {
+        border-collapse: collapse; 
+        border: 1px solid #aaa;
+    }
+    td,th {
+         border: 1px solid #aaa;
+         padding: 5px;
+    }
+</style>
+<body>
+    <table>
+        <tr>
+            <td colspan="2"></td>
+            <td colspan="2"></td>
+            <td colspan="2"></td>
+        </tr>
+        <tr>
+            <td rowspan="2" colspan="2"></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td rowspan="3"></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td colspan="4"></td>
+            <td colspan="2"></td>
+        </tr>
+    </table>
+    <table>
+        <tr>
+            <td></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td rowspan="3"></td>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+            <td></td>
+            <td></td>
+        </tr>
+        <tr>
+             
+            <td></td>
+            <td></td>
+        </tr>
+    </table>
+</body> 
+
+Example: List the products using table element.
+
+CategoryPage.cshtml
+---------------------
+<table>
+  <tr>
+    <td>Id</td><td><a href="ProductPage.cshtml?Category="Pen">Pen</a></td>
+  </tr>
+  ....
+</table>
+
+ProductPage.cshtml
+----------------------
+....
+Output should be:
+
+Id  |   Name    |    Rate   |  Unit   |  Available |
+ 1  |   xxxxxxx |  Rs. 0000 |  Kg     |    Yes     |
+
+Example: Display "ProductPage" using <form> element and table.
+
+<table>
+ ....
+ @foreach(var p in products)
+  {
+  <tbody>
+    <form method="post">
+      <tr>
+        <td><input type="number" name="id" value="@p.Id"/></td>
+        ....
+        <td><button name="cmd" value="Edit">Edit</button><button ..>Delete</button></td>
+      </tr>
+    </form>
+  </tbody>
+  }
+....
+
+    
+
+
+
+  

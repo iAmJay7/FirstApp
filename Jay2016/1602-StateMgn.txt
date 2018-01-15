@@ -1,0 +1,398 @@
+Manage the State (data being sent and received between requests)
+================================================================
+
+The HTTP is a stateless protocol and no communication record will be saved either at client or server machine/program except the page navigation history in web-browsers. 
+
+So, every request made to the web app will be consider as a fresh or new request and application & web server serve the request, process it without having knowledge of past communication.
+
+Database server is an example of stateful communication because the server & client program keep (save) the communication data. eg. User's credentails (username-password) and instructions are saved at server machine till you are connected or your client program is alive.
+
+Because we cannot have "state or data" management with HTTP by default then we must have to use our own (home made - using database or file) techniques or use the "Session" and "Cookie" mechanism provided by the ASP.NET and all other web technologies (PHP, Java Server Pages & Servlets, Ruby on Rails etc).
+
+We use home made techniques to persists the data between page requests via:
+  1. Re-write the URL e.g  http://www.example.com/?no=10&name=raj -- via Query string  
+  2. Embed data into <form> elements by re-write the html attribute.
+
+Example: Assume that we've five city names and write a program to show the one by one city when user press Next or Prev button.
+
+The Session Object/Property
+=============================
+
+What is the meaning of the term "Session"? 
+
+   A "session" means a record or identity of communication. The "session" is also meant as a "connection" or period 
+	of communication.
+
+In ASP.NET, the session is an object that is created by the ASP.NET application server when very first request from the client (browser) is received and that session object's identity is hand over to the client (browser) in the form of "cookie" ( cookie is a way to represent data into web-browser or client side). The session object will be created at server memory and will be always one object per client. If there are 1000 clients (browsers) that request the web app then there will be 1000 session objects but each session object serves an individual client.
+
+The Session object allow us to have an identity of the client (web-browser) and allow us to write/save client/user specific data into server memory.
+
+The session object will be discarded automatically after 20 minutes (Default Timeout in ASP.NET) after the client breaks the communication (close the browser). However we can control the sesssion timeout. The Session object will be automatically discarded and created immediately on error condition or changes in code/program or re-compilation of code.
+
+It is important to note here that Session always uses "cookie" mechanism to identify the object for each client.
+
+  Assume that there are 1000 browsers and a web app so all these 1000 session objects will be created into a single web   app's domain (area). The Application server (ASP.NET) creates the session into server memory and sent the ideneity of
+  the newly created object to the web-browser via cookie (Note that web-browser can save the data only in the form of
+  cookie) and this session ideneity is known as "SessionId". SessionId is just like a key of the lock - a session object
+  alive at server machine (remove machine). If your key can opens the lock then this is your object/bank; you can read 
+  or write your data for future communications.
+
+
+Session Property
+----------------
+A Session is an object of HttpSessionState and it is a kind of dictionary so we can set/get/remove key-pair value.
+
+In Web Pages, and the "Controller (MVC)", this object is accessed via "Session" property but in non-pages or non-controller classes; like in our regular classes, we must have to use HttpContext.Current.Session property to work with the Session object.
+
+
+1. To add data into the Session
+
+ Session["key"] = value; 
+
+ Note that the "value" can be of any datatype of CTS.
+
+2. To read key-value 
+
+ if(Session["key"]!=null)
+  {
+    Type varName = Session["key"] as Type;  //cast the returned value because it is of "object" form.
+   }
+
+3. To delete/remove an entry -  Session.Remove("key")
+   To delete all entries     -  Session.RemoveAll()
+   To invalidate the current session object.  It means to recreate new session object by releasing current entries - 				 Session.Abandon() method
+
+4. Session.SessionId - get session id
+5. Session.TimeOut - Set/get timeout in minutes.
+
+Example: 
+
+create.cshtml
+----------------
+<p>@Session.SessionId</p>
+<p>@Session.TimeOut</p>
+@{
+  Session["no"] = 10;
+  Session["name"] = "Raj";
+}
+<p>
+ <a href="create">Create</a>
+ <a href="show">Show</a>
+ <a href="delete">Delete</a>
+</p>
+
+show.cshtml
+-------------
+<p>@Session.SessionId</p>
+@{
+  if(Session["no"]!=null)
+   {
+    <p>@Session["no"] @Session["name"]</p>
+    }
+}
+<p>
+ <a href="create">Create</a>
+ <a href="show">Show</a>
+ <a href="delete">Delete</a>
+</p>
+delete.cshtml
+--------------
+<p>@Session.SessionId</p>
+@{
+  if(Session["no"]!=null)
+   {
+     Session.Remove("no"); 
+     Session.Remove("name"); //Or use Session.RemoveAll() or Session.Clear()
+    }
+}
+<p>
+ <a href="create">Create</a>
+ <a href="show">Show</a>
+ <a href="delete">Delete</a>
+</p>
+
+On first request, ASP.NET app server creates a session object and forward the sessionId to the client.
+On second or next request, web browser request the resource by sending sessionId. That means the "sessionId" will be
+then attached to each request and based upon the sessionId the app server identify the client.
+
+[Note: Turn off or disabled the cookie feature in your web-browser and see what happen? The Session will not work either.]
+
+The Session object and its controling activities are performed in web.config file.
+
+Normally, a session object is created with "UseCookies" option so the session will be failed when you turn off the "Cookies" in browser.
+
+In web.config's and inside the <system.web> tag:
+
+   <sessionState cookieless="AutoDetect"></sessionState>  will create a session that might uses "Uri" as well as 
+							  "cookies" if cookie is enabled.
+
+Example: We've some products and we want to add the selected items into a "Cart" and this "cart" thing is nothing but a collection object added inside the session.
+
+namespace ShopApp.Models
+{
+    public class Item
+    {
+        public int Id { get; set; }
+        public string Name { get; set; }
+        public decimal Rate { get; set; }
+
+        public static IEnumerable<Item> Products()
+        {
+            yield return new Item { Id = 1, Name = "A", Rate = 10.10m };
+            yield return new Item { Id = 2, Name = "B", Rate = 20.10m };
+            yield return new Item { Id = 3, Name = "C", Rate = 30.10m };
+        }
+    }
+
+    public class Cart
+    {
+        public int Id { get; set; }
+        public int Qty { get; set; }
+
+        public override bool Equals(object obj)
+        {
+            return GetHashCode() == obj.GetHashCode();
+        }
+        public override int GetHashCode()
+        {
+            return Id;
+        }
+        public static void AddItem(Cart prd)
+        {
+            HashSet<Cart> cart = Items();
+            cart.Add(prd);
+        }
+        public static void Remove(Cart prd)
+        {
+            HashSet<Cart> cart =  Items();
+            cart.Remove(prd);
+        }
+        public static HashSet<Cart> Items()
+        {
+            if (HttpContext.Current.Session["Cart"] == null)
+            {
+                HttpContext.Current.Session["Cart"] = new HashSet<Cart>();
+            }
+            return HttpContext.Current.Session["Cart"] as HashSet<Cart>;
+        }
+    }
+}
+
+Product.cshtml
+---------------
+
+@using ShopApp.Models
+@{
+    Cart cart = new Cart();
+    cart.Id = Request["Id"].AsInt();
+    cart.Qty = Request["Qty"].AsInt();
+    var cmd = Request["cmd"] ?? "";
+    if ("Add".Equals(cmd))
+    {
+        Cart.AddItem(cart);
+    }
+    if ("Remove".Equals(cmd))
+    {
+        Cart.Remove(cart);
+    }
+
+}
+@foreach (var p in Item.Products())
+{
+    <form method="post">
+        <input type="hidden" name="Id" value="@p.Id" />
+        <p>@p.Name at the rate @p.Rate</p>
+        <input type="number" name="Qty" placeholder="Qty" />
+        <button name="cmd" value="Add">Add to cart</button>
+    </form>
+}
+
+@foreach (var c in Cart.Items())
+{
+    <form method="post">
+        Product ID @c.Id and Qty  @c.Qty
+        <input type="hidden" name="Id" value="@c.Id" />
+        <button name="cmd" value="Remove">Remove</button>
+    </form>
+}
+
+Authentication & Authorization using Session
+=============================================
+
+Authentication means to verify whether a given user's credentails are valid or not and that is done by the use of database or file system data store to compare user name and password.
+
+Authorization is a way to tell the server app that this "client" is authenticat and allow him/her to function (call method or request pages etc).
+
+We will use a "flag" or "status" as an authorization token and that "token" will be examined in each request. If that token is present in Session object then user is allowed to function and if it is not then user will be redirected to other pages than actual page he/she requested.
+
+We will create a class and encapsulate Session related activities :
+
+namespace YourApp.Models
+{
+ public static class SessionWrapper
+   {
+     public static int UserId
+      {
+        get 
+           {
+              if(HttpContext.Current.Session["UserId"] == null) return 0;
+              return int.Parse( HttpContext.Current.Session["UserId"].ToString() );
+            }
+        set
+           {
+             HttpContext.Current.Session["UserId"] = value;
+           }
+       }
+     public static string Role
+      {
+        get 
+           {
+              if(HttpContext.Current.Session["Role"] == null) return "";
+              return HttpContext.Current.Session["Role"].ToString();
+            }
+        set
+           {
+             HttpContext.Current.Session["Role"] = value;
+           }
+       }
+     public static UserAccountViewModel User
+      {
+        get 
+           {
+              if(HttpContext.Current.Session["User"] == null) return null;
+              return HttpContext.Current.Session["User"] as UserAccountViewModel;
+            }
+        set
+           {
+             HttpContext.Current.Session["User"] = value;
+           }
+       }
+
+     public static bool IsLogged
+      {
+        get
+          {
+            return UserId!=0;
+           }
+       }
+     //Check the authorization for
+     public static void Authorize(string role)
+      {
+         if(!role.Equals(Role))
+           {
+               HttpContext.Current.Response.Redirect("~/Index");
+            }
+       }
+     public static void Logout()
+     {
+            HttpContext.Current.Session.Abandon();
+            HttpContext.Current.Response.Redirect("~/Index");
+      }
+}//End of class
+
+Now, assume that we've two types of users - Admin and Customer and we've _Admin.cshtml and _Customer.cshtml layout files.
+
+/_Layouts/_Admin.cshtml
+-------------------
+@using YourApp.Models
+@{
+  SessionWrapper.Authorize("Admin");
+}
+...
+...
+
+/_Layouts/_Customer.cshtml
+-------------------
+@using YourApp.Models
+@{
+  SessionWrapper.Authorize("Customer");
+}
+...
+...
+
+/Login.cshtml
+----------------
+
+....
+....
+   if(IsPost)
+    {
+        var userAccount = UserAccountBao.Login(Request["Email"] ?? "", Request["Password"] ?? "");
+        if(userAccount==null)
+        {
+            message = "Given email and password not match! Reenter please";
+        }
+        else
+        {
+            SessionWrapper.Role = userAccount.Role;
+            SessionWrapper.UserId = userAccount.Id;
+            SessionWrapper.User = userAccount;
+
+            var path = string.Format("~/{0}/Index.cshtml", userAccount.Role);
+            Response.Redirect(path);
+        }
+    }
+.....
+
+
+Cookies
+========
+It is a browser driven state management mechanism. The web-browser saves data in the form of an object called "a cookie" in its (different web-browsers have different ways to save the cookies) runtime environment. In fact, we will use ASP.NET classes and objects to manage the cookies. 
+
+We will instruct the browser to create a cookie:
+
+ HttpCookie c1 = new HttpCookie("key","value"); //This object represent data at server but this object is
+					        //serialized and sent to the browser using "Response" property.
+
+ c1.Path = "/";  // This property allow us to set the namespace under which cookies can be created
+		 // e.g. /admin/  or /clerk/ etc. In this statement we've used / root
+ 
+ c1.Expires = DateTime....;  This property tells the browser that when will be this cookie expires? The Expires
+			     property is System.DateTime and if this property is not set then the cookies
+			     will be available till that web-browser is running and all the cookies will be discarded
+				as soon as that browser is closed.
+
+				That means, cookies are persist into the RAM if Expires is not set.
+
+				If Expires property value is future date and maximum is 1 year from the current datetime 				then the web-brwoser saves cookies into a disk file.
+
+				If Expires property value is "past" date & time (below the current datetime) then the
+				web-browser will remove cookies from RAM or from the disk; So "Past DateTIme" to
+				Expires erase the cookies.
+
+ 
+ Response.Cookies.Add( c1 );  // This Response.Cookies collection serialize the HttpCookie object and send it to the
+			      // browser.
+
+We will read the cookies via Request.Cookies collection:
+
+    The cookies always travel on each request so at server side we have to use Request.Cookies collection:
+
+if(Request.Cookies["key"]!=null)
+{
+  var Value = Request.Cookies["key"].Value;
+}
+    
+
+Cookie based authorization
+============================
+
+public static void AddItem(Item item)
+{
+ HttpCookie c1 = null;
+
+ if(Request.Cookies["Cart"]==null)
+  {
+    c1 = new HttpCookie("Cart");
+  }
+ c1 = Request.Cookies["Cart"];
+
+ string str = item.Id + "," + item.Name + "," + item.Qty + "," + item.Rate;
+ c1.Value = c1.Value + "\n" + str;
+ Response.Cookies.Add(c1);
+}
+
+
+
+
+     

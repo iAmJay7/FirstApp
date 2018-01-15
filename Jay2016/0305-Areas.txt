@@ -1,0 +1,62 @@
+Areas
+=======
+
+In MVC Project Template, we might create as many as controllers into the "Controller" folder but it will become painful if there are 100 or more controllers and of course each of controller's views. The concept of "Area" is just like an area of "city" or "place" -- which separate the one part of people or things from another part.
+
+In MVC Project template, an "Area" is a file system folder and also a mechanism of MVC Router where each "Area" is composed of "Controllers, Views and Models" folder.
+
+ The Router map the Area and their controllers in following way:
+
+         www.xyz.com/AreaName/ControllerName/Action/Id
+
+ There we will be separate Route configure code file and web.config under each "Area" folder.
+
+
+You can create an Area to represent some special purpose controllers and you want to keep away from other purposes and users.
+
+  For instance, a shopping web app has three kinds of users - anonumous (public users; no credentials needed),   Administrator and Customer/Member.   So, in this case, we can create two Areas named "Admin" and "Member" (or   Customer).
+
+  You may create as many area you need in your app design. The main objective of "Areas" is to code separation at next
+  level (Separate one group of "MVC" classes from other group).
+
+
+How to create "Areas"?
+
+  => Project Menu + Areas OR
+  => Right mouse click on Project name in Solution Explorer + Add + Areas
+     => Use "ProperCase" to name the Area. e.g  Admin, Clerk, Member, Student etc
+
+  => In each "Area" you created (e.g Admin, Student etc) will be created into ~/Areas folder.
+
+  => Never create "HomeController" into an "Area" because the "Home" is already set as default controller for the root /      path.
+
+
+Should we create "ViewModels" for each "Area" separately?
+
+   Yes and No. You can create separate view models if you insists but there is no need to create separate set of
+    "ViewModels" for each "Area".
+
+    Just create "ViewModels" anywhere but at single location. I'd suggest to use "~/Models" folder.
+
+    You can also create "Library" project separately to persists the "Model" (Data and database) and "ViewModels" 
+    components.
+
+How can I create "Library" project and let it be use with ASP.NET MVC Project?
+
+  1. Create a blank solution project (File + Other Prject Types  + VS Solution + Empty Solution + 
+           Name it (e.g  JobSolution or JobSource )
+  2. File + Add + New Project + ASP.NET MVC + Name it (e.g JobWeb)
+  3. File + Add + New Project + Library Project + Name it (e.g JobDao or JobLib)
+
+  4. Add some code files into Library project and then build it.
+
+  5. Select "JobWeb - MVC" project in solution explorer and add the reference of "Library" project.
+
+  6. Build them frequently (as you go).
+
+  7. You can create "Remote Database" and add Entity Code into "Library" project. Define "Repositories" classes
+	into "Library" project and later use them into web app.
+
+[NOTE: In reality, local db (Local database) wont be used. We must have to create a remote (server) database. It is important to note that the we need to save SQL statements e.g create, alter, drop into sql file so we can create database whenever we want.]
+
+   

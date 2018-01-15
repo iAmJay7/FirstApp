@@ -1,0 +1,129 @@
+ background property
+====================
+
+To paint the background using solid or gradient color or image.
+
+background property is a short hand of "background-color", "background-image", background-size, background-position etc.
+
+Note that the image you wish to use to paint the background of an object must he exists in your app's root or elsewhere under the root directory.
+
+Syntax:
+
+ background: color url(image-url) repeat-value position-value,....;
+
+Or
+
+ background-color: color;
+ background-image: url(file-url);
+ background-repeat: value;
+
+
+Paint the <body> with a small sized (50 x 50 px) image.
+
+body {
+  background: url('file.png');
+}
+   Assume that the file.png is at the folder where your style.css is.
+
+   background: url('../images/file.jpg'); file.jpg is at images folder 
+      e.g   /------/Content/
+                       style.css
+            |
+            |------/images/
+                        file.jpg
+
+Example:
+
+Paint background with solid color if an image has transparency:
+
+  background: #f00 url(file.png);
+
+Example: Repeat value - by default image is repeated horizontally and vertically called "tiling"
+
+  background: url(file) no-repeat;  will display an image at left top.
+  background: url(file) repeat-x;   will repeat image horizontally
+  background: url(file) repeat-y;   will repeat image verticallly
+
+Example: Paint a value at cornor or angle and edge of the rectangular area.
+
+.box {
+  width: 300px;
+  height: 400px;
+
+  background: url(file) no-repeat left top,
+              url(file) no-repeat bottom right,
+              url(file) no-repeat center center;
+}
+You can use left, top, right, bottom and center constant value to specify the location.
+
+Example: Paint background of the object using single (possibly large photo) image.
+
+body {
+  background-image: url("../Images/sample.jpg");
+  background-repeat: no-repeat;
+  background-size:  cover;
+}
+Example: Paint a logo at center of the body and set it always fixed at center.
+
+body {
+  background: url(../Images/logo1.png) no-repeat center center;
+  background-attachment: fixed; /* it is scroll by default */
+}
+
+Example: Customize the size of image
+
+  background: url(../Images/sample.jpg) no-repeat center center;
+  background-size: 100px 200px;
+
+Example: Paint an image with transparent (no color but use background from its parent)
+
+    background: transparent url(../Images/logo1.png);
+
+
+Example: Paint a specific area of the image (possibly a large photo)
+
+body {
+  background: transparent  url(../Images/sample.jpg) no-repeat -1980px -1000px;
+}
+
+.box {
+    width: 300px;
+    height: 300px;
+    background:  url(../Images/sample.jpg) no-repeat -1980px -1000px;
+}
+
+Example: Assume that we've a file that contains small pictures/icons (approx 80 to 100 pix)
+
+|x|x|x|
+|x|x|x|
+
+    <div class="icon circle"></div>
+    <div class="icon diamond"></div>
+    <div class="icon pentagon"></div>
+
+.icon {
+   width: 84px;
+   height: 84px;
+   display: inline-block;
+   
+}
+.circle {
+    background: url(../Images/icons.png) no-repeat 0px 0px;
+}
+.circle:hover {
+    background: url(../Images/icons.png) no-repeat 0px -86px;
+}
+.diamond {
+    background: url(../Images/icons.png) no-repeat -86px 0px;
+}
+.diamond:hover {
+    background: url(../Images/icons.png) no-repeat -86px -86px;
+}
+.pentagon {
+    background: url(../Images/icons.png) no-repeat -172px 0px;
+}
+.pentagon:hover {
+    background: url(../Images/icons.png) no-repeat -172px -86px;
+}
+   
+

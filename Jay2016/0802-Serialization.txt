@@ -1,0 +1,157 @@
+Serialization & Deserialization
+=================================
+Serialize means to write array of bytes (sequence of byte) into the stream and deserialization means to read bytes from the stream and form an object.
+
+There are two types of serialization: 
+  1. Binary Serialization - In this serialization, an object along with with its type information is saved into the
+				stream and no one can change/update that stream directely.
+
+  2. XML Serialization - In this serialization, the XML protocol is used to serialize the public proeprties or fields.
+
+Note: In both kind serialization, an object will  be saved into a stream but binary serialization process saves data alon with its type whereas XML serialzation is kind of text and the stream can be easily read.
+
+
+Can be serialize any kind of object?
+-------------------
+No! Not all objects can be serializable. You can serialize those objects whose type/class is marked with [Serializable] attribute.
+
+You can skip some fields of an object while serialize by setting [NonSerialized] attribute at field (not at property).
+
+
+Example:
+
+using System;
+using System.IO;
+
+[Serializable]
+public class Emp
+{
+    [NonSerialized]
+    private int _id;
+    private string _name;
+
+    public int Id { get { return _id;  } set { _id = value; } }
+    public string Name { get { return _name; } set { _name = value; } }
+}
+public class Test
+{
+    //Serialize
+    static void Main()
+    {
+        Emp emp = new Emp { Id = 10, Name = "Rajesh" };
+
+        using (var stream = File.Create(@"emp.txt"))
+        {
+            System.Runtime.Serialization.Formatters.Binary.BinaryFormatter formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            formatter.Serialize(stream,emp);
+        }
+          
+    }
+    //Deserialize
+    static void Main()
+    {
+        Emp emp = null;
+
+        using (var stream = File.OpenRead(@"emp.txt"))
+        {
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            emp = (Emp)formatter.Deserialize(stream);
+            Console.WriteLine(emp.Id + " " + emp.Name);
+        }
+    }
+}
+
+Example: UserRepository which serialize/deserialize the "User's Set - HashSet<User>".
+
+using System;
+using System.IO;
+using System.Collections.Generic;
+using System.Linq;
+
+[Serializable]
+public class User
+{
+    public string Email { get; set; }
+    public string Password { get; set; }
+    public override int GetHashCode()
+    {
+        return string.IsNullOrWhiteSpace(Email) ? 0 : Email.GetHashCode();
+    }
+    public override bool Equals(object obj)
+    {
+        return GetHashCode() == obj.GetHashCode();
+    }
+}
+
+public class UserRepository
+{
+    public HashSet<User> Users { get; set; }
+    private string fileName = "users.data";
+    public UserRepository()
+    {
+        Users = new HashSet<User>();
+        if (!File.Exists(fileName))
+        {
+            Serialize();
+        }
+        Deserialize();
+    }
+    public bool IsValid(string email, string pass)
+    {
+        var search = Users.FirstOrDefault(x => x.Email.Equals(email) && x.Password.Equals(pass));
+        return search != null;
+    }
+    public bool ChangePassword(string email,string newpass)
+    {
+        var search = Users.FirstOrDefault(x => x.Email.Equals(email));
+        if (search == null)
+            return false;
+        search.Password = newpass;
+        Serialize();
+        return true;
+
+    }
+
+    public void Serialize()
+    {
+        using (var stream = File.Create(fileName))
+        {
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            formatter.Serialize(stream, Users);
+        }
+    }
+    public void Deserialize()
+    {
+        using (var stream = File.OpenRead(fileName))
+        {
+            var formatter = new System.Runtime.Serialization.Formatters.Binary.BinaryFormatter();
+            Users = (HashSet<User>)formatter.Deserialize(stream);
+        }
+    }
+}
+
+public class Test
+{
+
+    static void Main()
+    {
+        UserRepository repo = new global::UserRepository();
+       /* repo.Users.Add(new User { Email = "aa@aa.aa", Password = "aa" });
+        repo.Users.Add(new User { Email = "bb@bb.aa", Password = "bb" });
+        repo.Users.Add(new User { Email = "cc@aa.aa", Password = "cc" });
+        repo.Serialize();*/
+
+        foreach (var p in repo.Users)
+            Console.WriteLine(p.Email + " " + p.Password);
+
+        if (repo.IsValid("aa@aa.aa", "aa"))
+            Console.WriteLine("Welcome user");
+        else
+            Console.WriteLine("Not Found");
+
+        //Change Password
+        Console.WriteLine(repo.ChangePassword("aa.aa.22", "test"));
+        Console.WriteLine(repo.ChangePassword("aa@aa.aa", "test"));
+    }
+}
+

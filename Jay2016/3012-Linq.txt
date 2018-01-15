@@ -1,0 +1,265 @@
+Language Integrated Query - LINQ
+==========================================================================================================
+
+LINQ is a C# & .NET fraemwork feature to filter the objects or items from the "IEnumerable<T>" (or IQueryable<T>) types. Like an SQL statement, we can select or filter the results, arrange the data (sort) or creating a group (group by) the collections using LINQ keywords and APIs.
+
+So, some keywords that are part of the C# language used to define the "query" and "execute" the query and that's why this feature is called "Language Integrated -- C# Language". Apart from the keywords, there is an API called "LINQ API" exists under System.Linq namespaces and then the classes of this namespaces are used in different APIs too - including the DATABASE APIS (ADO.NET) - Linq to SQL , XML API (XML.NET) Linq to XML.
+
+So, at present we will use "Collections/arrays" as our data source and then we will define queries on them.
+
+How to define queries and execute them?
+---------------------------------------
+
+There are two ways to define the queries:
+   1. Using the Linq operators or keywords - from in where order by group by select etc
+   2. Using Query Methods (Extension methods at System.Linq)
+
+Either of the way, we need to import the System, System.Collections.Generic and System.Linq namespaces.
+
+Once you define a query, a query definition will be assigned to IEnumerable<T> variable and later you can execute it using one of the two methods: (Two ways to execute the queries):
+
+   1. Lazy or Differed execution via the "foreach" loop -- A query will be executed when the "foreach" loop begins.
+
+   2. Immediate execution -- By calling special methods -- ToList(), ToDictionary(), ToString(), ToArray(), 				FirstOrDefault(), and many more 
+
+There is no difference on which method (using linq operator or query methods) you use to define a query. You may use both or anyone as you like.
+
+STEPS:
+
+ 1. First of all the identify your data source (create or use)
+    
+    int []nos = { 33,22,3,4,2,66,7,88,9,2 };   // Use List,Dictionary etc
+
+ 2. Define one or more queries
+
+    IEnumerable<int> query1 = from n in nos
+                                 where n % 2 == 0 
+                                     select n;
+      (Because the query returns one or more "n - of type int" thats why IEnumerable<int>)
+
+    var query2 = from n in nos where n % 2 !=0 select n;
+    
+ 3. Execute the query
+
+     => Immediate execution of query
+          var arr = query1.ToArray(); // arr is an array of int hold the result
+          foreach(var a in arr)
+                Console.WriteLine(a); 
+    => Deffered execution (execute a query when foreach begins)
+          foreach(var a in query1)
+               Console.WriteLine(a);
+          foreach(var a in query2)
+                Console.WriteLine(a);
+
+Query operators/keywords method
+-------------------------------
+ var query_def_IEnumerable<T> = from <localVar> in <YourCollection>
+                                   where <conditions...>
+                                     order by <property>
+                                       group <property> by  <property> into <group>
+                                            select <localVar> | new { } | new TypeName {} | group
+
+ The query definition begins with "from" and ends with "select" keywords and rest are optional.
+ 
+Example-1 An expression that depends the value of variable and the benefit of defered execution of method.
+
+            int[] nos = { 20, 3, 1, 2, 5, 6, 7, 3, 7 };
+            int d = 0;
+            var query = from n in nos
+                        where n % d == 0
+                        select n;
+
+            d = 2;
+            foreach (var n in query)
+                Console.WriteLine(n);
+
+            d = 3;
+            foreach (var n in query)
+                Console.WriteLine(n);
+
+            //Query definition and execution
+            var oddNos = (from n in nos where n % 2 == 0 select n).ToList();
+            foreach(var n in oddNos) 
+                Console.WriteLine(n);
+
+Example-2 Returns anonymous object
+  
+     int []nos = { 20,3,4,5,2};
+     var query = from n in nos
+                    select new 
+                        {
+                         No = n,
+                         Square = n*n,
+                         IsOdd = n % 2
+                        };
+
+     foreach(var n in query)
+          Console.WriteLine( n.No + " " + n.Square + "  "+ n.IsOdd);
+
+Example-3 Search an element
+
+      var result = (from n in nos where n == 5 select n).ToList();
+      if(result.Count!=0)
+            Console.WriteLine("Found : " + result[0]);
+      else
+            Console.WriteLine("Not found");
+
+Example-4 Assume that we've List<Product> collection
+
+
+            var query = from p in products
+                        where p.Category.Equals("Pen")
+                        orderby  p.Name descending
+                        select p;
+            foreach (var p in query)
+                Console.WriteLine(p.Id + " " + p.Name);
+
+Example-5 Return "selected properties"
+
+    
+            var query = from p in products
+                        where p.Category.Equals("Pen")
+                        orderby  p.Name descending
+                        select 
+                           new Product 
+                                 {
+                                  Id = p.Id,
+                                  Name = p.Name
+                                  };
+            foreach (var p in query)
+                Console.WriteLine(p.Id + " " + p.Name);
+Note: If your program requires "some" properties (not all properies of Product see Example-4) then create a new instance of Product and assign the needed properties --- This way you an improve the app performance.
+
+Example-6 groupby - to create a group of similar value from the property
+
+          var query = from p in products
+                        group p by p.Category into g
+                        select g;
+
+            foreach(var c in query)
+            {
+                Console.WriteLine(c.Key); 
+                foreach(var p in c)
+                {
+                    Console.WriteLine("\t" + p.Id + " " + p.Name);
+                }
+            }
+
+LINQ using the extension methods 
+---------------------------------
+ Instead of LINQ keywords/operators, we have extension methods under System.Linq namespace classes so we can construct the queries by setting anonymous/lambda functions.
+
+For example,
+
+           int[] nos = { 11, 2, 3, 4, 5, 6, 7, 88, 5, 3, 2 };
+            //Sum all elements
+            var s1 = nos.Sum();
+
+            Console.WriteLine(s1);
+            s1 = nos.Sum(x => 
+            {
+                if (x >= 1 && x <= 10)
+                    return x;
+                return 0;
+            } );
+            Console.WriteLine(s1);
+            s1 = nos.Sum(x => x % 2 == 0 ? x : 0);
+            Console.WriteLine(s1);
+
+            var query = (from n in nos
+                         where n % 2 == 0
+                         select n).Sum();
+
+            Console.WriteLine(nos.Count(n => n % 2 == 0));
+
+FirstOrDefault() - method : Returns first value from the collection if exists; returns "default" value otherwise (It might be ZERO based value for simple TYPES or VALUE TYPES and null for reference types).
+
+   
+The "default" keyword returns default value of given type. eg.  default(int) returns 0. default(string) return null
+
+Example:
+           int[] nos = { 11, 2, 3, 4, 5, 6, 7, 88, 5, 3, 2 };
+
+            int n = default(int);
+
+            Console.WriteLine(n);
+            Console.WriteLine(default(String)==null);
+
+            var search = nos.FirstOrDefault();
+            Console.WriteLine(search);
+            search = nos.FirstOrDefault(x => x == 100);
+            if (search == default(int))
+                Console.WriteLine("Not exists");
+            else
+                Console.WriteLine("Exists");
+
+
+Example: Search a product whose Id is 5
+
+   var search = products.FirstOrDefault( x=> x.Id == 5);
+   if(search!=null) 
+       //Found
+  else
+       //Not found
+
+ Or use Where() + FirstOrDefault function:
+
+  search = products.Where(x=>x.Id == 5).FirstOrDefault();
+
+Where() Method - Returns a query by setting a boolean expression. It also returns all elements of the type T if Select() method is not specified.
+
+Example:
+
+   var odds = nos.Where(x=>x%2!=0);
+   var oddsMore = mos.Where(x=>x%2!=0).Select(x=> new { No=x, Square=x*x });
+   foreach(var n in odds) Console.WriteLine(n);
+   foreach(var n in oddsMore) Console.WriteLine(n.No + "  " + n.Square);
+
+Select() method - returns a sequence of same type or anonymous type of specified type.
+
+
+GroupBy() Method -- Returns a dictionary of groups based upon the given key.
+
+ var cats = products.GroupBy(x=>x.Category);
+
+OrderBy() OrderByDesceding() methods -- To sort the sequence.
+
+   var listByName = products.OrderBy(x=>x.Name);
+
+Example:
+
+            int[] nos = { 11,2,2,2,3,1,1,22,2,2,3,22,2,2};
+            var items = nos.GroupBy(x => x);
+            foreach (var g in items)
+                Console.WriteLine(g.Key + " " + g.Count());
+
+            var result = nos.GroupBy(x => x)
+                .Select(p => new { No =p.Key, Count = p.Count(), Max= p.Max(), Min=p.Min() })
+                .ToList();
+            foreach (var n in result)
+                Console.WriteLine(n.No + " " + n.Count +  "  " + n.Max);
+
+var cats = products.GroupBy(x=>x.Category)
+                   .Select(p=>new {
+                      CategoryNae = p.Key,
+                      TotalProducts = p.Count(),
+                      MaxRate = p.Max(y=>y.Rate),
+                      MinQty = p.Min(y=>y.Qty)
+                   }).ToList();
+
+First() Method - Returns first value if sequence has; throws an exception otherwise.
+Single() method - ----same as the First()---
+
+Skip(n) -- Skip n elements
+Take(n) -- Collect n elements  -- Both Skip and Take returns an IEnumerable based upon the given "n".
+
+            int[] nos = { 10,20,30,40,50};
+            foreach (var p in nos.Skip(2))
+                Console.WriteLine(p);
+
+            foreach (var p in nos.Skip(2).Take(2))
+                Console.WriteLine(p);
+
+NOTE: You can use these methods to define a "Paging"  - show n items per page.
+
+

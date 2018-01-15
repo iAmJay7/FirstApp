@@ -1,0 +1,170 @@
+Tables:
+
+create table Category
+(
+  Id int primary key identity,
+  Name varchar(100) not null unique
+)
+create table Product
+(
+  Id int primary key identity,
+  Name varchar(50) not null,
+  Rate Decimal(18,2) not null,
+  Unit Varchar(10) not null,
+  CategoryId int not null,
+  Photo Varchar(50),
+  Foreign Key (CategoryId) References Category(Id)
+)
+
+create table Country
+(
+  Id int primary key identity,
+  Name varchar(50) not null unique
+)
+create table State
+(
+  Id int primary key identity,
+  Name varchar(50) not null,
+  CountryId int not null,
+  Foreign Key (CountryId) References Country(Id)
+)
+  
+create table City
+(
+  Id int primary key identity,
+  Name varchar(50) not null,
+  StateId int not null,
+  Foreign Key (StateId) References State(Id)
+)
+
+create table UserAccount
+(
+  Id int primary key identity,
+  Email varchar(255) not null unique,
+  Password  varchar(MAX) not null,
+  Role      varchar(10) not null,
+  Created   DateTime,
+  LastLogin DateTime,
+  Active  bit default 0
+)
+create table UserProfile
+(
+  Id int primary key,
+  FullName varchar(130),
+  Address varchar(400),
+  CityId int,
+  Photo varchar(100),
+  Foreign key (Id) References UserAccount(Id),
+  Foreign key (CityId) References City(Id)
+)
+
+create table CustomerOrder
+(
+  Id int primary key identity,
+  OrderDate datetime,
+  UserId int,
+  Foreign key (UserId) References UserAccount(Id)
+)
+create table CustomerOrderDetail
+(
+  Id int primary key identity,
+  OrderId int,
+  ProductId int,
+  Qty  decimal(18,3),
+  Rate decimal(18,2),
+  Discount decimal(18,2),
+  Foreign key (OrderId) References CustomerOrder(Id),
+  Foreign key (ProductId) References Product(Id)
+)
+
+
+Execute both queries in an order: (We're gogin to create an admin user account)
+
+insert into UserAccount values
+('admin@gmail.com','admin','Admin',getdate(),getdate(),1)
+
+insert into UserProfile values 
+ (@@identity,'Administrator','No Address',null,null)
+
+The Views (Joins - Save the SQL SELECT Statements)
+-----------
+
+create View ViewState 
+as
+select Country.Id,
+Country.Name,
+State.Id as StateId,
+State.Name as StateName
+From Country
+Join State On State.CountryId = Country.Id
+
+--------------
+
+create view ViewCity
+as
+select ViewState.*,
+City.Id as CityId,
+City.Name as CityName
+From ViewState
+Join City On City.StateId = ViewState.StateId
+
+------------------
+
+create View ViewUserAccount
+as
+select UserAccount.*,
+UserProfile.FullName,
+UserProfile.Address,
+ViewCity.Id as CountryId,
+ViewCity.Name as CountryName,
+ViewCity.StateId,
+ViewCity.StateName,
+ViewCity.CityId,
+ViewCity.CityName,
+UserProfile.Photo
+From UserAccount
+Join UserProfile On UserProfile.Id = UserAccount.Id
+Join ViewCity on UserProfile.CityId = ViewCity.CityId
+
+
+--------------
+create view ViewProduct
+as
+
+select Product.*,
+
+Category.Name as CategoryName
+from Product
+Join Category on Product.CategoryId = Category.Id
+---------------------
+
+create view ViewCustomerOrder
+as
+select 
+ ViewUserAccount.*,
+ CustomerOrder.Id as OrderId,
+ CustomerOrder.OrderDate
+ from ViewUserAccount
+ Join CustomerOrder on ViewUserAccount.Id = CustomerOrder.UserId
+
+---------------------
+
+create view ViewCustomerOrderDetail
+as
+Select 
+CustomerOrderDetail.OrderId,
+CustomerOrder.UserId,
+CustomerOrderDetail.Id as DetailId,
+CustomerOrderDetail.Qty,
+CustomerOrderDetail.Rate as SaleRate,
+CustomerOrderDetail.Discount,
+ViewProduct.*
+from CustomerOrderDetail
+join CustomerOrder on CustomerOrder.Id = CustomerOrderDetail.OrderId
+join ViewProduct on ViewProduct.Id = CustomerOrderDetail.ProductId
+ 
+
+
+The ViewModels
+=================
+

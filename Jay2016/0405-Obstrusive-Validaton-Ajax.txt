@@ -1,0 +1,116 @@
+jQuery Plug-in - Validation & Ajax (XMLHttpRequest) routines
+=============================================================
+
+Basically, data annotations [Required], [EmailAddress] etc supports server-side validation and the property ModeState.IsValid examine the model input and compare the data with specified validation expression.
+
+Now, here we've jQuery plug-in called jQuery Validation that is also download from the jQuery.com or you can download from the nuget package manager. In Data annotations specification, there is a code arrangment with JavaScript so the validation messages set for the server will be used automatically with jQuery and jQuery-validation framework without adding or writing an exra line of code into the views.
+
+Install-Package Microsoft.jQuery.Unobtrusive.Validation
+
+
+Example:
+
+1. We've LoginViewModel
+
+ public class LoginViewModel
+    {
+        [Required]
+        [EmailAddress]
+        public string Email { get; set; }
+
+        [Required]
+        public string Password { get; set; }
+    }
+2. Login.cshtml
+@model YourApp.Models.LoginViewModel
+<h2>Login</h2>
+@using (Html.BeginForm())
+{
+    <p>
+        @Html.LabelFor(x => x.Email)
+        @Html.TextBoxFor(x => x.Email)
+        @Html.ValidationMessageFor(x => x.Email)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.Password)
+        @Html.EditorFor(x => x.Password)
+        @Html.ValidationMessageFor(x => x.Password)
+    </p>
+    <p>
+        <button>Login</button>
+    </p>
+}
+
+3. Update or install - Install-Package Microsoft.jQuery.Unobtrusive.Validation
+
+4. Embed the jQuery, jQuery Validation and Unobstrusive lib.
+    
+    <script src="~/Scripts/jquery-1.10.2.min.js"></script>
+    <script src="~/Scripts/bootstrap.min.js"></script>
+    <script src="~/Scripts/jquery.validate.min.js"></script>
+    <script src="~/Scripts/jquery.validate.unobtrusive.min.js"></script>
+
+Ajax.BeginForm()  and Unobstrusive Ajax plug ins
+--------------------------------------------------
+You can add "AJAX" behaviour to your existing "Model (ViewModels)" by installing:
+
+   Install-Package Microsoft.jQuery.Unobtrusive.Ajax
+
+and mebeding 
+
+   .....
+   <script src="~/Scripts/jquery.unobtrusive-ajax.min.js"></script>
+
+Example: EmpViewModel with Name and Address proeprties.
+         
+Action method name can be Emp or any name you like.
+
+        [HttpGet]
+        public ActionResult Emp()
+        {
+            return View(new EmpViewModel());
+        }
+        [HttpPost]
+        public ActionResult Emp(EmpViewModel model)
+        {
+            if (ModelState.IsValid)
+            {
+                //TODO
+                return Content("Record saved!!!!");
+            }
+            return Content("Cannt save! Re-enter input");
+        }
+    ActionResult must be content in case you want to return a specific set of JSON data or string.
+
+Emp.cshtml
+--------------
+@model YourApp.Models.EmpViewModel
+@using (Ajax.BeginForm(
+                        new AjaxOptions
+                            {
+                                HttpMethod = "post",
+                                Confirm = "Are you sure to add this record?",
+                                OnSuccess = "doThis",
+                                UpdateTargetId = "message"
+                            }))
+{
+    <p>
+        @Html.LabelFor(x => x.Name)
+        @Html.TextBoxFor(x => x.Name)
+        @Html.ValidationMessageFor(x => x.Name)
+    </p>
+    <p>
+        @Html.LabelFor(x => x.Address)
+        @Html.EditorFor(x => x.Address)
+        @Html.ValidationMessageFor(x => x.Address)
+    </p>
+    <p>
+        <button>Add</button>
+    </p>
+    <div id="message"></div>
+}
+<script>
+    function doThis() {
+        console.log("Success");
+    }
+</script>

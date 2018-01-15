@@ -1,0 +1,141 @@
+The Layers -- Classes to separate the code
+===================================================================================
+As we know that the data should be define separately other than the current page because we've to copy them to another page if the same set of data is required.
+
+In fact, the code separation is the prime concept of any programming methodology; in C Language, we've used/created header files (functions), in OOP, we will have to create classes, interfaces etc to separate the code. There are number of advantages of doing this are:
+   1. Easy to maintain or replace the whole or piece of code
+   2. Separate the code from other components so they can be used one or more location without affecting one-another.
+   3. It is possible that there might be more than one person/developers are working on same project on different   
+      components.
+
+We will define some components (TYPES) for the different purposes and they may be - PURE CLR objects or Neutral classes (Also called Plain CLR object), Classes represents the database or data related code (save, update, read, write etc), and Classes that expose the easy use of the all componets or integrate the components.
+
+
+Classes which works with user interfaces are called "View Model" classes.
+Classes which are used implement data related (databse,file,network etc) tasks are called "Model" Or "Data Access Layers" or "Data access object".
+Classes which integrate the "View models", "Data Access layers" are called "Business Access Layer (BAL) or Business Access Object.
+
+In this example, we will define three kind of components in our project.
+
+1. Create a Project (For Example - ShoppingApp) -- Use "PascalCase" to name files/folder/components etc.
+2. Create "Models" folder in it.
+    
+Create CategoryViewModel.cs, ProductViewModel.cs, CategoryBao.cs, ProductBao.cs  (We will add data access components later. Presently the data access code will be added into the Bao classes)
+
+CategoryViewModel.cs
+---------------------
+namespace ShoppingApp.Models
+{ 
+  public class CategoryViewModel
+   { 
+     public int Id {get;set;} 
+     public string Name {get;set;}
+    }
+}
+ProductViewModel.cs
+------------------------
+namespace ShoppingApp.Models
+{
+  public class ProductViewModel
+   {
+     public int Id { get;set;}
+     public string Name {get;set;}
+     public string Unit {get;set;}
+     public decimal Rate {get;set;}
+     public bool IsAvailable {get;set;}
+     public string Photo {get;set;}
+     public CategoryViewModel Category {get;set;}
+    }
+}
+
+CategoryBao.cs
+---------------
+namespace ShoppingApp.Models
+{
+  public class CategoryBao
+   {
+      public  CategoryViewModel []Categories { get;set;}
+
+      public CategoryBao()
+       {
+          Categories=new CategorViewModel[]
+            {
+               new CategoryViewModel  { Id=10, Name="Pen" },
+               new CategoryViewModel  { Id=20, Name="Book"}
+             }
+     }
+}
+ProductBao.cs
+--------------            
+namespace ShoppingApp.Models
+{
+  public class ProductBao
+   {
+      public  ProductViewModel []Products { get;set;}
+
+      public CategoryBao()
+       {
+          var cats = new CategoryBao().Categories;
+          Products=new CategorViewModel[]
+            {
+               new ProductViewModel 
+                { Id=1,Name="Raynold .45",Category=cats[0],Rate=10.5m,Unit="Nog",IsAvailable=true,Photo="ray.png"},
+               new ProductViewModel 
+                { Id=1,Name="Raynold .85",Category=cats[0],Rate=20.5m,Unit="Nog",IsAvailable=false,Photo="roy.png"},
+                   new ProductViewModel 
+                { Id=1,Name="Navneet Fullscape",Category=cats[1],Rate=50m,Unit="Nog",IsAvailable=true,Photo="bk.png"},
+                ...
+             }
+     }
+}
+
+Now, add CategoryPage.cshtml and ProductPage.cshtml and show these data.
+
+CategoryPage.cshtml
+@foreach(var c in new ShoppingApp.Models.CategoryBao().Categories)
+{
+ <p><a href="ProductPage.cshtml?Id=?@c.Id">@c.Name</a></p>
+}
+
+ProductPage.cshtml
+@{
+  var id = Request["Id].AsInt();
+  var products = new ShoppingApp.Models().Products;
+ }
+@foreach(var p in products)
+{
+  if(p.Category.Id == id)
+    {
+     <p>@p.Name @p.Rate @p.Unit @p.Photo</p>
+     }
+}
+
+Example: Create "Question, SingleChoice and MultiChoice components" and navigate them [Next...Prev... etc]
+Example: Create Customer, Product, and Invoice compnents to design the bill/invoice
+
+--------------------------------------------------------------------------------------
+   Bill NO: xxxxxxxx              COMPANY NAME
+ Bill Date: xx/xx/xxxxx    (Address    xxx xxxxx x xxxxxx)
+
+ Customer: _____________________
+           
+           _______________________
+
+ ----------------------------------------------------------------------------------------
+ #   |  Product                       | Unit     |   Rate    | Qty   | Discount | Amount
+ 1   |  xxxxxxxxxxxxxxxx                Kg            100       2        0         200.00
+ .......
+ .......
+ ------------------------------------------------------------------------------------------
+							 	Total Amount Rs.   xxxxxx.xx
+				Rs. X thoundand x hundred and x only.
+
+ Draw borders and choose appropriate color, image(logo) etc.
+   NOTE: Create a pages and having two different style -- one for the screen (color ful)
+						       -- second for the printer (black & white)
+
+
+  
+ 
+
+   

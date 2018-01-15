@@ -1,0 +1,176 @@
+Web Browser Or Http Client
+==================================================================
+
+HTTP protocol is implemented by the browsers or any library or tool is called "Http client"; Each programming environment has such kind of library (Java, .NET, PHP etc) so developer can request the web-server and also receive the resopnse.
+
+A web-browser is the most complex software a computer ever has; It is made up of number of tools, protocols, standards and libraries. In fact, a web-browser is mostly written using C/C++.
+
+Application or use of web-browser:
+
+1. Web browser has number of "Parsers" or "Engines" or "Software components/lib" that are responsible to perform
+   many tasks including:
+
+        => Request the web-resources.
+        => Receive the responses in varities of format (image, video, zip, pdf, doc, text, xml, html, svg, css, 		javascript and many more...)
+        => Save the "responses" (download the returned resources) into disk file and load/use them accordingly.
+        => The web-browser loads the "web-document" into memory by creating "objects". Each <htmlTag> is transformed
+		into an object by the HTML Parser tool that is a part of web-browser. HTML Parser validate & verify
+		the HTML Element, set default values/properties/attributes, arrange the created objects into
+		a document tree and then pass this document tree to the "Graphics Engine -- a software service that
+		renders/paints objets".
+
+		Html <tags> transformed into "objects" are known as "HTML Objects" and we can access these objects
+		programatically via JavaScript language using the DOM - Document Object Model library.
+
+		In fact, HTML, XML, SVG, and other markup languages along with JavaScript uses DOM API to parse the
+		markup (create an object from markup, set/get properties or data, validate the data & markup and
+		arranging objects as a tree are the major functions of "Parser" software")
+
+		After the creation of DOMs or HTML Objects (we can say HTML object as a DOM object), the CSS parser
+		set/get CSS proeprties to the HTML objects.
+
+		Because these HTML objects are ready for the actions, the JavaSCript engine (Language, Library & 		Runtime) allow programming environment for the developer so we can perform runtime asks.
+
+2. To instruct the web-server and to create a "request".
+
+	A "request" is made up of instructions (header) and data (body).  We will use the term  Http Request that 	carries Http Headers and HttpRequestBody.
+
+	However, we can use JavaScript and HTML markup to modify the instructions & data programatically.
+
+	Normally, an Http request header contains - "client portfolio - A-Z information about client & clien't enviormment" and that includes IP-address, PORT number, client OS & its version, client's ability (supported features) and many more.
+
+	The <head> element consists the instructions for the browser & web server.
+
+ <!doctype html>   <!---- (This is HTML Comment)    --->
+                   <!---- doctype is an instruction --->
+
+<html lang="en_US"> <!--- meta data for browser that the lang of page is US English -->
+ <head>
+     <meta charset="utf-8"/>  <!-- Instruction for the browser to use UTF-8 encoding scheme --->
+     <title>This is the win title</title> <!--- instruction to set win title --->
+     <!--- here goes other instructions using HTML element -- link, script, meta etc -->
+ </head>
+ <body>
+     <!---- Tags/Text that will be rendered or appeared into the document area of web browser window --->
+     ....
+     ....
+
+     <!---- Write JavaScript code here or just after nearly all DOM are prepreared --->
+     <script>
+        ....
+     </script>
+  </body>
+</html>
+
+
+It is imporant to note that the CSS properties or CSS linked document should be embed inside the <head> and after the <title> element. That way your web-browser renders the HTML objects progressively.
+
+
+Example: (Open or create website/project) + Add "Index.html" (or "Index.cshtml") + Add "Style.css" files
+
+Style.css
+----------
+h1 {
+ font-size: 500%;
+}
+p {
+ font-size: 200%;
+}
+h2 {
+  color: red;
+}
+
+Index.html
+=========
+<!doctype html>
+<head>
+  <meta charset="utf-8" />
+  <title>You can ommit html tag too and still it is valid markup</title>
+  <link rel="stylesheet" href="Style.css" />   <!--- Emned the CSS document -->
+  <!--- Emebd the CSS properties directly ino the page -->
+  <style>
+     div {
+        background: blue;
+        color: white;
+        padding: 10px;
+        border-radius: 20px;
+     }
+  </style>
+</head>
+<body>
+ <h1>The Appleman Pvt Ltd</h1>
+ <h2>A design that you will always thought...</h2>
+ <p>Welcome to the world of designer - Web Design</p>
+ <div>
+    Welcome to the world of designer - Web Design
+ </div>
+</body>
+
+
+MIME - Multi purpose Mail Extension
+----------------------------------------
+This is a protocol used by Email and now used with HTTP to instruct the "client" and "server" about the data-type or content-type or what kind of content/data are to send or recevied between clients & servers.
+
+The web-browser uses "text/html" as a default MIME type.
+
+   Syntax:     content-type: text/html
+
+		content-type: generic_name/specific_name;
+
+	for example:     images/jpeg   for JPEG images
+			 images/png	for png
+			 text/csv	comma separated value (excel document or tab separated)
+			 text/plain	plain text
+			 winword/application 
+
+3. Receive the Http Response Headers & Http Response Body
+
+   A response is wrapped into "headers" which instructs the web-browser about the response "body".
+
+4. Browsers have APIs (library) called WebAPI so you can perform request-response behind the scene or backgroundly. 
+	The most commonly used APIs is XmlHttpRequest class and its method and it is used to request the resource
+	via JavaScript code and also receive the response via JavaScript code.
+	
+	XmlHttpRequest is also known as "XHR" or "AJAX - Asynchronious JavaScript And XML"
+5. Browsers supports local storage - uses disk of client machine to save the data temporarly or permenantly -- This 	feature is called "IO". 
+6. Browsers have an assistant for the developers -- Developer Tool
+7. Browsers have programming environment to develop the plug-ins
+
+
+IMPORTANT NOTES:
+
+ 1. Data Interchange format - XML and JSON
+
+	JavaScript Object Notation (JSON) and Extensible MArkup Language (XML) are "standard" or "data interchange
+	rules/format" that every program uses to send or receive data to or from another program. That means
+	JSON or XML is a common point of interest between two programs written in any language and running on
+	any OS/platform. One program receive or send data to anoter program in the "form" of XML or JSON.
+
+  For example,
+	If I want to send data to other people in following form (my own standard) (also called RAW form):
+               NO:10,Age:20,Address:B:102 ABC,Mehana
+		I've to take great care about the "form" I've used beause some people might not understand or get	
+		the way I want to present this data.
+  So what are the standard ways to express or describe the data?
+	Well, we have JSON or XML:
+
+XML
+====
+<mydata>
+ <no>10</no> 
+ <age>20</age>
+ <address>B:102 ABC, Mehsana</address>
+</mydata>
+
+OR use JSON
+===========
+{
+  "mydata": 
+     {
+       "no": 10,
+       "age": 20,
+       "address": "B:102 ABC, Mehsana"
+       }
+}
+XML & JSON formats are used by all OSs & programming platforms. The JSON format is acually a syntax to creates an object in JavaScript.
+

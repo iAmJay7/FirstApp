@@ -1,0 +1,11 @@
+ CategoryId  CategoryName ParentId
+   1         Pen          null
+   2         Pencil       null
+   3         Ball point   1
+   4         Raynold .45  3
+
+
+ Unit
+ UnitId  UnitName
+  1      Kilogram
+  2      Dozen

@@ -1,0 +1,105 @@
+Layout Files
+============
+
+Layout is a very special purpose cshtml/vbhtml page that allow us to reuse some of the markup/code into one or more pages which are created from the "layout" page.
+
+To have consistent structure of web page, ie. all pages have common heading, logos, menus/links, footer etc we need to use "Layout"" razor page.
+
+A "Layout" razor page is an ordinary cshtml page with a "section" called "body section" which is created by calling @RenderBody() method.
+
+Example:
+
+MyLayout.cshtml
+----------------
+<!doctype html>
+<html>
+  <head>
+    <title>@Page.Title</title>
+  </head>
+  <body>
+    <h1>My Site</h1>
+    <nav>
+      <a href="Index">Home</a>
+      <a href="About">About us</a>
+    </nav>
+    <div>
+      @RenderBody()
+    </div>
+    <footer>
+       <p>&copy; MySite</p>
+    </footer>
+ </body>
+</html>
+
+The @RenderBody() function makes your cshtml page the "Layout" page. Once you call @RenderBody() in cshtml page, your page will become a master/main page and you cannot request it. Instead, we need to create the content pages (sub pages) - pages which uses structure of "layout or master" page.
+
+Index.cshtml (Content page)
+----------------------------
+@{
+ Page.Title = "Welcome Home";
+ Layout="~/MyLayout.cshtml";
+}
+<h3>Welcome to the site</h3>
+<p>The rest content in this "index.cshtml" will be inserted into "MyLayout.cshtml" where the "RenderBody" is called</p>
+
+About.cshtml (Content Page)
+--------------------------
+@{
+ Page.Title = "About us";
+ Layout="~/MyLayout.cshtml";
+}
+<h3>About us</h3>
+<p>We're so and so...</p>
+ 
+  
+Define the custom sections in layout page - @RenderSection("section-name", required : true/false)
+-------------------------------------------------
+In Layout page, there must be a @RenderBody() section and it is mandatory however, we can create custom sections and that may be optional or compulsory depends upon the "required" property value.
+
+NewLayout.cshtml
+------------------
+<!doctype html>
+<head>
+  <title>@Page.Title</title>
+  @RenderSection("head", required: false)
+</head>
+<body>
+  <h1>Site Name</h1>
+  <div>
+    @RenderSection("news", required: false)
+  </div>
+  <div>
+    @RenderBody()
+  </div>
+  <footer>
+     <p>&copy; MySite</p>
+     @RenderSection("footer", required: false)
+  </footer>
+</body>
+
+Index.cshtml
+-------------
+@{
+Page.Title = "Hello";
+Layout="~/NewLayout.cshtml";
+}
+@section news {
+ <marquee>This is...</marquee>
+}
+
+
+About.cshtml
+-------------
+@{
+Page.Title = "About us";
+Layout="~/NewLayout.cshtml";
+}
+@section footer {
+  <h2>Additional Foooter content</h2>
+}
+@section news {
+  <img src="logo.png" />
+}
+<h3>About us </h3>
+<p>We are... </p>
+

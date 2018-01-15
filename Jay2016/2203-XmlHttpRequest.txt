@@ -1,0 +1,150 @@
+XmlHttpRequest Object
+======================
+This object and its method allow us to request the web-resources programatically and also receive the result (response) programatically. It means we can request the resources and receive output/result behind the screen or silently without affecting the web-browers' UI and refreshig a page or changing the URL at addressbar and such feature is commonly known as AJAX - Asynchronious JavaScript And XML.
+
+ So, AJAX is a programming activity to request the resources and receive the result backgroundly using XmlHttpRequest or (XHR) object.
+
+Example:
+
+1. getdate.cshtml
+@DateTime.Now
+
+2. Index.cshtml
+
+<div id="out"></div>
+
+<script>
+    var url = "getdate.cshtml";
+    var method = "post";
+
+    //1. Create XHR
+    var xhr = new XMLHttpRequest();
+    //2. Set URL & Callback
+    xhr.open(method, url, true);
+    xhr.onreadystatechange = gotOutput;
+    //3. Send your request
+    xhr.send();
+
+
+    //Callback
+    function gotOutput() {
+        console.log(xhr.readyState);
+
+        if (xhr.readyState == xhr.DONE) {
+            console.log(xhr.responseText);
+            document.getElementById("out").innerHTML = xhr.responseText;
+        }
+    }
+</script>
+
+Value of xhr.readyState ( which is integer constant) represent the status of request and response (e.g 2 for open, 4 for DONE etc).
+
+Example: EmpPage.cshtml
+
+<input type="text" id="no"/>
+<input type="text" id="name"/>
+<button onclick="doSave()">Submit</button>
+<div id="out"></div>
+
+<script>
+  function doSave() {
+    var no = document.getElementById("no").value;
+    var name = document.getElementById("name").value;
+    var data = "no=" + no + "&name=" + name;
+    var url = "EmpSave.cshtml?" + data;
+    var xhr = new XMLHttpRequest();
+    
+    xhr.open("post",url,true);
+    xhr.onreadystatechange = function() {
+       if(xhr.readyState == xhr.DONE) {
+          document.getElementById("out").innerHTML = xhr.responseText;
+       }
+    }
+    xhr.send();
+  }
+</script>
+
+EmpSave.cshtml
+----------------
+@{
+ var no = Request["no"].AsInt();
+ var name = Request["name"] ?? "";
+ <p>Received @no and @name</p>
+}
+ 
+Example: Rewise the code by creating a "Request"  type.
+
+
+xhr.js
+--------
+function Request(url,data,callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open("post",url,true);
+    xhr.onreadystatechange = function() {
+       if(xhr.readyState == xhr.DONE) {
+           callback(xhr.responseText);
+       }
+    }
+    xhr.send();
+  }
+
+
+EmpPage.cshtml
+---------------
+<input type="text" id="no" />
+<input type="text" id="name" />
+<button onclick="doSave()">Submit</button>
+<div id="out"></div>
+
+<script src="xhr.js"></script>
+<script>
+    function doSave() {
+        var no = document.getElementById("no").value;
+        var name = document.getElementById("name").value;
+        var data = "no=" + no + "&name=" + name;
+        var url = "EmpSave.cshtml?" + data;
+        new Request(url, data, function (result) {
+            console.log(result);
+            var obj = JSON.parse(result);
+            console.log(obj);
+            document.getElementById("out").innerHTML = result;
+        })
+    }
+</script>
+
+EmpSave.cshtml ( Returns JSON string)
+--------------
+@{
+    var no = Request["no"].AsInt();
+    var name = Request["name"] ?? "";
+    string str = "{\"no\":" + no + ",\"name\": \"" + name + "\"}";
+
+       
+    Response.ContentType = "application/json";
+    Response.Write(str);
+}
+
+Example: Assume that we've Emp table in EmpDb database with two columns. Write a code to insert emp record.
+ Changes in EmpSave.cshtml
+
+@using System.Data.SqlClient
+@{
+    var no = Request["no"].AsInt();
+    var name = Request["name"] ?? "";
+    var message = "";
+    using(var cn = new SqlConnection())
+     {
+      using(var cmd = new SqlCommand())
+       {
+         cn.ConnectiionString = @"Copy+Paste";
+         cmd.Connection = cn;
+         cmd.CommandText = "insert into emp values (@p1,@p2)";
+         cmd.Parameters.AddWithValue("@p1",no);
+         cmd.Parameters.AddWithValue("@p2",name);
+         cn.Open();
+         cmd.ExecuteNonQuery();
+         message = "Added successfully";
+        }
+     }
+}
+@message

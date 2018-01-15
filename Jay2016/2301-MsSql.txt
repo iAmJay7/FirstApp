@@ -1,0 +1,282 @@
+Microsoft SQL Server Database - Sequal Server
+==========================================================================================
+
+It is a commercial RDBMS product from Microsoft.
+
+It has different versions for different requirements (client's requirements) and these are:
+   -> Enterprise edition
+   -> Standard edition and
+   -> Express edition or local database for developers
+
+   The "Express" or "MsSqlLocalDb" server will be installed when you install Visual Studio. However this version/edition
+   is only for the developers and at production there will be "Standard" or "Enterprise" edition. 
+
+   The MsSQL Local Database or Express edition is same as "Enterprise" or "Standard" but with limited "clients/users";    support only one user/client program at a time.
+
+The MSSQL Server database product has two types of authentication (login and user account) systems:
+   1. Windows Authentication -- In this case, operating system's user account is used to log into the DBMS.
+   2. SQL Server Authentication -- A role based user account system that is controlled by the System Administrator and
+				he/she is responsible to grant or revoke permissions.
+
+	NOTE: Express or Local Database comes with single auth system which is "Windows Authentication".
+
+
+The Local DB server and databases
+=================================
+
+Express (earlier version 2010 or older) and Local Db (recent) server allow us to create databases which falls under two categories:
+
+ 1. Project specific database - local to the one app and will be created inside the project folder.
+
+ 2. Machine wide database or global or remote datbase - It is saved at user's account folder and it is shared by one or
+				more programs/projects/apps.
+
+ So, we can create "local - inside the project" database for the basic purpose that we can move source code along with 
+				database and this is the best situation for the developers.
+
+ the "remote" databases - it is the natual choice and in production it is the only choice; 
+
+Creating and managing databases
+=================================
+The Visual Studio has some tools which will allow us to manage the MSSQL Databases.
+ View Menu => 1. Server Explorer 
+              2. SQL Sever Object Explorer
+
+1. Create a project specific database : Create/open a project + Add new item + SQL Server database + Name the database
+					file (Always use "PascCase" e.g StudentDb, ShopDb etc).
+
+2. Create a machine wide - remote database : Open visual studio + View Menu + Server Explorer + Right mouse client
+     + Create SQL Server database + Set Server name (for local db) : MSSQLLocalDb					 		   
+ [Note: The name of SQL Server database in Visual Studio template is "Service Based Database"]
+
+ The database file ; local or remote; is made up of two data files:
+
+    1. .mdf  e.g StudentDb.mdf - Master Data File - which represent data dictionary or table or relation
+    2. .ldf  e.g StudentDb.ldf - Log data file - which persists the database transcation log.
+
+In Web Application projects, the MSSQL Server Database must be copied under the "App_Data" folder otherwise the Visual Studio Tools - Server Explorer and SQL Sever Object Explorer wont works for that database.
+
+To create Remove Database use (localdb)\MSSQLLocalDb server name (sometime it can be an IP address or other name).
+
+To open the Remove database, use Server Explorer + Right mouse + Add Connection + set server name + select database
+
+A local database will be opened and closed when you open or close the project respectively.
+
+The field types or databases of columns
+=======================================
+MSSQL Server has varities of types to represent the data:
+
+ for integer values,
+
+    tinyint - 8 bits
+    smallint - 16 bits
+    int      - 32 bits
+    bigint   - 64 bits
+    
+    bit or bool - 1 bit   (0 or 1)
+
+ for real values,
+
+    decimal(scale,precision) e.g decimal(18,2)
+    money, numeric are same as decimal
+
+    double and float but don't use 
+
+ for fixed length string 
+     char(size)  - for ANSI
+     nchar(size) - for Unicode
+
+ for variable length string
+     varchar(size|VARMAX) - for ANSI
+     nvarchar(size|VARMAX) - for unicode
+
+ for binary or byte arrays
+     varbinary(size | VARMAX) 
+     image(size) -- never use "image" because varbinary is improved version of "image"
+ 
+ for date & time
+     datetime
+     date
+     smalldate
+     year
+     month
+
+Auto number columns is defined using "identity" keyword.
+
+Naming conventions
+-------------------
+Reserved chars or names or names having special chars & whitespace will be automatically escaped via  [ ] operators.
+
+e.g. If you want to create a table name or columns has whitespaces in it then
+ create table [My Table]
+ (
+   [First No] int,
+   [Date] Date,
+   ..
+  }
+However avoid the use of whitespaces into the names.
+
+=> Use "singular" names.
+
+Don't use => create table Students ()
+           create table Student ( Rolls int ) 
+
+Always use singular name => create table Student (Roll int, Name, etc)
+
+=> Always use "PascalCase"
+
+=> Try to use "generic" column name.
+
+ For example,
+
+create table Category
+(
+  Id primary key identity,
+  Name varchar(100) not null unique
+}
+
+However you can use CategoryId or CatId or CategoryName etc but if you're already with "Category" name then no need to add prefix or suffix word "Category".
+
+The MSSQL Server Database and System.Data.SqlClient provider
+==============================================================
+In order to access MSSQL Server database, we must have to use "SqlClient Data Provider". So we will use TYPES from System.Data.SqlClient namespace and TYPEs have "Sql" prefix (SqlConnection, SqlCommand, SqlDataReader, SqlParameter etc).
+
+ Connection String for locally stored database uses "AttachDbFileName" clause : Server Explorer + Right mouse click + Properties + Copy the "ConnectionString" properties and modify the path of .mdf file; which will be looks a like:
+
+     var CnStr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ShopDb.mdf;Integrated Security=True";
+
+        Data Source=server name/instance name;
+        AttachDbFileName = path of .mdf file
+        Integrated Security = true means use the "Window Authentication"
+
+ Remote database connection string don't have path;
+
+        var CnStr = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=ShopDb;Integrated Security=True";
+ 
+ For SQL Server authentication mode, a connection string would be:
+ 
+  var CnStr = @"Data Source=(LocalDB)\MSSQLLocalDB;Initial Catalog=ShopDb;Integrated Security=False;User Id=username;Password=your-password";
+  
+Example: A "general purpose" database model which encapsulate basic database actions - prepare connection, command and execute the queries, returns result etc.
+
+In "Models" folder of your web app project (ShopApp namespace)
+
+using System;
+using System.Collections.Generic;
+using System.Data.SqlClient;
+using System.Linq;
+using System.Web;
+
+namespace ShopApp.Models
+{
+    public class Db : IDisposable
+    {
+        public static readonly string CnStr = @"Data Source=(LocalDB)\MSSQLLocalDB;AttachDbFilename=|DataDirectory|\ShopDb.mdf;Integrated Security=True";
+        private SqlConnection _cn;
+        private SqlCommand _cmd;
+
+        public Db(string sql)
+        {
+            _cn = GetCn();
+            _cmd = new SqlCommand(sql, _cn);
+        }
+
+        public SqlCommand Cmd
+        {
+            get { return _cmd; }
+        }
+
+        public int Execute()
+        {
+            _cn.Open();
+            var result = _cmd.ExecuteNonQuery();
+            _cn.Close();
+            return result;
+        }
+
+        public object Scalar()
+        {
+            _cn.Open();
+            var result = _cmd.ExecuteScalar();
+            _cn.Close();
+            return result;
+        }
+
+        public List<object[]> Rows()
+        {
+            var list = new List<Object[]>();
+            _cn.Open();
+
+            using (var dr = _cmd.ExecuteReader())
+            {
+                while (dr.Read())
+                {
+                    object[] ar = new object[dr.FieldCount];
+                    dr.GetValues(ar); // Copy entire row into an array
+                    list.Add(ar);
+                }
+            }
+
+            return list;
+        }
+
+        public object Row()
+        {
+             _cn.Open();
+
+            using (var dr = _cmd.ExecuteReader())
+            {
+                if (dr.Read())
+                {
+                    object[] ar = new object[dr.FieldCount];
+                    dr.GetValues(ar); // Copy entire row into an array
+                    return ar;
+                }
+            }
+            return null;
+        }
+
+        public static SqlConnection GetCn()
+        {
+            return new SqlConnection(CnStr);
+        }
+
+        public void Dispose()
+        {
+            if (_cn != null)
+            {
+                _cn.Dispose();
+            }
+            if (_cmd != null)
+            {
+                _cmd.Dispose();
+            }
+        }
+    }
+}
+
+
+Test-1 (in .cshtml)
+
+@using(var x = new Db("insert into category (Name) Values (@Name)"))
+{
+  x.Cmd.Parameters.AddWithValue("@Name","Pen");
+  x.Execute();
+}
+
+@using(var x = new Db("select count(*) from Category"))
+{
+  <p>Total Rows @(x.Scalar()) </p>
+ }
+
+Test-2 Fetch rows
+
+@using(var x = new Db("select * from category"))
+{
+  var categories = x.Rows();
+  foreach(var ar in categories)
+   {
+    <p>@ar[0]  @ar[1]</p>
+    }
+}
+

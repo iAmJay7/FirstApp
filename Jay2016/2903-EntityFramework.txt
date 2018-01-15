@@ -1,0 +1,304 @@
+The Entity Framework or EF
+==========================
+
+The "Entity Framework" is an open source Entity Relationship APIs to ease the Database (especially RDBMS) tasks. It is a kind of ORM - Object Relation Mapping tool and API.
+
+What is ORM?
+
+  In general, it is a software tool that does many things on behalf of developer in databases including connecting the
+  database, create database objects (tables), create queries (select, insert, update, delete), maintain the dependencies   of database objects, execute the queries and retrieving the results.
+
+  O - Object - It is a plain CLR object (C# class with properties)
+  R - Relation - Database table
+  M - Mapping - Ensure that Database table's field value sync with Object and vice versa.
+
+	For example,
+
+   We've a plain object CLR object (POCO)
+
+     public class Student
+      {
+        public int Roll {get;set;}
+        public string Name {get;set;}
+       }
+
+  and there is a table (database)
+     create table Student
+     (
+       Roll int primary key,
+       Name varchar(50) not null
+      )
+
+  the ORM tool perform the mapping or relate POCO with Table and perform database operatings and allow us the control
+  of these things in the form of APIs (Libraries - classes, interfaces etc).
+
+  The Entity Framework (EF) is a protocol for various data providers including MSSQL, ORacle, MySql. Currently the MSSQL   Server's Entity Framework  OR ORM is exists with Visual Studio so if you're planning to use Oracle or MySql or anyother database then you must download the "Entity Framework" or ORM from conncern database vendor's site.
+
+ 
+  Note that the Entity framework always uses "ADO.NET" data provider APIs implicitly. In fact, it is important to learn that the performance of ADO.NET's data provider API is less or more improved by the entity framework.
+
+ Here are some basic concepts or advantages of EF over Data providers
+ ----------
+
+  1. Entity Framework is designed to work with Relational Databases and the mapping of the database object
+     or CRL object to database is easily done using following ways:
+
+	1. Database First -  In this approach, the EF tool uses existing database schema and generate Plain CLR objects
+			     (which we will call "Entities") and other APIs.
+
+        2. Code First     - In this approach, the EF tool uses exising "Entities classes or POCO classes" to
+				create database and schema and other objects.
+
+        3. The third approach is called "Model" via Designer - The Visual Studio helps us to model the Entity and they
+				create database, tables and POCOs.
+
+		The first two approaches are the most commonly used across all over the world.
+
+       So, we can work with any database with any number of tables without writing complex queries and code.
+ 2. the EF maintain the data dependencies and it has a unique feature called "Lazy load" which reads/loads database
+	result when it is really needed by the programs. That means if database result is not needed by your code then
+	EF will not execute the SELECT queries or perform any other operations.
+
+         The record navigation between parent and children table is prime feature of "EF".
+         You can read parent record from using child table row and vice versa.
+
+ 3. We, the programms just have to use "Entities or POCOs" whether we want to insert/delete/update or list the database
+	records. That's things enhance the developer's productivity.
+
+
+Database First : Example demonstrate the EF's Database First approach 
+==============
+
+IMPORTANT:
+
+As per name suggest "DAtabase First" -- EF uses Database relation (and objects) to create the Plain CLR Entities(classes) and if names of table are in lower case or field name in datbase are lower case then naturally it violates the C# coding style.
+
+So, Always use "Pascal" or "Proper" case name for Database, Table and Field.
+
+Secondly, the EF uses "Plural" entity name for "collection" so avoid the plural form of name. e.g Students, Cities etc
+
+
+ 1. We've EmpDb.mdf database
+ 2. Tables:
+
+create table Dept
+(
+  Id int primary key identity,
+  Name varchar(50) not null unique,
+  Location Varchar(30) not null
+)
+
+create table Emp
+(
+  Id int primary key identity,
+  Name varchar(50) not null unique,
+  BirthDate  Date not null,
+  Salary decimal(18,2),
+  DeptId int not null,
+  Foreign Key (DeptId) References Dept(Id)
+)
+
+ [NOTE: You can use any kind of "Project Template" - console, web, website etc to use the EF]
+
+
+The "DbContext" sub-class
+---------------------------
+The Database First EF automatically create a sub class of DbContext named "EmpDbEntities" (YourDatabaseEntities).
+The XXXXXEntities is the primary or entry point class and we will use its methods to perform any database operation.
+
+Steps to run EF tool for Database First
+----------------------------------------
+1. Add New Item + ADO.NET Entity Data Model + A file named Modelxxx.edmx will be created (you can create anywhere inside the root namespace or another namespace/folder).
+2. Choose "EF Designer from Database"
+3. Next 
+4. In this step a connection string will be prepared and saved into "web.config" file.
+5. Next
+6. Now select EntityFramework version 6.x
+7. Next
+8. Select "Tables/Views/StoredProc"  (checked)
+9. Finish - This step generate "entities" and "DbContext sub class" along with "Model" designer.
+
+10. Now, create .cshtml page (if web app) and write following code to insert "Dept" records:
+
+@{ 
+    //1. Create DbContext object
+    var db = new EmpDbEntities();
+
+    //2. Create Entity - Dept
+    var dept1 = new Dept { Name = "Account", Location = "Mumbai" };
+    var dept2 = new Dept { Name = "Production", Location = "Mehsana" };
+
+    //3. Add/save entites to the database
+    db.Depts.Add(dept1);
+    db.Depts.Add(dept2);
+
+    //4. Commit the changes
+    db.SaveChanges();
+}
+
+NOTE: The memory issues is still exists if DbContext is not disposed properly so always use using() block.
+
+ using(var db = new EmpDbEntities())
+  {
+   //code
+  }
+
+Example: List Depts
+
+   using (var db = new EmpDbEntities())
+    {
+        foreach(var dept in db.Depts)
+        {
+            <p>@dept.Id  @dept.Name @dept.Location</p>
+        }
+    }
+
+Example: Search by Id (or any other field)
+
+   using (var db = new EmpDbEntities())
+    {
+         var search  = db.Depts.FirstOrDefault( x=>x.Id == 2);
+         if(search!=null)
+           {
+             <p>Found @search.Id @search.Name</p>
+            }
+         else
+           {
+             <p>Not found</p>
+            }
+    }
+
+Example: Update the dept
+
+using (var db = new EmpDbEntities())
+    {
+         var search  = db.Depts.FirstOrDefault( x=>x.Id == 2);
+         if(search!=null)
+           {
+              search.Name = "New DeptName";
+              search.Location = "New Location";
+               db.SaveChanges();              
+            }
+    }
+Example: Delete the dept
+ ....
+ ....
+ if(search!=null)
+  {
+    db.Depts.Remove( search );
+    db.SaveChanges();
+   }
+...
+
+
+Update the "Entities" when changes occurs in Database schema
+-------------------------------------------------------------
+In Database First EF, we first need to open the designer (xxxxx.edmx) and remove all models ( Ctrl + A to select all models and press delete or delete it one by one).
+
+After deleting "Entities" + Save the .edmx file  + Right mouse click on designer + Update models from database + Save it.
+
+
+The Nullable<T> type with "Entities".
+-------------------------------------
+The EF automatically generate Nullable for those fields having "null" constraints.
+
+For example, "Salary" field in Emp is  nullable and it is created in Emp.cs as 
+  "public Nullable<Decimal> Salary {get;set;}
+ So, in order to use these field, use null operator or check the field value before read/write.
+
+  e.g  var salary = emp.Salary ?? 0.0m;
+   OR
+
+      if(emp.Salary!=null)
+        {
+          var salary = emp.Salary.Value;
+         }
+
+The "Entity" and "Collection"
+------------------------------
+The "Entity" class has a "Set collection - an object of DbSet<Entity>" and the name of collection property is a plural of entity.
+e.g.  Dept is an entity class and Depts is the collection. 
+
+
+The LINQ and Extension methods
+-------------------------------
+To manipulate, read or update or filter the collection, the collections offer Extension methods and LINQ queries. It is important to note that the EF uses "lazy load" to fetch child or parent record from the existing or attached object.
+
+Attached or alive object is such object which allow us to read its children records as well as it parent records without constructing another object or writing a query (LINQ).
+
+For example, Program to print "Emp" dept wise.
+
+@{
+  var db = new EmpDbEntities();
+   foreach(var dept in db.Depts)
+   {
+      <h2>@dept.Name</h2>
+     @foreach(var emp in dept.Emps)  // The "Emps" is a navigation collection property of Dept object
+       {
+         <h5>@emp.Id @emp.Name @emp.Salary</h5>
+        }
+     }
+}
+
+Or List the Emp's name, id, dept name, location, salary
+
+@{
+  var db = new EmpDbEntities();
+  foreach(var emp in db.Emps)
+   {
+      <h5>@emp.Id  @emp.Name  @emp.Dept.Id  @emp.Dept.Name @emp.Dept.Location @emp.Salary</h5>
+    }
+}
+
+
+Example: Business access layers or Entity Repositories 
+
+1. Create ViewModel classes DeptViewModel, EmpViewModel
+2. Create DeptRepository or DeptBao and EmpRepository or EmpBao 
+
+public class DeptViewModel
+{
+   public int Id {get;set;}
+   public string Name {get;set;}
+   public string Location {get;set;}
+}
+public class EmpViewModel
+{
+   ....
+/*    public DeptViewModel Dept {get;set;}/
+ 
+   public int DeptId {get;set;}
+   public string DeptName {get;set;}
+   public string DeptLocation {get;set;}
+}
+public class DeptRepository
+{
+   public static bool Add(DeptViewModel model)
+    {
+      using(var db = new EmpDbEntities())
+       {
+          var search = db.Depts.FirstOrDefault(x=>x.Name.Equals(model.Name));
+          if(search != null) return false;
+          db.Depts.Add(search);
+          db.SaveChanges();
+          return true;
+        }
+     }
+   //Fetch all Dept - Always use ToList() to execute immediate LINQ
+   
+   public static List<DeptViewModel> GetDepts()
+    {
+      using(var db = new EmpDbEntities())
+       {
+          return db.Depts.ToList();
+        }
+     }
+   ....
+}
+
+
+Design the database schemas
+============================
+
+1. Shopping  - e-commerce app
+2. Inventory Control System - A "store owner or shop keeper" keep records of purchases and sales, purchase returns and sale returns, customers, parties and payment transactions. This system gether the data and generate different purposes and kind of business reports (output) - e.g How much sales in a day, between days, month, quarter and year. Similarly for the purchase. How many (much) items (qty) left in shop of a partical product and if the quantity is zero or below the re-order level (for example an item quantity is 5 as a re-order level means the system inform if it reaches 5 or below).

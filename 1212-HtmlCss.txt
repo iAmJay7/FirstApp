@@ -1,0 +1,624 @@
+5. Multiple selectors having common set of CSS properties:
+
+selecto1, selector2,.... {
+  
+}
+
+Example:
+
+html, body, div, header, h1 {
+  margin: 0;
+}
+
+All element selectors listed above have 0 margin.
+
+6. selector1 selector2 { ... }   - Child selector -- Will select all objects belongs to "selector2" placed inside the
+						     "selector1".
+
+Example:
+
+div article {
+  color: red;
+}
+
+<div>
+  <article>A</article>
+  <article>B</article>
+  <section>
+    <article>C</article>
+  </section>
+</div>
+<article>No style for this because it is not a child of a div</article>
+
+You can use id, or class or universal selectors too:
+
+.article .head {
+  font-size: 2.3em;
+  color: maroon;
+}
+
+<div class="article">
+   <div class="head">
+        Introduction
+   </div>
+   <div>
+        This is regular text....
+   </div>
+   <div class="head">
+        Chapter-1</div>
+   </div>
+</div>
+
+
+This kind of selector is also known as "Descendent selector -- child, grand child, great grand child and so on".
+
+6. selector1 > selector2 { ... }    -- child selector or 1st level descendent selector.
+
+div > article {
+     ...
+}
+
+.article > .head {
+     ..
+}
+[Use previous example markup & CSS properties]
+
+7.  Spouse selector  or Sibling selector
+   selector1 + selector2 { ... }    - Select the "selector2" which appears just after the selector1
+
+h1 + div {
+  font-size: 1.9em;
+}
+
+<h1>Introduction</h1>
+<div>The details...</div>
+<div>Will be regular text</div>
+<h1>Chapter1</h1>
+<p>No sibling</h1>
+<div>No effect at all</div>
+<h1>Chapter2</h1>
+<div>Of course it is!</div>
+
+  
+8. selector1 ~ selector2 -- Enhanced siblings -- Selector all HTML objects of "selector2" which are siblings of 				"selector1".
+
+.record ~ .emp {
+    color: red;
+}
+
+<div class="record">Year 2015</div>
+<div class="emp">First1</div>
+<div class="emp">First2</div>
+<div class="emp">First3</div>
+<div class="record">Year 2016</div>
+<div>Not Available</div>
+<div class="emp">Second!</div>
+
+9. attribute selector   
+
+  selector[attribute="value or pattern"] { ... }
+
+input {
+ border: 1px solid #aaa;
+}
+input[type="text"] {
+  padding: 4px 4px 4px 15px;
+}
+input[type="submit"] {
+  padding: 4px;
+  background: #aaa;
+  color: red;
+}
+div[name="help"] {
+  color: green;
+}
+
+<input type="text" />
+<input type="submit" value="Submit the data" />
+<div>These are form elements</div>
+<div name="help">Help or Tips</div>
+<div name="help">Guideline...</div>
+
+
+10. Pseudo selector -- These are special instructions to the parser and they will apply the CSS properties when an appropriate actions are performed.
+
+For example:
+
+a:link
+a:active
+a:visited are three pseudo selector used with hyperlinks.
+
+
+a:link {
+  background: red;
+}
+a:active {
+  background: yellow;
+}
+a:visited {
+   background: #aaa;
+}
+
+<a href="index.cshtml">Home</a>  
+<a href="about.cshtml">About us</a>
+<a href="contact.cshtml">Contact us</a>
+
+There are other pseudo selectors used with other selectors including element, class, id and universal.
+
+h1:hover {
+  color: red; /* when mouse entered into h1 area */
+}
+
+<h1>The black text will trun into red when mouse pointer is inside this region</h1>
+
+.para:first-letter{
+  font-size: 4em;
+}
+
+<div class="para">
+ This is.......
+</div>
+<div class="para">
+  ....
+</div>
+
+Example: Set CSS properties for selected text on the body
+
+::selection {
+   background: #4d2;
+}
+
+Color: RGB(0-255 (FF),0-255(FF),0-255(FF)) red+green+blue
+
+#hex-for-redhex-for-greenhex-for-blue
+
+#ff0000; #six-hex-digits;
+
+#ff000; <--Wrong
+
+#110000;
+
+CSS Properties
+=======================================================================
+
+Measurement units
+------------------
+
+Inch (in), centimeter (cm), Point (pt) and Pixel (px) are absolute/fixed units used with CSS properties and
+Emphesis (em), and Percent( %) are relative units.
+
+Absolute or fixed units set the fixed value and they cannot be changed on any condition - for example, on resize of windows, or changes in screen resolution etc.  
+
+The absolute units especially in, cm and pt should not be used but you can use "px" where it is really needed. For example set the border width or set padding or margins.
+
+Never use absolute units for the font-size and line-heigth properties -- We must have to use "relative" units instead of absolute because the size of font and spacing between the lines should be proportionally increated or decreated based upon the changes in screen resolution or resize of the container (windows).
+
+
+Example:
+
+body {
+  font-size: 1em;   /* will set default or 100% of the font-size or actual size */
+}
+OR
+body {
+  font-size: 100%;
+}
+
+
+Example:
+
+body {
+  font-size: 2em;
+}
+
+h1 {
+ font-size: 30px;
+}
+
+So, the font size of h1 will remains 30 pixel even you change the font-size of body and also changes in screen resolution. If you use h1 { font-size: 2em; } -- it means it's total font-size as compare to actual size is 4em or 400%.
+
+Example:
+
+body {
+  font-size: 1.5em;
+  line-height: 1.5em;
+}
+
+<p>Add three or more lines of text here</p>
+
+Special values that don't uses the units
+-----------------------------------------
+Some CSS properties uses integer or real values without measurement units.
+
+For example, to set 0 for some properties, do not suffix it with 0px 0em or something; Just set 0.
+
+body {
+  margin: 0;
+}
+
+
+The "auto" keyword is also used to instruct the browser to compute the property value.
+
+For example,
+
+body {
+  margin: auto;
+}
+
+The font-weight property value must be int value 100 to 900. (bold, bolder, boldest etc) - It set bold font face based upon the 100, 200,...900 impression value.
+
+p {
+ font-weigth: 100; 
+}
+
+The "opacity" and alpha value in CSS function is 0.0 to 1.0. (Alpha or opacity is a real value that describe the transparency)
+
+p {
+  opacity: 0.4;  /* semi-transparent */
+}
+
+The CSS function calc(value with units) compute the CSS property value dynamically.
+
+Example:
+
+.main * {
+   border: 1px solid red;
+   display: inline-block;
+   margin: 0;
+   width: calc( 50% - 0.2em);
+   
+}
+.main {
+    border: 1px solid blue;
+}
+
+<div class="main">
+ <div>A</div>
+ <div>B</div>
+</div>
+
+The color value
+-----------------
+Text color, background color and color for borders, shadows, outlines etc is set via color value.
+
+The named color, hexa decimal values and CSS functions rgb(), rgba() are used to set the color.
+
+There are some pre-defined stadandard color name can be used to set color.
+  for example:  color: red;
+
+We can also use #000000  #+six-char-hexadecimal  to set the color where first two hex chars represent the RED ( 00 to FF), next two hex char represents GREEN and last two char represents BLUE color.
+
+#000000; black
+#ff0000; red
+#00ff00; green
+
+You can also use #+three-char-hexa that will automatically replicate the each char.
+For example,
+
+#f00  means #ff0000
+#abc  means #aabbcc
+#123  means #112233
+
+The rgb(0-255,0-255,0-255) and rgba(0-255,0-255,0-255,0.0-1.0) functions uses integer value and for opacity, it is real value.
+
+h1 {
+ color: #ff3311;
+}
+h2 {
+ color: rgb(255,22,11);
+}
+
+h3 {
+ color: rgba(255,22,22,0.4);  /* alpha set the opacity 0.4 (40%) */
+}
+
+1. margin: value;
+   margin: top right bottom left;
+
+   the "margin" is a shorthand property of margin-left, margin-top, margin-bottom, margin-right.
+
+   You can use "auto" value  to let browser to calc and set the margin based upon the width & height and other properties of the element.
+
+Example:
+
+html, body, header {
+  margin: 0;
+}
+
+Example:
+
+body {
+ margin-left: 5%;
+ margin-right: 5%;
+ margin-top: 0;
+ border-left: 1px solid #aaa;
+ border-right: 1px solid #aaa;
+}
+
+<body>
+  <div>
+    <header><h1>My Site</h1></header>
+    ....
+  </div>
+</body>
+
+
+Example:
+
+body {
+ margin: 0 5% 0 5%;
+ border: 1px solid #aaa;
+}
+h1 {
+    width: 400px;
+    border: 1px solid #aaa;
+    margin: auto;
+}
+
+
+To place the component at the center of the parent, set width/height and auto to the margin.
+
+Example:
+
+.item-1 {
+  width: 100px;
+  height: 100px;
+  background: blue;
+  margin: 30px auto 0 auto;
+}
+
+
+2. padding: value
+   padding: top right bottom left;  or use padding-left, padding-top, padding-bottom and padding-right
+
+   It adds extra space inside the element.
+
+h1 {
+ padding: 10px;  <--- set 10px padding at all four edges
+}
+
+input[type="text"] {
+  padding: 5px 5px 5px 30px;
+}
+
+3. width: value;  absolute width
+   min-width: value; set mininum width
+   max-width: value; set max width
+
+4. height: value; absolute or fixed height
+   min-height and max-height sets min & max height   
+
+  The content of the container will be overflowed if content exceeds the container when absolute height/width is set.
+
+.container {
+  height: 100px;
+  width: 100px;
+  border: 1px solid red;
+}
+
+<div class="container">
+  add some lines of text (four to five )
+  ...
+</div>
+
+ To hide or show the overlapped content, use the "overflow" property
+
+5. overflow: none | auto | scroll | visible | hidden
+
+add overflow: scroll into .container and there will be scrollbars around the container.   
+
+6. display: none | inline | block | inline-block | table  - To change the display of the HTML element.
+
+display: none; will hide the object.
+
+.info > div {
+  display: none;
+}
+
+.info:hover > div {
+  display: block;
+}
+
+<div class="info">
+  <p>Move your mouse pointer here</p>
+  <div>
+    <h2>Who are you?</h2>
+    <p>Anything....</p>
+  </div>
+</div>
+
+7. float: none | left | right; -- Float the elements either at left or right edges of the parent
+8. clear: both | left | right; -- Clear the float.
+
+.float-left {
+  float: left;
+}
+.float-right {
+  float: right;
+}
+.clear {
+  clear: both;
+}
+
+<div>
+  <div class="float-right">A</div>  
+  <div class="float-left">B</div>
+  <div class="float-right">C</div>
+  <div class="float-left">D</div>
+</div>
+<!--To erase the float effect, use clear property -->
+<div class="clear"></div>
+<div>
+  <div class="float-left">My Left Section</div>
+  <div class="float-left">Next to the left</di>
+</div>
+<div class="clear"></div>
+<div>Regular - no float at all </div>
+
+[For better understanding add borders to all divs  div { border: 1px solid red; }]
+
+The float and clear properties are used to define the document templates or layouts. There are number other alternatives elements/css properties exists that you can layout the document.
+
+9. font-family: font1, font2, font3, ...., font-family-name;
+
+   To set the font, use the font-family property.  Following are the standard font families:
+
+	1. serif
+	2. sans-serif
+	3. cursive
+	4. monospace
+  Note: Enclose the font names with single or double quotes when they contains special char/unicode or whitespace.
+
+Example:
+
+h1 {
+  font-family:   Cambria, Cochin, Georgia, Times, "Times New Roman", serif;
+}
+
+p {
+  font-family: "Georgia", "Arial Bold", Helvatika, sans-serif;
+}
+
+serif fonts - Edges and glyph of the fonts have sharp pointed arrow like shape.
+sans-serif  - No arrow like shape, mostly rounded edge or squared edge.
+cursive	    - fantacy or cursive fonts
+monospace   - Plain fonts (like typewriter text) - used for legal documents.
+
+The open source fonts and how to embed them into the documents
+---------------------------------------------------------------
+You can download the open source (free or commerical) fonts or use them remotely (We will uses "fonts.google.com" in this example).
+
+1. Embed fonts from the remote website (fonts.google.com )
+   
+   Method-1 
+   ---------
+    <link href="https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300" rel="stylesheet">
+    [Add <link> just before your custom CSS doc links]
+
+  And set   font-family: 'Open Sans Condensed', sans-serif;
+
+   Method-2
+   --------
+   Use @import directive and url() CSS function to include the CSS document and set font-family.
+
+   in css document or <style> tag:
+
+@import url('https://fonts.googleapis.com/css?family=Molle:400i');
+
+h1 {
+  font-family: 'Molle', cursive;
+}
+
+2. Copy the fonts inside your application/project and use them locally.
+
+   => copy the font files under the project folder (say /Styles/fonts)
+
+   => Write following CSS code
+
+
+@font-face {
+    
+  font-family: 'My Font';
+    
+  src: url('/Styles/fonts/IndieFlower.ttf') format('truetype');
+
+}
+
+h1 {
+    font-family: "My Font",cursive;
+}
+
+10. font-size: value;  Always uses em or % (relative) units
+11. font-style: none | italic | oblique;
+12. font-weight: value between to 100 to 900 or use bold, bolder etc;
+13. font-variant: normal | small-caps;
+14. text-decoration: none | underline | overline | line-through;
+15. text-transform: none | uppercase | lowercase | capitalize;
+16. text-align: left | right | center | justify;
+17. line-height: value; Height of line (spaces between two lines)
+18. word-spacing: value; spaces between words
+19. letter-spacing: value; spaces between letters
+20. white-space: normal | pre | pre-line | pre-wrap;
+    To allow whitespace - pre
+    To allow whitespace and wrap the content - pre-wrap
+    To allow whitespace and wrap a line - pre-line
+
+Example:
+.para {
+  white-space: pre; /* pre-wrap */
+  width: 200px; 
+  border: 1px solid red;
+}
+<div class="para">
+    Dear Student,
+
+    While .......add your text here
+</div>
+    
+21.  word-break: break-word | normal | break-all; breaks word or text
+22.  word-wrap: hyphenate | break-word; Set hyphen automatically or allow hard hyphen (manual)
+
+23. border: borderWidth style color;  draw border at four edges.
+    border-left, border-right, border-top, border-bottom can be used to set border style for a specific border.
+
+24. border-radius: value;  round corner at all four angles
+    border-radius: leftTp  rightTop rightBottom leftBottom;
+
+25. outline: width style color; Draw the outline - after the border of the element.
+    outline-left, top,right or bottom can be used.
+
+.test {
+  width: 300px;
+  height: 300px;
+
+  background: blue;
+  border: 10px solid red;
+  outline: 10px solid green;
+}
+
+<div class="test"></div>
+
+The style constants are : solid, dotted, dashed, outset, ridge, double etc
+
+26. box-shadow: xPos yPos Blur color; Draw shadow around the edges
+27. text-shadown: xpos ypos blur color; shadow around the text
+
+.title {
+  font-size: 4em;
+  text-shadow: 3px 3px 4px black;
+}
+
+.box {
+  padding: 10px;
+  border-radius: 10px;
+  border: 1px solid black;
+  box-shadow: 5px 5px 5px #aaa;
+}
+
+<div class="title box">
+  The Red Sun
+</div>
+
+28. opacity: value-between-0.0 to 0.1; To set transparent or opaque background 
+29. position: static (default) | absolute | fixed | relative; To positioned the element by setting left, top, right
+		and bottom properties.
+
+	Note: default is "static" and you can't use left,top,right and bottom properties with this value.
+
+Example: Change position with absolute, static, fixed and relative and see the effect 
+
+1. Assume that your page have 2 or more screenful text/information
+
+<p>,...</p>
+<p>....</p>
+......
+<h1 class="test">This is all about CSS positioning</h1>
+
+.test {
+  position: absolute;
+  left: 200px;
+  top: 100px;
+  background: yellow;
+}
+
+

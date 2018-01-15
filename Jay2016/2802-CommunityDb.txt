@@ -1,0 +1,10 @@
+Community Database
+==================
+
+1. Two types of users/roles - Admin & Member
+2. Represent the family and family related data -- Use geneology
+3. There are "N" number of "villages/cities" that form a particular community (e.g 52 samaj or 27 )
+4. There will be no option to delete a record physically - Use flag to hide/show records from the table (delete/undelete)
+5. Set created by and date, updated by and date meta to each table.
+
+
